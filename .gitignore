@@ -1,0 +1,50 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Local files
+*.user*
+*.layout
+
+# Urho3D's local files.
+bin/CoreData/*
+bin/Urho3DEditorData/*
+urho3d-cmake/*
+
+# Blender temporary files.
+*.blend1
+
+# Logs.
+*.log
+
+# CLion configuration
+.idea
