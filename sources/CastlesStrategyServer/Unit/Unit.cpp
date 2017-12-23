@@ -1,5 +1,6 @@
 #include "Unit.hpp"
 #include <Urho3D/Core/Context.h>
+#include <ActivitiesApplication/UniversalException.hpp>
 
 namespace CastlesStrategy
 {
@@ -69,6 +70,10 @@ float Unit::GetAttackCooldown () const
 
 void Unit::SetAttackCooldown (float attackCooldown)
 {
+    if (attackCooldown < 0.0f)
+    {
+        throw UniversalException <Unit> ("Unit: attack cooldown can not be less than 0!");
+    }
     attackCooldown_ = attackCooldown;
 }
 
