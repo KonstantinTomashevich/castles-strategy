@@ -1,6 +1,6 @@
 #include "ActivitiesApplication.hpp"
 #include <Urho3D/Core/CoreEvents.h>
-#include <ActivitiesApplication/Exception.hpp>
+#include <ActivitiesApplication/UniversalException.hpp>
 
 namespace ActivitiesApplication
 {
@@ -87,7 +87,7 @@ void ActivitiesApplication::SetupActivityNextFrame (Activity *activity)
 {
     if (activity == nullptr)
     {
-        throw Exception <ActivitiesApplication> ("ActivitiesApplication: can not setup nullptr activity!");
+        throw UniversalException <ActivitiesApplication> ("ActivitiesApplication: can not setup nullptr activity!");
     }
     activitiesToSetup_.Push (Urho3D::SharedPtr <Activity> (activity));
 }
@@ -96,7 +96,7 @@ void ActivitiesApplication::StopActivityNextFrame (Activity *activity)
 {
     if (activity == nullptr)
     {
-        throw Exception <ActivitiesApplication> ("ActivitiesApplication: can not stop nullptr activity!");
+        throw UniversalException <ActivitiesApplication> ("ActivitiesApplication: can not stop nullptr activity!");
     }
     activitiesToStop_.Push (Urho3D::SharedPtr <Activity> (activity));
 }
@@ -110,7 +110,7 @@ Activity *ActivitiesApplication::GetActivityByIndex (int index)
 {
     if (index >= currentActivities_.Size ())
     {
-        throw Exception <ActivitiesApplication> ("ActivitiesApplication: there is only" +
+        throw UniversalException <ActivitiesApplication> ("ActivitiesApplication: there is only" +
                                                  Urho3D::String (currentActivities_.Size ()) + " but activity with index " +
                                                  Urho3D::String (index) + "requested!"
         );

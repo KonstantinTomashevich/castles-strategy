@@ -1,5 +1,5 @@
 #include "UnitType.hpp"
-#include <ActivitiesApplication/Exception.hpp>
+#include <ActivitiesApplication/UniversalException.hpp>
 
 namespace CastlesStrategy
 {
@@ -118,32 +118,32 @@ void UnitType::Check ()
 {
     if (attackRange_ <= 0.0f)
     {
-        throw Exception <UnitType> ("UnitType: attack range must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: attack range must be more than 0!");
     }
 
     if (attackSpeed_ <= 0.0f)
     {
-        throw Exception <UnitType> ("UnitType: attack speed must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: attack speed must be more than 0!");
     }
 
     if (visionRange_ <= 0.0f)
     {
-        throw Exception <UnitType> ("UnitType: vision range must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: vision range must be more than 0!");
     }
 
     if (moveSpeed_ <= 0.0f)
     {
-        throw Exception <UnitType> ("UnitType: attack range must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: attack range must be more than 0!");
     }
 
     if (maxHp_ == 0)
     {
-        throw Exception <UnitType> ("UnitType: max HP must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: max HP must be more than 0!");
     }
 
     if (modelPath_.Empty ())
     {
-        throw Exception <UnitType> ("UnitType: model path must not be more empty!");
+        throw UniversalException <UnitType> ("UnitType: model path must not be more empty!");
     }
 }
 }
