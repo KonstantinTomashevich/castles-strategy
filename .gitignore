@@ -48,3 +48,6 @@ urho3d-cmake/*
 
 # CLion configuration
 .idea
+
+# Microsoft Office temporary files
+~*
