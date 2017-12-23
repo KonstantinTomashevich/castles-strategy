@@ -1,6 +1,6 @@
 #include "ActivitiesApplication.hpp"
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/AngelScript/Script.h>
+#include <ActivitiesApplication/Exception.hpp>
 
 namespace ActivitiesApplication
 {
@@ -44,7 +44,7 @@ void ActivitiesApplication::UpdateActivities (Urho3D::StringHash eventType, Urho
         {
             Urho3D::SharedPtr <Activity> activity = activitiesToStop_.Front ();
             activitiesToStop_.Remove (activity);
-            assert (activity.NotNull ());
+
             currentActivities_.Remove (activity);
             activity->Stop ();
         }
@@ -56,7 +56,7 @@ void ActivitiesApplication::UpdateActivities (Urho3D::StringHash eventType, Urho
         {
             Urho3D::SharedPtr <Activity> activity = activitiesToSetup_.Front ();
             activitiesToSetup_.Remove (activity);
-            assert (activity.NotNull ());
+
             currentActivities_.Push (activity);
             activity->SetApplication (this);
             activity->Start ();
@@ -85,13 +85,19 @@ void ActivitiesApplication::Stop ()
 
 void ActivitiesApplication::SetupActivityNextFrame (Activity *activity)
 {
-    assert (activity);
+    if (activity == nullptr)
+    {
+        throw Exception <ActivitiesApplication> ("ActivitiesApplication: can not setup nullptr activity!");
+    }
     activitiesToSetup_.Push (Urho3D::SharedPtr <Activity> (activity));
 }
 
 void ActivitiesApplication::StopActivityNextFrame (Activity *activity)
 {
-    assert (activity);
+    if (activity == nullptr)
+    {
+        throw Exception <ActivitiesApplication> ("ActivitiesApplication: can not stop nullptr activity!");
+    }
     activitiesToStop_.Push (Urho3D::SharedPtr <Activity> (activity));
 }
 
@@ -102,7 +108,13 @@ unsigned ActivitiesApplication::GetActivitiesCount ()
 
 Activity *ActivitiesApplication::GetActivityByIndex (int index)
 {
-    assert (index < currentActivities_.Size ());
+    if (index >= currentActivities_.Size ())
+    {
+        throw Exception <ActivitiesApplication> ("ActivitiesApplication: there is only" +
+                                                 Urho3D::String (currentActivities_.Size ()) + " but activity with index " +
+                                                 Urho3D::String (index) + "requested!"
+        );
+    }
     return currentActivities_.At (index);
 }
 }
