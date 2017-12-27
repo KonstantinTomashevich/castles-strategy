@@ -38,6 +38,27 @@ Unit *UnitsManager::GetUnit (unsigned int id) const
     return found ? units_ [index] : nullptr;
 }
 
+Unit *UnitsManager::GetNearestEnemy (Unit *unit) const
+{
+    float minimumDistance = INT_MAX;
+    Unit *nearestEnemy = nullptr;
+
+    for (auto &scanningUnit : units_)
+    {
+        if (unit->GetOwner () != scanningUnit->GetOwner ())
+        {
+            float distance = (unit->GetNode ()->GetWorldPosition () - scanningUnit->GetNode ()->GetWorldPosition ()).Length ();
+            if (distance < minimumDistance)
+            {
+                minimumDistance = distance;
+                nearestEnemy = scanningUnit;
+            }
+        }
+    }
+
+    return nearestEnemy;
+}
+
 void UnitsManager::HandleUpdate (float timeStep)
 {
     ProcessUnits (timeStep);
@@ -184,6 +205,8 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
         if (command.commandType_ == UCT_MOVE_TO_WAYPOINT)
         {
             target = unit->GetWaypoints () [unit->GetCurrentWaypointIndex ()];
+            target.z_ = target.y_;
+            target.y_ = 0.0f;
         }
         else
         {
@@ -191,7 +214,9 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
             target = another->GetNode ()->GetWorldPosition ();
         }
 
-        target = unit->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target);
+        target = unit->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target,
+            Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
+
         Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
         crowdAgent->SetTargetPosition (target);
     }

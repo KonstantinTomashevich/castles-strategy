@@ -13,6 +13,7 @@ public:
 
     void AddUnit (Unit *unit);
     Unit *GetUnit (unsigned int id) const;
+    Unit *GetNearestEnemy (Unit *unit) const;
     void HandleUpdate (float timeStep);
 
     void SaveUnitsTypesToXML (Urho3D::XMLElement &output) const;
