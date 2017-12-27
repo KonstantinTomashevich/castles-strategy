@@ -25,15 +25,18 @@ bool UnitCommand::operator != (const UnitCommand &rhs) const
     return !(rhs == *this);
 }
 
-UnitType::UnitType (unsigned int id, float attackRange, float attackSpeed, float visionRange, float moveSpeed,
-                    unsigned int maxHp, const Urho3D::String &modelPath) :
+UnitType::UnitType (unsigned int id, float attackRange, float attackSpeed, unsigned int attackForce,
+                    float visionRange, float navigationRadius, float moveSpeed, unsigned int maxHp,
+                    const Urho3D::String &prefabPath) :
         id_ (id),
         attackRange_ (attackRange),
         attackSpeed_ (attackSpeed),
+        attackForce_ (attackForce),
         visionRange_ (visionRange),
+        navigationRadius_ (navigationRadius),
         moveSpeed_ (moveSpeed),
         maxHp_ (maxHp),
-        modelPath_ (modelPath)
+        prefabPath_ (prefabPath)
 {
     Check ();
 }
@@ -58,9 +61,19 @@ float UnitType::GetAttackSpeed () const
     return attackSpeed_;
 }
 
+unsigned int UnitType::GetAttackForce () const
+{
+    return attackForce_;
+}
+
 float UnitType::GetVisionRange () const
 {
     return visionRange_;
+}
+
+float UnitType::GetNavigationRadius () const
+{
+    return navigationRadius_;
 }
 
 float UnitType::GetMoveSpeed () const
@@ -73,9 +86,9 @@ unsigned int UnitType::GetMaxHp () const
     return maxHp_;
 }
 
-const Urho3D::String &UnitType::GetModelPath () const
+const Urho3D::String &UnitType::GetPrefabPath () const
 {
-    return modelPath_;
+    return prefabPath_;
 }
 
 UnitAIProcessor UnitType::GetAiProcessor () const
@@ -93,25 +106,20 @@ void UnitType::SaveToXML (Urho3D::XMLElement &output) const
     output.SetUInt ("id", id_);
     output.SetFloat ("attackRange", attackRange_);
     output.SetFloat ("attackSpeed", attackSpeed_);
+    output.SetUInt ("attackForce", attackForce_);
     output.SetFloat ("visionRange", visionRange_);
 
+    output.SetFloat ("navigationRadius", navigationRadius_);
     output.SetFloat ("moveSpeed", moveSpeed_);
     output.SetUInt ("maxHp", maxHp_);
-    output.SetAttribute ("modelPath", modelPath_);
+    output.SetAttribute ("prefabPath", prefabPath_);
 }
 
-UnitType *UnitType::LoadFromXML (const Urho3D::XMLElement &input)
+UnitType UnitType::LoadFromXML (const Urho3D::XMLElement &input)
 {
-    return new UnitType (
-            input.GetUInt ("id"),
-            input.GetFloat ("attackRange"),
-            input.GetFloat ("attackSpeed"),
-            input.GetFloat ("visionRange"),
-
-            input.GetFloat ("moveSpeed"),
-            input.GetUInt ("maxHp"),
-            input.GetAttribute ("modelPath")
-    );
+    return UnitType (input.GetUInt ("id"), input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
+                     input.GetUInt ("attackForce"), input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"),
+                     input.GetFloat ("moveSpeed"), input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"));
 }
 
 void UnitType::Check ()
@@ -131,9 +139,14 @@ void UnitType::Check ()
         throw UniversalException <UnitType> ("UnitType: vision range must be more than 0!");
     }
 
+    if (navigationRadius_ <= 0.0f)
+    {
+        throw UniversalException <UnitType> ("UnitType: navigation radius must be more than 0!");
+    }
+
     if (moveSpeed_ <= 0.0f)
     {
-        throw UniversalException <UnitType> ("UnitType: attack range must be more than 0!");
+        throw UniversalException <UnitType> ("UnitType: move speed must be more than 0!");
     }
 
     if (maxHp_ == 0)
@@ -141,7 +154,7 @@ void UnitType::Check ()
         throw UniversalException <UnitType> ("UnitType: max HP must be more than 0!");
     }
 
-    if (modelPath_.Empty ())
+    if (prefabPath_.Empty ())
     {
         throw UniversalException <UnitType> ("UnitType: model path must not be more empty!");
     }
