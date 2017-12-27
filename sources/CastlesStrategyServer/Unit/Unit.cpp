@@ -13,6 +13,7 @@ static const Urho3D::StringVector waypointsElementsNames =
 Unit::Unit (Urho3D::Context *context) :
         Urho3D::Component (context),
 
+        owner_ (0),
         hp_ (0),
         unitType_ (0),
         attackCooldown_ (0.0f),
@@ -33,6 +34,7 @@ void Unit::RegisterObjectType (Urho3D::Context *context)
     context->RegisterFactory <Unit> ();
     URHO3D_ACCESSOR_ATTRIBUTE ("Is Enabled", IsEnabled, SetEnabled, bool, true, Urho3D::AM_DEFAULT);
 
+    URHO3D_ACCESSOR_ATTRIBUTE ("Owner", GetOwner, SetOwner, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("HP", GetHp, SetHp, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Unit Type", GetUnitType, SetUnitType, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Attack Cooldown", GetAttackCooldown, SetAttackCooldown, float, 0.0f, Urho3D::AM_DEFAULT);
@@ -41,6 +43,25 @@ void Unit::RegisterObjectType (Urho3D::Context *context)
         Urho3D::Variant::emptyVariantVector, Urho3D::AM_DEFAULT)
             .SetMetadata (Urho3D::AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, waypointsElementsNames);
     URHO3D_ACCESSOR_ATTRIBUTE ("Current Waypoint Index", GetCurrentWaypointIndex, SetCurrentWaypointIndex, unsigned int, 0, Urho3D::AM_DEFAULT);
+}
+
+void Unit::UpdateCooldowns (float timeStep)
+{
+    attackCooldown_ -= timeStep;
+    if (attackCooldown_ < 0.0f)
+    {
+        attackCooldown_ = 0.0f;
+    }
+}
+
+unsigned int Unit::GetOwner () const
+{
+    return owner_;
+}
+
+void Unit::SetOwner (unsigned int owner)
+{
+    owner_ = owner;
 }
 
 unsigned int Unit::GetHp () const

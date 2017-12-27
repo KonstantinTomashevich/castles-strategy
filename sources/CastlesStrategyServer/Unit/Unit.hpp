@@ -11,7 +11,12 @@ URHO3D_OBJECT (Unit, Component)
 public:
     Unit (Urho3D::Context *context);
     virtual ~Unit ();
+
     static void RegisterObjectType (Urho3D::Context *context);
+    void UpdateCooldowns (float timeStep);
+
+    unsigned int GetOwner () const;
+    void SetOwner (unsigned int owner);
 
     unsigned int GetHp () const;
     void SetHp (unsigned int hp);
@@ -35,6 +40,7 @@ protected:
     virtual void OnSceneSet (Urho3D::Scene *scene);
 
 private:
+    unsigned int owner_;
     unsigned int hp_;
     unsigned int unitType_;
     float attackCooldown_;
