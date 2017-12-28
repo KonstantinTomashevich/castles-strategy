@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <Urho3D/Container/Vector.h>
 #include <CastlesStrategyServer/Unit/Unit.hpp>
 #include <CastlesStrategyServer/Unit/UnitType.hpp>
@@ -28,7 +29,7 @@ private:
     void ProcessUnitCommand (Unit *unit, const UnitCommand &command, const UnitType &unitType);
     void MakeUnitDead (Unit *unit);
 
-    Urho3D::PODVector <UnitType> unitsTypes_;
+    std::vector <UnitType> unitsTypes_;
     Urho3D::PODVector <Unit *> units_;
 };
 }

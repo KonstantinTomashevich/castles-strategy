@@ -4,7 +4,10 @@
 
 #include <Urho3D/Navigation/CrowdAgent.h>
 #include <Urho3D/Navigation/NavigationMesh.h>
+#include <Urho3D/IO/Log.h>
+
 #include <ActivitiesApplication/UniversalException.hpp>
+#include <CastlesStrategyServer/Unit/BasicUnitAi.hpp>
 
 namespace CastlesStrategy
 {
@@ -22,7 +25,7 @@ UnitsManager::~UnitsManager ()
 
 void UnitsManager::AddUnit (Unit *unit)
 {
-    if (units_.Back ()->GetID () >= unit->GetID ())
+    if (!units_.Empty () && units_.Back ()->GetID () >= unit->GetID ())
     {
         throw UniversalException <UnitsManager> ("UnitsManager: attempt to add the same unit twice!");
     }
@@ -67,7 +70,7 @@ void UnitsManager::HandleUpdate (float timeStep)
 
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 {
-    for (unsigned index = 0; index < unitsTypes_.Size (); index++)
+    for (unsigned index = 0; index < unitsTypes_.size (); index++)
     {
         Urho3D::XMLElement newChild = output.CreateChild ("unitType" + Urho3D::String (index));
         unitsTypes_ [index].SaveToXML (newChild);
@@ -79,7 +82,9 @@ void UnitsManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
     Urho3D::XMLElement element = input.GetChild ();
     while (element.NotNull ())
     {
-        unitsTypes_.Push (UnitType::LoadFromXML (element));
+        // TODO: Currently basic ai setted as default for all units types.
+        unitsTypes_.push_back (UnitType::LoadFromXML (element));
+        unitsTypes_.back ().SetAiProcessor (BasicUnitAI);
         element = element.GetNext ();
     }
 }
@@ -122,10 +127,10 @@ void UnitsManager::ProcessUnits (float timeStep)
         {
             unit->UpdateCooldowns (timeStep);
 
-            if (unit->GetUnitType () >= unitsTypes_.Size ())
+            if (unit->GetUnitType () >= unitsTypes_.size ())
             {
                 throw UniversalException <UnitsManager> (
-                        "UnitsManager: there is only " + Urho3D::String (unitsTypes_.Size ()) +
+                        "UnitsManager: there is only " + Urho3D::String (unitsTypes_.size ()) +
                         " units types, but T" + Urho3D::String (unit->GetUnitType ()) + " requested!");
             }
 
@@ -156,9 +161,9 @@ void UnitsManager::ClearDeadUnits ()
 
 void UnitsManager::SetupUnit (Unit *unit)
 {
-    if (unit->GetUnitType () >= unitsTypes_.Size ())
+    if (unit->GetUnitType () >= unitsTypes_.size ())
     {
-        throw UniversalException <UnitsManager> ("UnitsManager: there is only " + Urho3D::String (unitsTypes_.Size ()) +
+        throw UniversalException <UnitsManager> ("UnitsManager: there is only " + Urho3D::String (unitsTypes_.size ()) +
                                                  " units types, but T" + Urho3D::String (unit->GetUnitType ()) + " requested!");
     }
 
@@ -169,6 +174,10 @@ void UnitsManager::SetupUnit (Unit *unit)
     crowdAgent->SetMaxSpeed (unitType.GetMoveSpeed ());
     crowdAgent->SetMaxAccel (unitType.GetMoveSpeed ());
     crowdAgent->SetRadius (unitType.GetNavigationRadius ());
+
+    unit->SetHp (unitType.GetMaxHp ());
+    unit->SetAttackCooldown (0.0f);
+    unit->SetCurrentWaypointIndex (0);
 }
 
 void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, const UnitType &unitType)
