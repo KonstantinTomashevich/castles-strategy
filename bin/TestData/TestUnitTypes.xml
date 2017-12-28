@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unitTypes>
+    <unitType
+        id="0"
+        attackRange="1"
+        attackSpeed="1"
+        attackForce="10"
+        visionRange="10"
+
+        navigationRadius="0.3"
+        moveSpeed="2"
+        maxHp="100"
+        prefabPath="Not specified!"
+    />
+</unitTypes>

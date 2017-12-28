@@ -43,6 +43,7 @@ include (UrhoCommon)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
+option (CASTLES_STRATEGY_ENABLE_TESTS "Includes test targets (for CTest)." 0)
 if (CASTLES_STRATEGY_ENABLE_TESTS)
     enable_testing ()
 endif ()

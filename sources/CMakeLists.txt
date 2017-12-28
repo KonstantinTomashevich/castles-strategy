@@ -4,6 +4,6 @@ add_subdirectory (CastlesStrategyServer)
 add_subdirectory (CastlesStrategyClient)
 add_subdirectory (CastlesStrategyLauncher)
 
-if (DUTCHY_ENABLE_TESTS)
+if (CASTLES_STRATEGY_ENABLE_TESTS)
     add_subdirectory (Tests)
 endif ()
