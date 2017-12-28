@@ -1,5 +1,5 @@
 set (TARGET_NAME CastlesStrategyServer)
 define_source_files (RECURSE GLOB_H_PATTERNS "*.hpp")
 define_dependency_libs (Urho3D)
-setup_library (SHARED)
+setup_library (STATIC)
 target_link_libraries (CastlesStrategyServer ActivitiesApplication)
