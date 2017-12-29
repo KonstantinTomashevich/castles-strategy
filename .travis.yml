@@ -1,6 +1,8 @@
 language: cpp
 compiler: gcc
-dist: precise
+dist: trusty
+sudo: required
+
 before_install:
 - sudo apt-get -qq update
 - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
