@@ -21,3 +21,4 @@ before_script:
 script:
 - echo $URHO3D_HOME && echo $PWD
 - mkdir build && cd build && ${CMake} .. -DCASTLES_STRATEGY_ENABLE_TESTS=1 && make && make test
+- echo "Testing log:" && cat "Testing/Temporary/LastTest.log"
