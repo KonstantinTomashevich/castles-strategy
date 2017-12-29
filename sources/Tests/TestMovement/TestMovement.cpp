@@ -19,6 +19,7 @@
 #include <CastlesStrategyServer/Unit/UnitType.hpp>
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
 
+void CustomTerminate ();
 void SetupEngine (Urho3D::Engine *engine);
 Urho3D::Scene *SetupScene (Urho3D::Context *context);
 void SetupUnitsManager (CastlesStrategy::UnitsManager &unitsManager, Urho3D::Context *context);
@@ -27,6 +28,7 @@ CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene
 const Urho3D::PODVector <Urho3D::Vector2> waypoints = {{10.0f, 10.0f}, {-10.0f, 20.0f}, {10.0f, 30.0f}, {-10.0f, 40.0f}};
 int main(int argc, char **argv)
 {
+    std::set_terminate (CustomTerminate);
     Urho3D::SharedPtr <Urho3D::Context> context (new Urho3D::Context());
     Urho3D::SharedPtr <Urho3D::Engine> engine (new Urho3D::Engine(context));
 
@@ -55,13 +57,37 @@ int main(int argc, char **argv)
     if ((scene->GetChild ("TestUnitNode")->GetWorldPosition () - Urho3D::Vector3 (waypoints.Back ().x_, 0, waypoints.Back ().y_)).
             Length () > 1.0f)
     {
-        URHO3D_LOGDEBUG ("Unit is to far from requested point: " + waypoints.Back ().ToString ());
+        URHO3D_LOGERROR ("Unit is to far from requested point: " + waypoints.Back ().ToString ());
         return 1;
     }
     else
     {
         return 0;
     }
+}
+
+void CustomTerminate ()
+{
+    try
+    {
+        std::rethrow_exception (std::current_exception ());
+    }
+
+    catch (UniversalException <CastlesStrategy::UnitsManager> &exception)
+    {
+        URHO3D_LOGERROR (exception.GetException ());
+    }
+
+    catch (UniversalException <CastlesStrategy::UnitType> &exception)
+    {
+        URHO3D_LOGERROR (exception.GetException ());
+    }
+
+    catch (...)
+    {
+        URHO3D_LOGERROR ("Unknown exception!");
+    }
+    abort ();
 }
 
 void SetupEngine (Urho3D::Engine *engine)
@@ -98,15 +124,7 @@ Urho3D::Scene *SetupScene (Urho3D::Context *context)
 void SetupUnitsManager (CastlesStrategy::UnitsManager &unitsManager, Urho3D::Context *context)
 {
     Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
-    try
-    {
-        unitsManager.LoadUnitsTypesFromXML (cache->GetResource <Urho3D::XMLFile> ("TestUnitTypes.xml")->GetRoot ());
-    }
-    catch (UniversalException <CastlesStrategy::UnitType> &exception)
-    {
-        URHO3D_LOGERROR (exception.GetException ());
-        abort ();
-    }
+    unitsManager.LoadUnitsTypesFromXML (cache->GetResource <Urho3D::XMLFile> ("TestUnitTypes.xml")->GetRoot ());
 }
 
 CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene)
