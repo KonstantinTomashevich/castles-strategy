@@ -98,7 +98,7 @@ void SetupEngine (Urho3D::Engine *engine)
     engineParameters [Urho3D::EP_LOG_NAME] = "TestMovement.log";
 
     engineParameters [Urho3D::EP_RESOURCE_PREFIX_PATHS] = "..;.";
-    engineParameters [Urho3D::EP_RESOURCE_PATHS] = "Data;CoreData;TestData";
+    engineParameters [Urho3D::EP_RESOURCE_PATHS] = "CoreData;TestData;Data";
     engine->Initialize(engineParameters);
 }
 
