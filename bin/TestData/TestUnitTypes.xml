@@ -12,4 +12,17 @@
         maxHp="100"
         prefabPath="Not specified!"
     />
+
+    <unitType
+        id="1"
+        attackRange="1"
+        attackSpeed="1"
+        attackForce="10"
+        visionRange="10"
+
+        navigationRadius="0.3"
+        moveSpeed="2"
+        maxHp="10"
+        prefabPath="Not specified!"
+    />
 </unitTypes>

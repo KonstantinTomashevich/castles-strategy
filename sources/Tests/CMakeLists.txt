@@ -14,3 +14,4 @@ macro(setup_test_executable ARG_NAME)
 endmacro ()
 
 add_subdirectory (TestMovement)
+add_subdirectory (TestAttackAndMovement)

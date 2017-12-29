@@ -193,7 +193,7 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
                                                      " does not exists, can not attack! AI error?");
         }
 
-        if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () <=
+        if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
             unitType.GetAttackRange ())
         {
             throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
