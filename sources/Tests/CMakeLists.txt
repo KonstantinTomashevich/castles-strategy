@@ -1,8 +1,8 @@
 macro(setup_test_executable ARG_NAME)
     set (TARGET_NAME "${ARG_NAME}")
     define_source_files (RECURSE GLOB_H_PATTERNS *.hpp)
-    set (RESOURCE_DIRS "${CMAKE_SOURCE_DIR}/bin/CoreData;${CMAKE_SOURCE_DIR}/bin/CoreData;${CMAKE_SOURCE_DIR}/bin/TestData")
-    setup_executable ()
+    define_resource_dirs ()
+    setup_main_executable ()
 
     target_link_libraries (${ARG_NAME} CastlesStrategyServer)
     add_test (NAME ${ARG_NAME} COMMAND ${ARG_NAME})
