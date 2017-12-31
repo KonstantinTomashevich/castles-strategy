@@ -214,9 +214,8 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
         Urho3D::Vector3 target;
         if (command.commandType_ == UCT_MOVE_TO_WAYPOINT)
         {
-            target = unit->GetWaypoints () [unit->GetCurrentWaypointIndex ()];
-            target.z_ = target.y_;
-            target.y_ = 0.0f;
+            Urho3D::Vector2 nextWaypoint = unit->GetWaypoints () [unit->GetCurrentWaypointIndex ()];
+            target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
         }
         else
         {

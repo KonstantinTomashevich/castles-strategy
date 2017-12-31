@@ -25,20 +25,18 @@ UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, UnitsManager *uni
     }
     else
     {
-        Urho3D::Vector3 target = self->GetWaypoints () [self->GetCurrentWaypointIndex ()];
-        target.z_ = target.y_;
-        target.y_ = 0.0f;
+        Urho3D::Vector2 nextWaypoint = self->GetWaypoints () [self->GetCurrentWaypointIndex ()];
+        Urho3D::Vector3 target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
 
         target = self->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target,
             Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
 
         distance = (self->GetNode ()->GetWorldPosition () - target).Length ();
-        unsigned nextWaypoint = self->GetCurrentWaypointIndex () + 1;
+        unsigned nextWaypointIndex = self->GetCurrentWaypointIndex () + 1;
 
-
-        if (distance < unitType.GetAttackRange () && nextWaypoint < self->GetWaypoints ().Size ())
+        if (distance < unitType.GetAttackRange () && nextWaypointIndex < self->GetWaypoints ().Size ())
         {
-            self->SetCurrentWaypointIndex (nextWaypoint);
+            self->SetCurrentWaypointIndex (nextWaypointIndex);
         }
 
         return {UCT_MOVE_TO_WAYPOINT, 0};
