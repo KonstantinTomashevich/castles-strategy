@@ -1,21 +1,23 @@
 #pragma once
 #include <vector>
 #include <Urho3D/Container/Vector.h>
+
+#include <CastlesStrategyServer/Managers/Manager.hpp>
 #include <CastlesStrategyServer/Unit/Unit.hpp>
 #include <CastlesStrategyServer/Unit/UnitType.hpp>
 
 namespace CastlesStrategy
 {
-class UnitsManager
+class UnitsManager : public Manager
 {
 public:
-    UnitsManager ();
+    UnitsManager (ManagersHub *managersHub);
     virtual ~UnitsManager ();
 
     void AddUnit (Unit *unit);
     Unit *GetUnit (unsigned int id) const;
     Unit *GetNearestEnemy (Unit *unit) const;
-    void HandleUpdate (float timeStep);
+    virtual void HandleUpdate (float timeStep);
 
     void SaveUnitsTypesToXML (Urho3D::XMLElement &output) const;
     void LoadUnitsTypesFromXML (const Urho3D::XMLElement &input);

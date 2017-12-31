@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     SetupEngine (engine);
     Urho3D::SharedPtr <Urho3D::Scene> scene (SetupScene (context));
 
-    CastlesStrategy::UnitsManager unitsManager;
+    CastlesStrategy::UnitsManager unitsManager (nullptr);
     SetupUnitsManager (unitsManager, context);
     unitsManager.AddUnit (SpawnUnit (context, scene));
 

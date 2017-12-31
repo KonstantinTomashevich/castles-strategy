@@ -12,7 +12,7 @@
 
 namespace CastlesStrategy
 {
-UnitsManager::UnitsManager () :
+UnitsManager::UnitsManager (ManagersHub *managersHub) : Manager (managersHub),
     units_ (),
     unitsTypes_ ()
 {
