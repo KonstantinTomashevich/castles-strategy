@@ -1,4 +1,4 @@
-#include "BasicUnitAi.hpp"
+#include "BasicUnitAI.hpp"
 #include <climits>
 #include <Urho3D/Scene/Node.h>
 #include <Urho3D/Scene/Scene.h>

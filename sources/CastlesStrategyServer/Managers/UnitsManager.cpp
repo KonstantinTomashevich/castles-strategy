@@ -7,7 +7,7 @@
 #include <Urho3D/Navigation/NavigationMesh.h>
 #include <Urho3D/IO/Log.h>
 
-#include <CastlesStrategyServer/Unit/BasicUnitAi.hpp>
+#include <CastlesStrategyServer/Unit/BasicUnitAI.hpp>
 #include <CastlesStrategyServer/Managers/Map.hpp>
 #include <CastlesStrategyServer/Managers/ManagersHub.hpp>
 #include <ActivitiesApplication/UniversalException.hpp>
