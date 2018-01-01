@@ -4,12 +4,6 @@
 
 namespace CastlesStrategy
 {
-static const Urho3D::StringVector waypointsElementsNames =
-{
-    "Waypoints Count",
-    "   Waypoint"
-};
-
 Unit::Unit (Urho3D::Context *context) :
         Urho3D::Component (context),
 
@@ -18,7 +12,7 @@ Unit::Unit (Urho3D::Context *context) :
         unitType_ (0),
         attackCooldown_ (0.0f),
 
-        waypoints_ (),
+        routeIndex_ (0),
         currentWaypointIndex_ (0)
 {
 
@@ -39,9 +33,7 @@ void Unit::RegisterObjectType (Urho3D::Context *context)
     URHO3D_ACCESSOR_ATTRIBUTE ("Unit Type", GetUnitType, SetUnitType, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Attack Cooldown", GetAttackCooldown, SetAttackCooldown, float, 0.0f, Urho3D::AM_DEFAULT);
 
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE ("Waypoints", GetWaypointsAttribute, SetWaypointsAttribute, Urho3D::VariantVector,
-        Urho3D::Variant::emptyVariantVector, Urho3D::AM_DEFAULT)
-            .SetMetadata (Urho3D::AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, waypointsElementsNames);
+    URHO3D_ACCESSOR_ATTRIBUTE ("Route Index", GetRouteIndex, SetRouteIndex, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Current Waypoint Index", GetCurrentWaypointIndex, SetCurrentWaypointIndex, unsigned int, 0, Urho3D::AM_DEFAULT);
 }
 
@@ -98,55 +90,19 @@ void Unit::SetAttackCooldown (float attackCooldown)
     attackCooldown_ = attackCooldown;
 }
 
-const Urho3D::PODVector <Urho3D::Vector2> &Unit::GetWaypoints () const
-{
-    return waypoints_;
-}
-
-void Unit::SetWaypoints (const Urho3D::PODVector <Urho3D::Vector2> &waypoints)
-{
-    waypoints_ = waypoints;
-}
-
-Urho3D::VariantVector Unit::GetWaypointsAttribute () const
-{
-    Urho3D::VariantVector attribute;
-    attribute.Reserve (waypoints_.Size () + 1);
-    attribute.Push (waypoints_.Size ());
-
-    for (auto &waypoint : waypoints_)
-    {
-        attribute.Push (waypoint);
-    }
-
-    return attribute;
-}
-
-void Unit::SetWaypointsAttribute (const Urho3D::VariantVector &waypoints)
-{
-    waypoints_.Clear ();
-    if (waypoints.Empty ())
-    {
-        return;
-    }
-
-    waypoints_.Reserve (waypoints [0].GetUInt ());
-    for (unsigned index = 0; index < waypoints [0].GetUInt (); index++)
-    {
-        if (index + 1 < waypoints.Size ())
-        {
-            waypoints_.Push (waypoints [index + 1].GetVector2 ());
-        }
-        else
-        {
-            waypoints_.Push (Urho3D::Vector2::ZERO);
-        }
-    }
-}
-
 unsigned int Unit::GetCurrentWaypointIndex () const
 {
     return currentWaypointIndex_;
+}
+
+unsigned int Unit::GetRouteIndex () const
+{
+    return routeIndex_;
+}
+
+void Unit::SetRouteIndex (unsigned int routeIndex)
+{
+    routeIndex_ = routeIndex;
 }
 
 void Unit::SetCurrentWaypointIndex (unsigned int currentWaypointIndex)

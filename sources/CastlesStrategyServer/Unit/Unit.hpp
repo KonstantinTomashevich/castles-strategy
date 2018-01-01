@@ -27,11 +27,8 @@ public:
     float GetAttackCooldown () const;
     void SetAttackCooldown (float attackCooldown);
 
-    const Urho3D::PODVector <Urho3D::Vector2> &GetWaypoints () const;
-    void SetWaypoints (const Urho3D::PODVector <Urho3D::Vector2> &waypoints);
-
-    Urho3D::VariantVector GetWaypointsAttribute () const;
-    void SetWaypointsAttribute (const Urho3D::VariantVector &waypoints);
+    unsigned int GetRouteIndex () const;
+    void SetRouteIndex (unsigned int routeIndex);
 
     unsigned int GetCurrentWaypointIndex () const;
     void SetCurrentWaypointIndex (unsigned int currentWaypointIndex);
@@ -45,7 +42,7 @@ private:
     unsigned int unitType_;
     float attackCooldown_;
 
-    Urho3D::PODVector <Urho3D::Vector2> waypoints_;
+    unsigned int routeIndex_;
     unsigned int currentWaypointIndex_;
 };
 }
