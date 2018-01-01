@@ -13,7 +13,7 @@ Manager::~Manager ()
 
 }
 
-ManagersHub *Manager::GetManagersHub () const
+const ManagersHub * Manager::GetManagersHub () const
 {
     return managersHub_;
 }

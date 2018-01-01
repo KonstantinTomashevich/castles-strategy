@@ -10,7 +10,7 @@ public:
     explicit Manager (ManagersHub *managersHub);
     virtual ~Manager ();
 
-    ManagersHub *GetManagersHub () const;
+    const ManagersHub * GetManagersHub () const;
     virtual void HandleUpdate (float timeStep) = 0;
 
 private:
