@@ -17,15 +17,19 @@
 #include <ActivitiesApplication/UniversalException.hpp>
 #include <CastlesStrategyServer/Unit/Unit.hpp>
 #include <CastlesStrategyServer/Unit/UnitType.hpp>
+
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
+#include <CastlesStrategyServer/Managers/Map.hpp>
+#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
 
 void CustomTerminate ();
 void SetupEngine (Urho3D::Engine *engine);
 Urho3D::Scene *SetupScene (Urho3D::Context *context);
-void SetupUnitsManager (CastlesStrategy::UnitsManager &unitsManager, Urho3D::Context *context);
-CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene);
 
-const Urho3D::PODVector <Urho3D::Vector2> waypoints = {{10.0f, 10.0f}, {-10.0f, 20.0f}, {10.0f, 30.0f}, {-10.0f, 40.0f}};
+void SetupUnitsManager (CastlesStrategy::UnitsManager *unitsManager, Urho3D::Context *context);
+void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context);
+CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene, CastlesStrategy::Map *map);
+
 int main(int argc, char **argv)
 {
     std::set_terminate (CustomTerminate);
@@ -38,9 +42,14 @@ int main(int argc, char **argv)
     SetupEngine (engine);
     Urho3D::SharedPtr <Urho3D::Scene> scene (SetupScene (context));
 
-    CastlesStrategy::UnitsManager unitsManager (nullptr);
+    CastlesStrategy::ManagersHub managersHub;
+    CastlesStrategy::Map *map = dynamic_cast <CastlesStrategy::Map *> (managersHub.GetManager (CastlesStrategy::MI_MAP));
+    SetupMap (map, context);
+
+    CastlesStrategy::UnitsManager *unitsManager =
+            dynamic_cast <CastlesStrategy::UnitsManager *> (managersHub.GetManager (CastlesStrategy::MI_UNITS_MANAGER));
     SetupUnitsManager (unitsManager, context);
-    unitsManager.AddUnit (SpawnUnit (context, scene));
+    unitsManager->AddUnit (SpawnUnit (context, scene, map));
 
     const float MAX_TIME = 1000.0f;
     const float TIME_STEP = 1.0f / 60.0f;
@@ -48,16 +57,17 @@ int main(int argc, char **argv)
 
     while (elapsedTime < MAX_TIME)
     {
-        unitsManager.HandleUpdate (TIME_STEP);
+        managersHub.HandleUpdate (TIME_STEP);
         scene->Update (TIME_STEP);
         elapsedTime += TIME_STEP;
     }
 
     URHO3D_LOGINFO ("Result unit position: " + scene->GetChild ("TestUnitNode")->GetWorldPosition ().ToString ());
-    if ((scene->GetChild ("TestUnitNode")->GetWorldPosition () - Urho3D::Vector3 (waypoints.Back ().x_, 0, waypoints.Back ().y_)).
+    if ((scene->GetChild ("TestUnitNode")->GetWorldPosition () -
+                Urho3D::Vector3 (map->GetWaypoint (0, 0, 1).x_, 0, map->GetWaypoint (0, 0, 1).y_)).
             Length () > 1.0f)
     {
-        URHO3D_LOGERROR ("Unit is to far from requested point: " + waypoints.Back ().ToString ());
+        URHO3D_LOGERROR ("Unit is to far from requested point: " + map->GetWaypoint (0, 0, 1).ToString ());
         return 1;
     }
     else
@@ -79,6 +89,16 @@ void CustomTerminate ()
     }
 
     catch (UniversalException <CastlesStrategy::UnitType> &exception)
+    {
+        URHO3D_LOGERROR (exception.GetException ());
+    }
+
+    catch (UniversalException <CastlesStrategy::Map> &exception)
+    {
+        URHO3D_LOGERROR (exception.GetException ());
+    }
+
+    catch (UniversalException <CastlesStrategy::ManagersHub> &exception)
     {
         URHO3D_LOGERROR (exception.GetException ());
     }
@@ -107,8 +127,8 @@ Urho3D::Scene *SetupScene (Urho3D::Context *context)
     Urho3D::Scene *scene = new Urho3D::Scene (context);
     Urho3D::Node *planeNode = scene->CreateChild ("Plane");
 
-    planeNode->SetPosition (Urho3D::Vector3::ZERO);
-    planeNode->SetScale (100.0f);
+    planeNode->SetPosition ({50.0f, 0.0f, 50.0f});
+    planeNode->SetScale ({100.0f, 1.0f, 100.0f});
     planeNode->CreateComponent <Urho3D::Navigable> ();
 
     Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
@@ -121,20 +141,32 @@ Urho3D::Scene *SetupScene (Urho3D::Context *context)
     return scene;
 }
 
-void SetupUnitsManager (CastlesStrategy::UnitsManager &unitsManager, Urho3D::Context *context)
+void SetupUnitsManager (CastlesStrategy::UnitsManager *unitsManager, Urho3D::Context *context)
 {
     Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
-    unitsManager.LoadUnitsTypesFromXML (cache->GetResource <Urho3D::XMLFile> ("TestUnitTypes.xml")->GetRoot ());
+    unitsManager->LoadUnitsTypesFromXML (cache->GetResource <Urho3D::XMLFile> ("TestUnitTypes.xml")->GetRoot ());
 }
 
-CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene)
+void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context)
+{
+    Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::XMLElement xml = cache->GetResource <Urho3D::XMLFile> ("TestMap.xml")->GetRoot ();
+
+    map->SetSize (xml.GetIntVector2 ("size"));
+    map->SetInvertedPlayer (1);
+    map->LoadRoutesFromXML (xml);
+}
+
+CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene, CastlesStrategy::Map *map)
 {
     CastlesStrategy::Unit *unit = scene->CreateChild ("TestUnitNode")->CreateComponent <CastlesStrategy::Unit> ();
     Urho3D::NavigationMesh *navMesh = scene->GetComponent <Urho3D::NavigationMesh> ();
-    unit->GetNode ()->SetPosition (navMesh->FindNearestPoint (Urho3D::Vector3::ZERO));
+
+    Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, 0);
+    unit->GetNode ()->SetPosition (navMesh->FindNearestPoint ({nearestWaypoint.x_, 0.0f, nearestWaypoint.y_}));
 
     unit->SetOwner (0);
     unit->SetUnitType (0);
-    unit->SetWaypoints (waypoints);
+    unit->SetRouteIndex (0);
     return unit;
 }
