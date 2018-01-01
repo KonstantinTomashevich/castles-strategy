@@ -5,7 +5,7 @@
 
 namespace CastlesStrategy
 {
-class UnitsManager;
+class ManagersHub;
 class UnitType;
 
 const Urho3D::StringHash UNIT_PREFAB_VAR_HASH ("UnitPrefab");
@@ -28,7 +28,7 @@ struct UnitCommand
     bool operator != (const UnitCommand &rhs) const;
 };
 
-typedef UnitCommand (*UnitAIProcessor) (Unit *self, const UnitType &unitType, UnitsManager *unitsManager);
+typedef UnitCommand (*UnitAIProcessor) (Unit *self, const UnitType &unitType, const ManagersHub *managersHub);
 class UnitType
 {
 public:
@@ -52,7 +52,7 @@ public:
     void SetAiProcessor (UnitAIProcessor aiProcessor);
 
     void SaveToXML (Urho3D::XMLElement &output) const;
-    static UnitType LoadFromXML (const Urho3D::XMLElement &input);
+    static UnitType LoadFromXML (unsigned int id, const Urho3D::XMLElement &input);
 
 private:
     void Check ();

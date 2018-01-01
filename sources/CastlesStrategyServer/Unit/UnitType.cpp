@@ -103,7 +103,6 @@ void UnitType::SetAiProcessor (UnitAIProcessor aiProcessor)
 
 void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 {
-    output.SetUInt ("id", id_);
     output.SetFloat ("attackRange", attackRange_);
     output.SetFloat ("attackSpeed", attackSpeed_);
     output.SetUInt ("attackForce", attackForce_);
@@ -115,9 +114,9 @@ void UnitType::SaveToXML (Urho3D::XMLElement &output) const
     output.SetAttribute ("prefabPath", prefabPath_);
 }
 
-UnitType UnitType::LoadFromXML (const Urho3D::XMLElement &input)
+UnitType UnitType::LoadFromXML (unsigned int id, const Urho3D::XMLElement &input)
 {
-    return UnitType (input.GetUInt ("id"), input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
+    return UnitType (id, input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
                      input.GetUInt ("attackForce"), input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"),
                      input.GetFloat ("moveSpeed"), input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"));
 }
