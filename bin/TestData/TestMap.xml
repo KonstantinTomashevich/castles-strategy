@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map size="100 100">
+    <route>
+        <waypoint coord="40 10" />
+        <waypoint coord="20 30" />
+        <waypoint coord="50 50" />
+        <waypoint coord="80 70" />
+        <waypoint coord="60 90" />
+    </route>
+
+    <route>
+        <waypoint coord="60 10" />
+        <waypoint coord="80 30" />
+        <waypoint coord="50 50" />
+        <waypoint coord="20 70" />
+        <waypoint coord="40 90" />
+    </route>
+</map>
