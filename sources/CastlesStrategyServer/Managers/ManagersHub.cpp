@@ -1,13 +1,15 @@
 #include "ManagersHub.hpp"
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
+#include <CastlesStrategyServer/Managers/Map.hpp>
 #include <ActivitiesApplication/UniversalException.hpp>
 
 namespace CastlesStrategy
 {
-ManagersHub::ManagersHub ()
+ManagersHub::ManagersHub () :
+        managers_ (MI_MANAGERS_COUNT)
 {
-    managers_.Reserve (MI_MANAGERS_COUNT);
     managers_ [MI_UNITS_MANAGER] = new UnitsManager (this);
+    managers_ [MI_MAP] = new Map (this);
 }
 
 ManagersHub::~ManagersHub ()
@@ -18,7 +20,17 @@ ManagersHub::~ManagersHub ()
     }
 }
 
-Manager *ManagersHub::GetManager (ManagerIndex index) const
+Manager *ManagersHub::GetManager (ManagerIndex index)
+{
+    if (index == MI_MANAGERS_COUNT)
+    {
+        throw UniversalException <ManagersHub> ("ManagersHub: manager index is out of range!");
+    }
+
+    return managers_ [index];
+}
+
+const Manager * ManagersHub::GetManager (ManagerIndex index) const
 {
     if (index == MI_MANAGERS_COUNT)
     {

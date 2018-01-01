@@ -7,6 +7,7 @@ namespace CastlesStrategy
 enum ManagerIndex
 {
     MI_UNITS_MANAGER = 0,
+    MI_MAP,
     MI_MANAGERS_COUNT
 };
 
@@ -16,7 +17,8 @@ public:
     ManagersHub ();
     virtual ~ManagersHub ();
 
-    Manager *GetManager (ManagerIndex index) const;
+    Manager *GetManager (ManagerIndex index);
+    const Manager *GetManager (ManagerIndex index) const;
     void HandleUpdate (float timeStep);
 
 private:
