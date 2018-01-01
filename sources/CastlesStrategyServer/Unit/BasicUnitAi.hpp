@@ -2,5 +2,5 @@
 
 namespace CastlesStrategy
 {
-UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, UnitsManager *unitsManager);
+UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, const ManagersHub *managersHub);
 }

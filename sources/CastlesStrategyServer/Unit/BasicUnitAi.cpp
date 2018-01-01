@@ -5,13 +5,18 @@
 
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Navigation/NavigationMesh.h>
+
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
+#include <CastlesStrategyServer/Managers/Map.hpp>
+#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
 
 namespace CastlesStrategy
 {
-UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, UnitsManager *unitsManager)
+UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, const ManagersHub *managersHub)
 {
-    Unit *nearestEnemy = unitsManager->GetNearestEnemy (self);
+    const UnitsManager *unitsManager = dynamic_cast <const UnitsManager *> (managersHub->GetManager (MI_UNITS_MANAGER));
+    const Unit *nearestEnemy = unitsManager->GetNearestEnemy (self);
+
     float distance = nearestEnemy != nullptr ?
                      (self->GetNode ()->GetWorldPosition () - nearestEnemy->GetNode ()->GetWorldPosition ()).Length () : 0.0f;
 
@@ -25,16 +30,18 @@ UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, UnitsManager *uni
     }
     else
     {
-        Urho3D::Vector2 nextWaypoint = self->GetWaypoints () [self->GetCurrentWaypointIndex ()];
-        Urho3D::Vector3 target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
+        const Map *map = dynamic_cast <const Map *> (managersHub->GetManager (MI_MAP));
+        Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
+                self->GetRouteIndex (), self->GetCurrentWaypointIndex (), self->GetOwner ());
 
-        target = self->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target,
-            Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
+        Urho3D::Vector3 target = self->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (
+                {nextWaypoint.x_, 0.0f, nextWaypoint.y_}, Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
 
         distance = (self->GetNode ()->GetWorldPosition () - target).Length ();
         unsigned nextWaypointIndex = self->GetCurrentWaypointIndex () + 1;
 
-        if (distance < unitType.GetAttackRange () && nextWaypointIndex < self->GetWaypoints ().Size ())
+        if (distance < unitType.GetAttackRange () &&
+                nextWaypointIndex < map->GetRoutes () [self->GetRouteIndex ()].GetWaypoints ().Size ())
         {
             self->SetCurrentWaypointIndex (nextWaypointIndex);
         }
