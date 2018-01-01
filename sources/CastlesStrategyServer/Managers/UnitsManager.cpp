@@ -7,8 +7,10 @@
 #include <Urho3D/Navigation/NavigationMesh.h>
 #include <Urho3D/IO/Log.h>
 
-#include <ActivitiesApplication/UniversalException.hpp>
 #include <CastlesStrategyServer/Unit/BasicUnitAi.hpp>
+#include <CastlesStrategyServer/Managers/Map.hpp>
+#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
+#include <ActivitiesApplication/UniversalException.hpp>
 
 namespace CastlesStrategy
 {
@@ -35,19 +37,19 @@ void UnitsManager::AddUnit (Unit *unit)
     SetupUnit (unit);
 }
 
-Unit *UnitsManager::GetUnit (unsigned int id) const
+const Unit *UnitsManager::GetUnit (unsigned int id) const
 {
     bool found;
     unsigned index = GetUnitIndex (id, found);
     return found ? units_ [index] : nullptr;
 }
 
-Unit *UnitsManager::GetNearestEnemy (Unit *unit) const
+const Unit *UnitsManager::GetNearestEnemy (Unit *unit) const
 {
     float minimumDistance = INT_MAX;
-    Unit *nearestEnemy = nullptr;
+    const Unit *nearestEnemy = nullptr;
 
-    for (auto &scanningUnit : units_)
+    for (const Unit *scanningUnit : units_)
     {
         if (unit->GetOwner () != scanningUnit->GetOwner ())
         {
@@ -71,22 +73,26 @@ void UnitsManager::HandleUpdate (float timeStep)
 
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 {
-    for (unsigned index = 0; index < unitsTypes_.size (); index++)
+    for (const UnitType &unitType : unitsTypes_)
     {
-        Urho3D::XMLElement newChild = output.CreateChild ("unitType" + Urho3D::String (index));
-        unitsTypes_ [index].SaveToXML (newChild);
+        Urho3D::XMLElement newChild = output.CreateChild ("unitType");
+        unitType.SaveToXML (newChild);
     }
 }
 
 void UnitsManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
 {
     Urho3D::XMLElement element = input.GetChild ();
+    unsigned int id = 0;
+
     while (element.NotNull ())
     {
         // TODO: Currently basic ai setted as default for all units types.
-        unitsTypes_.push_back (UnitType::LoadFromXML (element));
+        unitsTypes_.push_back (UnitType::LoadFromXML (id, element));
         unitsTypes_.back ().SetAiProcessor (BasicUnitAI);
+
         element = element.GetNext ();
+        id++;
     }
 }
 
@@ -136,7 +142,7 @@ void UnitsManager::ProcessUnits (float timeStep)
             }
 
             const UnitType &unitType = unitsTypes_[unit->GetUnitType ()];
-            UnitCommand command = unitType.GetAiProcessor () (unit, unitType, this);
+            UnitCommand command = unitType.GetAiProcessor () (unit, unitType, GetManagersHub ());
             ProcessUnitCommand (unit, command, unitType);
         }
     }
@@ -186,12 +192,20 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
     if (command.commandType_ == UCT_ATTACK_UNIT)
     {
         unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetTargetVelocity (Urho3D::Vector3::ZERO);
-        Unit *another = GetUnit (command.argument_);
-
-        if (another == nullptr)
+        Unit *another = nullptr;
         {
-            throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
-                                                     " does not exists, can not attack! AI error?");
+            bool found;
+            unsigned index = GetUnitIndex (command.argument_, found);
+
+            if (!found)
+            {
+                throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
+                                                         " does not exists, can not attack! AI error?");
+            }
+            else
+            {
+                another = units_[index];
+            }
         }
 
         if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
@@ -214,12 +228,28 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
         Urho3D::Vector3 target;
         if (command.commandType_ == UCT_MOVE_TO_WAYPOINT)
         {
-            Urho3D::Vector2 nextWaypoint = unit->GetWaypoints () [unit->GetCurrentWaypointIndex ()];
+            const Map *map = dynamic_cast <const Map *> (GetManagersHub ()->GetManager (MI_MAP));
+            Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
+                    unit->GetRouteIndex (), unit->GetCurrentWaypointIndex (), unit->GetOwner ());
             target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
         }
         else
         {
-            Unit *another = GetUnit (command.argument_);
+            Unit *another = nullptr;
+            {
+                bool found;
+                unsigned index = GetUnitIndex (command.argument_, found);
+
+                if (!found)
+                {
+                    throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
+                                                             " does not exists, can not follow! AI error?");
+                }
+                else
+                {
+                    another = units_[index];
+                }
+            }
             target = another->GetNode ()->GetWorldPosition ();
         }
 

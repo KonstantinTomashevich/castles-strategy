@@ -15,8 +15,8 @@ public:
     virtual ~UnitsManager ();
 
     void AddUnit (Unit *unit);
-    Unit *GetUnit (unsigned int id) const;
-    Unit *GetNearestEnemy (Unit *unit) const;
+    const Unit *GetUnit (unsigned int id) const;
+    const Unit *GetNearestEnemy (Unit *unit) const;
     virtual void HandleUpdate (float timeStep);
 
     void SaveUnitsTypesToXML (Urho3D::XMLElement &output) const;
