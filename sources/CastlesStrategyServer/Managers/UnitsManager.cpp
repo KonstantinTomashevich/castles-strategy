@@ -71,6 +71,22 @@ void UnitsManager::HandleUpdate (float timeStep)
     ClearDeadUnits ();
 }
 
+unsigned int UnitsManager::GetUnitsTypesCount () const
+{
+    return unitsTypes_.size ();
+}
+
+const UnitType &UnitsManager::GetUnitType (unsigned int index) const
+{
+    if (index >= unitsTypes_.size ())
+    {
+        throw UniversalException <UnitsManager> ("UnitsManager: unit type " + Urho3D::String (index) +
+            " requested, but there is only " + Urho3D::String (unitsTypes_.size ()) + " unit types!");
+    }
+
+    return  unitsTypes_ [index];
+}
+
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 {
     for (const UnitType &unitType : unitsTypes_)
