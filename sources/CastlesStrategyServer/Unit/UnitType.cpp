@@ -25,14 +25,18 @@ bool UnitCommand::operator != (const UnitCommand &rhs) const
     return !(rhs == *this);
 }
 
-UnitType::UnitType (unsigned int id, float attackRange, float attackSpeed, unsigned int attackForce,
-                    float visionRange, float navigationRadius, float moveSpeed, unsigned int maxHp,
-                    const Urho3D::String &prefabPath) :
+UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
+                    float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
+                    unsigned int maxHp, const Urho3D::String &prefabPath) :
         id_ (id),
+        recruitmentCost_ (recruitmentCost),
+        recruitmentTime_ (recruitmentTime),
+
         attackRange_ (attackRange),
         attackSpeed_ (attackSpeed),
         attackForce_ (attackForce),
         visionRange_ (visionRange),
+
         navigationRadius_ (navigationRadius),
         moveSpeed_ (moveSpeed),
         maxHp_ (maxHp),
@@ -49,6 +53,16 @@ UnitType::~UnitType ()
 unsigned int UnitType::GetId () const
 {
     return id_;
+}
+
+unsigned int UnitType::GetRecruitmentCost () const
+{
+    return recruitmentCost_;
+}
+
+float UnitType::GetRecruitmentTime () const
+{
+    return recruitmentTime_;
 }
 
 float UnitType::GetAttackRange () const
@@ -103,6 +117,9 @@ void UnitType::SetAiProcessor (UnitAIProcessor aiProcessor)
 
 void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 {
+    output.SetUInt ("recruitmentCost", recruitmentCost_);
+    output.SetFloat ("recruitmentTime", recruitmentTime_);
+
     output.SetFloat ("attackRange", attackRange_);
     output.SetFloat ("attackSpeed", attackSpeed_);
     output.SetUInt ("attackForce", attackForce_);
@@ -116,13 +133,19 @@ void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 
 UnitType UnitType::LoadFromXML (unsigned int id, const Urho3D::XMLElement &input)
 {
-    return UnitType (id, input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
+    return UnitType (id, input.GetUInt ("recruitmentCost"), input.GetFloat ("recruitmentTime"),
+                     input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
                      input.GetUInt ("attackForce"), input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"),
                      input.GetFloat ("moveSpeed"), input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"));
 }
 
 void UnitType::Check ()
 {
+    if (recruitmentTime_ <= 0.0f)
+    {
+        throw UniversalException <UnitType> ("UnitType: recruitment time must be more than 0!");
+    }
+
     if (attackRange_ <= 0.0f)
     {
         throw UniversalException <UnitType> ("UnitType: attack range must be more than 0!");

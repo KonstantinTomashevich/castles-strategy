@@ -32,12 +32,15 @@ typedef UnitCommand (*UnitAIProcessor) (Unit *self, const UnitType &unitType, co
 class UnitType
 {
 public:
-    UnitType (unsigned int id, float attackRange, float attackSpeed, unsigned int attackForce,
-                  float visionRange, float navigationRadius, float moveSpeed, unsigned int maxHp,
-                  const Urho3D::String &prefabPath);
+    UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
+                  float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
+                  unsigned int maxHp, const Urho3D::String &prefabPath);
     virtual ~UnitType ();
 
     unsigned int GetId () const;
+    unsigned int GetRecruitmentCost () const;
+    float GetRecruitmentTime () const;
+
     float GetAttackRange () const;
     float GetAttackSpeed () const;
     unsigned int GetAttackForce () const;
@@ -58,6 +61,9 @@ private:
     void Check ();
 
     unsigned int id_;
+    unsigned int recruitmentCost_;
+    float recruitmentTime_;
+
     float attackRange_;
     float attackSpeed_;
     unsigned int attackForce_;

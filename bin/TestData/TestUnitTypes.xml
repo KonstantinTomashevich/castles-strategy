@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <unitTypes>
     <unitType
+        recruitmentCost="100"
+        recruitmentTime="5.5"
+
         attackRange="1"
         attackSpeed="1"
         attackForce="10"
@@ -13,6 +16,9 @@
     />
 
     <unitType
+        recruitmentCost="20"
+        recruitmentTime="2.0"
+
         attackRange="1"
         attackSpeed="1"
         attackForce="10"
