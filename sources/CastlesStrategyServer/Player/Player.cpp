@@ -90,17 +90,22 @@ void Player::RemoveOrder (unsigned int unitType)
         return;
     }
 
+    const UnitsManager *unitsManager = dynamic_cast <const UnitsManager *> (managersHub_->GetManager (MI_UNITS_MANAGER));
+    const UnitType &unitTypeData = unitsManager->GetUnitType (unitType);
+
     for (auto iterator = ++orders_.Begin (); iterator != orders_.End (); iterator++)
     {
         if (iterator->unitType_ == unitType)
         {
             iterator = orders_.Erase (iterator);
+            coins_ += unitTypeData.GetRecruitmentCost ();
             return;
         }
     }
 
     if (orders_.Front ().unitType_ == unitType)
     {
+        coins_ += unitTypeData.GetRecruitmentCost ();
         orders_.PopFront ();
     }
 }
