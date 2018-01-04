@@ -15,3 +15,4 @@ endmacro ()
 
 add_subdirectory (TestMovement)
 add_subdirectory (TestAttackAndMovement)
+add_subdirectory (TestPlayerOrders)
