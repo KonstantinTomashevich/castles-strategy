@@ -9,6 +9,7 @@ class Route
 {
 public:
     explicit Route (const Urho3D::PODVector <Urho3D::Vector2> &waypoints);
+    Route (const Route &another);
     virtual ~Route ();
 
     const Urho3D::PODVector <Urho3D::Vector2> &GetWaypoints () const;

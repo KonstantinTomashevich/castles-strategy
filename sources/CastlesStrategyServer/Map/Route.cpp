@@ -12,6 +12,12 @@ Route::Route (const Urho3D::PODVector <Urho3D::Vector2> &waypoints) :
     }
 }
 
+Route::Route (const Route &another) :
+    waypoints_ (another.waypoints_)
+{
+
+}
+
 Route::~Route ()
 {
 
