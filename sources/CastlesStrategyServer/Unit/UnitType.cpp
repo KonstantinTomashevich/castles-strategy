@@ -45,6 +45,25 @@ UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruit
     Check ();
 }
 
+UnitType::UnitType (const UnitType &another) :
+        id_ (another.id_),
+        recruitmentCost_ (another.recruitmentCost_),
+        recruitmentTime_ (another.recruitmentTime_),
+
+        attackRange_ (another.attackRange_),
+        attackSpeed_ (another.attackSpeed_),
+        attackForce_ (another.attackForce_),
+        visionRange_ (another.visionRange_),
+
+        navigationRadius_ (another.navigationRadius_),
+        moveSpeed_ (another.moveSpeed_),
+        maxHp_ (another.maxHp_),
+        prefabPath_ (another.prefabPath_),
+        aiProcessor_ (another.aiProcessor_)
+{
+
+}
+
 UnitType::~UnitType ()
 {
 

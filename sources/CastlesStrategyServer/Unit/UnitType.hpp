@@ -35,6 +35,7 @@ public:
     UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
                   float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
                   unsigned int maxHp, const Urho3D::String &prefabPath);
+    UnitType (const UnitType &another);
     virtual ~UnitType ();
 
     unsigned int GetId () const;

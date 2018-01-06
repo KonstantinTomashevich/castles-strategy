@@ -157,7 +157,7 @@ void UnitsManager::ProcessUnits (float timeStep)
                         " units types, but T" + Urho3D::String (unit->GetUnitType ()) + " requested!");
             }
 
-            const UnitType &unitType = unitsTypes_[unit->GetUnitType ()];
+            const UnitType &unitType = unitsTypes_ [unit->GetUnitType ()];
             UnitCommand command = unitType.GetAiProcessor () (unit, unitType, GetManagersHub ());
             ProcessUnitCommand (unit, command, unitType);
         }
