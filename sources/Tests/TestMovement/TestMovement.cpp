@@ -64,10 +64,10 @@ int main(int argc, char **argv)
 
     URHO3D_LOGINFO ("Result unit position: " + scene->GetChild ("TestUnitNode")->GetWorldPosition ().ToString ());
     if ((scene->GetChild ("TestUnitNode")->GetWorldPosition () -
-                Urho3D::Vector3 (map->GetWaypoint (0, 0, 1).x_, 0, map->GetWaypoint (0, 0, 1).y_)).
+                Urho3D::Vector3 (map->GetWaypoint (0, 0, false).x_, 0, map->GetWaypoint (0, 0, false).y_)).
             Length () > 1.0f)
     {
-        URHO3D_LOGERROR ("Unit is to far from requested point: " + map->GetWaypoint (0, 0, 1).ToString ());
+        URHO3D_LOGERROR ("Unit is to far from requested point: " + map->GetWaypoint (0, 0, false).ToString ());
         return 1;
     }
     else
@@ -153,7 +153,6 @@ void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context)
     Urho3D::XMLElement xml = cache->GetResource <Urho3D::XMLFile> ("TestMap.xml")->GetRoot ();
 
     map->SetSize (xml.GetIntVector2 ("size"));
-    map->SetInvertedPlayer (1);
     map->LoadRoutesFromXML (xml);
 }
 
@@ -165,7 +164,7 @@ CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene
     Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, 0);
     unit->GetNode ()->SetPosition (navMesh->FindNearestPoint ({nearestWaypoint.x_, 0.0f, nearestWaypoint.y_}));
 
-    unit->SetOwner (0);
+    unit->SetBelongsToFirst (true);
     unit->SetUnitType (0);
     unit->SetRouteIndex (0);
     return unit;

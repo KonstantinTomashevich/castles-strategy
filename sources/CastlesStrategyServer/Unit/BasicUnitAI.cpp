@@ -32,7 +32,7 @@ UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, const ManagersHub
     {
         const Map *map = dynamic_cast <const Map *> (managersHub->GetManager (MI_MAP));
         Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
-                self->GetRouteIndex (), self->GetCurrentWaypointIndex (), self->GetOwner ());
+                self->GetRouteIndex (), self->GetCurrentWaypointIndex (), self->IsBelongsToFirst ());
 
         Urho3D::Vector3 target = self->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (
                 {nextWaypoint.x_, 0.0f, nextWaypoint.y_}, Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));

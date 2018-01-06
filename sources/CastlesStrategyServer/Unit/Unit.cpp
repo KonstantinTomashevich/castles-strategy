@@ -7,7 +7,7 @@ namespace CastlesStrategy
 Unit::Unit (Urho3D::Context *context) :
         Urho3D::Component (context),
 
-        owner_ (0),
+        belongsToFirst_ (false),
         hp_ (0),
         unitType_ (0),
         attackCooldown_ (0.0f),
@@ -28,7 +28,7 @@ void Unit::RegisterObjectType (Urho3D::Context *context)
     context->RegisterFactory <Unit> ();
     URHO3D_ACCESSOR_ATTRIBUTE ("Is Enabled", IsEnabled, SetEnabled, bool, true, Urho3D::AM_DEFAULT);
 
-    URHO3D_ACCESSOR_ATTRIBUTE ("Owner", GetOwner, SetOwner, unsigned int, 0, Urho3D::AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE ("Is Belongs To First", IsBelongsToFirst, SetBelongsToFirst, bool, false, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("HP", GetHp, SetHp, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Unit Type", GetUnitType, SetUnitType, unsigned int, 0, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Attack Cooldown", GetAttackCooldown, SetAttackCooldown, float, 0.0f, Urho3D::AM_DEFAULT);
@@ -46,14 +46,14 @@ void Unit::UpdateCooldowns (float timeStep)
     }
 }
 
-unsigned int Unit::GetOwner () const
+bool Unit::IsBelongsToFirst () const
 {
-    return owner_;
+    return belongsToFirst_;
 }
 
-void Unit::SetOwner (unsigned int owner)
+void Unit::SetBelongsToFirst (bool belongsToFirst)
 {
-    owner_ = owner;
+    belongsToFirst_ = belongsToFirst;
 }
 
 unsigned int Unit::GetHp () const

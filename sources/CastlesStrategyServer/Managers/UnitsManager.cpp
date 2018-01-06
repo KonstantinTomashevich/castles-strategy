@@ -51,7 +51,7 @@ const Unit *UnitsManager::GetNearestEnemy (Unit *unit) const
 
     for (const Unit *scanningUnit : units_)
     {
-        if (unit->GetOwner () != scanningUnit->GetOwner ())
+        if (unit->IsBelongsToFirst () != scanningUnit->IsBelongsToFirst ())
         {
             float distance = (unit->GetNode ()->GetWorldPosition () - scanningUnit->GetNode ()->GetWorldPosition ()).Length ();
             if (distance < minimumDistance)
@@ -246,7 +246,7 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
         {
             const Map *map = dynamic_cast <const Map *> (GetManagersHub ()->GetManager (MI_MAP));
             Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
-                    unit->GetRouteIndex (), unit->GetCurrentWaypointIndex (), unit->GetOwner ());
+                    unit->GetRouteIndex (), unit->GetCurrentWaypointIndex (), unit->IsBelongsToFirst ());
             target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
         }
         else

@@ -11,7 +11,7 @@ namespace CastlesStrategy
 class UnitsManager : public Manager
 {
 public:
-    UnitsManager (ManagersHub *managersHub);
+    explicit UnitsManager (ManagersHub *managersHub);
     virtual ~UnitsManager ();
 
     void AddUnit (Unit *unit);

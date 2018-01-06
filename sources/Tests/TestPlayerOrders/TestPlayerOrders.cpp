@@ -205,6 +205,5 @@ void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context)
     Urho3D::XMLElement xml = cache->GetResource <Urho3D::XMLFile> ("TestMap.xml")->GetRoot ();
 
     map->SetSize (xml.GetIntVector2 ("size"));
-    map->SetInvertedPlayer (1);
     map->LoadRoutesFromXML (xml);
 }
