@@ -16,6 +16,18 @@ Player::Player (const ManagersHub *managersHub) :
 
 }
 
+Player::Player (const Player &another) :
+    managersHub_ (another.managersHub_),
+    coins_ (another.coins_),
+    name_ (another.name_),
+    belongingMaterialIndex_ (another.belongingMaterialIndex_),
+
+    orders_ (another.orders_),
+    unitsPull_ (another.unitsPull_)
+{
+
+}
+
 Player::~Player ()
 {
 

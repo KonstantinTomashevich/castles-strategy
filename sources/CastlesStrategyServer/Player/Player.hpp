@@ -15,7 +15,8 @@ struct RecruitmentOrder
 class Player
 {
 public:
-    Player (const ManagersHub *managersHub);
+    explicit Player (const ManagersHub *managersHub);
+    Player (const Player &another);
     virtual ~Player ();
 
     void HandleUpdate (float timeStep);
