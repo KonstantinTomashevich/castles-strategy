@@ -4,7 +4,6 @@
 namespace CastlesStrategy
 {
 Map::Map (ManagersHub *managersHub) : Manager (managersHub),
-    invertedPlayer_ (0),
     routes_ ()
 {
 
@@ -30,22 +29,12 @@ void Map::SetSize (const Urho3D::IntVector2 &size)
     size_ = size;
 }
 
-unsigned int Map::GetInvertedPlayer () const
-{
-    return invertedPlayer_;
-}
-
-void Map::SetInvertedPlayer (unsigned int invertedPlayer)
-{
-    invertedPlayer_ = invertedPlayer;
-}
-
 const std::vector <Route> &Map::GetRoutes () const
 {
     return routes_;
 }
 
-Urho3D::Vector2 Map::GetWaypoint (unsigned int route, unsigned int index, unsigned int ownerPlayer) const
+Urho3D::Vector2 Map::GetWaypoint (unsigned int route, unsigned int index, bool isBelongsToFirst) const
 {
     if (route >= routes_.size ())
     {
@@ -60,8 +49,7 @@ Urho3D::Vector2 Map::GetWaypoint (unsigned int route, unsigned int index, unsign
                                                 Urho3D::String (requestedRoute.GetWaypoints ().Size ()) + " waypoints!");
     }
 
-    return requestedRoute.GetWaypoints () [ownerPlayer != invertedPlayer_ ?
-                                           index : requestedRoute.GetWaypoints ().Size () - index - 1];
+    return requestedRoute.GetWaypoints () [isBelongsToFirst ? index : requestedRoute.GetWaypoints ().Size () - index - 1];
 }
 
 void Map::SaveRoutesToXML (Urho3D::XMLElement &output) const
