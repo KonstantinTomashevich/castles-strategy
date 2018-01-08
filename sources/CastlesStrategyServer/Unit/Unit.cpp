@@ -54,6 +54,7 @@ bool Unit::IsBelongsToFirst () const
 void Unit::SetBelongsToFirst (bool belongsToFirst)
 {
     belongsToFirst_ = belongsToFirst;
+    MarkNetworkUpdate ();
 }
 
 unsigned int Unit::GetHp () const
@@ -64,6 +65,7 @@ unsigned int Unit::GetHp () const
 void Unit::SetHp (unsigned int hp)
 {
     hp_ = hp;
+    MarkNetworkUpdate ();
 }
 
 unsigned int Unit::GetUnitType () const
@@ -74,6 +76,7 @@ unsigned int Unit::GetUnitType () const
 void Unit::SetUnitType (unsigned int unitType)
 {
     unitType_ = unitType;
+    MarkNetworkUpdate ();
 }
 
 float Unit::GetAttackCooldown () const
@@ -87,12 +90,20 @@ void Unit::SetAttackCooldown (float attackCooldown)
     {
         throw UniversalException <Unit> ("Unit: attack cooldown can not be less than 0!");
     }
+
     attackCooldown_ = attackCooldown;
+    MarkNetworkUpdate ();
 }
 
 unsigned int Unit::GetCurrentWaypointIndex () const
 {
     return currentWaypointIndex_;
+}
+
+void Unit::SetCurrentWaypointIndex (unsigned int currentWaypointIndex)
+{
+    currentWaypointIndex_ = currentWaypointIndex;
+    MarkNetworkUpdate ();
 }
 
 unsigned int Unit::GetRouteIndex () const
@@ -103,11 +114,7 @@ unsigned int Unit::GetRouteIndex () const
 void Unit::SetRouteIndex (unsigned int routeIndex)
 {
     routeIndex_ = routeIndex;
-}
-
-void Unit::SetCurrentWaypointIndex (unsigned int currentWaypointIndex)
-{
-    currentWaypointIndex_ = currentWaypointIndex;
+    MarkNetworkUpdate ();
 }
 
 void Unit::OnSceneSet (Urho3D::Scene *scene)
