@@ -15,4 +15,10 @@
         <waypoint coord="20 70" />
         <waypoint coord="40 90" />
     </route>
+
+    <spawn position="40 8" belongsToFirst="true" route="0" />
+    <spawn position="60 92" belongsToFirst="false" route="0" />
+
+    <spawn position="60 8" belongsToFirst="true" route="1" />
+    <spawn position="40 92" belongsToFirst="false" route="1" />
 </map>
