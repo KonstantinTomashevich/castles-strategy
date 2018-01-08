@@ -15,6 +15,7 @@
 namespace CastlesStrategy
 {
 UnitsManager::UnitsManager (ManagersHub *managersHub) : Manager (managersHub),
+    spawnUnitType_ (0),
     units_ (),
     unitsTypes_ ()
 {
@@ -35,6 +36,23 @@ void UnitsManager::AddUnit (Unit *unit)
 
     units_.Push (unit);
     SetupUnit (unit);
+}
+
+unsigned UnitsManager::SpawnUnit (unsigned spawnId, unsigned unitType)
+{
+    const Unit *spawn = GetUnit (spawnId);
+    if (spawn == nullptr)
+    {
+        throw UniversalException <UnitsManager> ("UnitsManager: spawn with id " +
+                                                         Urho3D::String (spawnId) + " does not exists!");
+    }
+
+    Urho3D::Vector3 spawnWorldPosition = spawn->GetNode ()->GetWorldPosition ();
+    Unit *unit = CreateUnit ({spawnWorldPosition.x_, spawnWorldPosition.z_}, unitType,
+        spawn->IsBelongsToFirst (), spawn->GetRouteIndex ());
+
+    AddUnit (unit);
+    return unit->GetID ();
 }
 
 const Unit *UnitsManager::GetUnit (unsigned int id) const
@@ -89,6 +107,7 @@ const UnitType &UnitsManager::GetUnitType (unsigned int index) const
 
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 {
+    output.SetUInt ("spawnsUnitType", spawnUnitType_);
     for (const UnitType &unitType : unitsTypes_)
     {
         Urho3D::XMLElement newChild = output.CreateChild ("unitType");
@@ -98,6 +117,7 @@ void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 
 void UnitsManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
 {
+    spawnUnitType_ = input.GetUInt ("spawnsUnitType");
     Urho3D::XMLElement element = input.GetChild ();
     unsigned int id = 0;
 
@@ -109,6 +129,36 @@ void UnitsManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
 
         element = element.GetNext ();
         id++;
+    }
+}
+
+void UnitsManager::SaveSpawnsToXML (Urho3D::XMLElement &output) const
+{
+    for (const Unit *unit : units_)
+    {
+        if (unit->GetUnitType () == spawnUnitType_)
+        {
+            Urho3D::XMLElement newChild = output.CreateChild ("spawn");
+            Urho3D::Vector3 worldPosition = unit->GetNode ()->GetWorldPosition ();
+
+            newChild.SetVector2 ("position", {worldPosition.x_, worldPosition.z_});
+            newChild.SetBool ("belongsToFirst", unit->IsBelongsToFirst ());
+            newChild.SetUInt ("route", unit->GetRouteIndex ());
+        }
+    }
+}
+
+void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
+{
+    Urho3D::XMLElement element = input.GetChild ();
+    while (element.NotNull ())
+    {
+        Unit *unit = CreateUnit (element.GetVector2 ("position"), spawnUnitType_,
+                                 element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
+        AddUnit (unit);
+
+        Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->CreateComponent <Urho3D::CrowdAgent> (Urho3D::LOCAL);
+        crowdAgent->SetEnabled (false);
     }
 }
 
@@ -182,15 +232,27 @@ void UnitsManager::ClearDeadUnits ()
     units_.Resize (units_.Size () - offset);
 }
 
-void UnitsManager::SetupUnit (Unit *unit)
+Unit *UnitsManager::CreateUnit (Urho3D::Vector2 position, unsigned unitType, bool belongsToFirst, unsigned route)
 {
-    if (unit->GetUnitType () >= unitsTypes_.size ())
+    Urho3D::Node *unitsNode = GetManagersHub ()->GetScene ()->GetChild ("units");
+    if (unitsNode == nullptr)
     {
-        throw UniversalException <UnitsManager> ("UnitsManager: there is only " + Urho3D::String (unitsTypes_.size ()) +
-                                                 " units types, but T" + Urho3D::String (unit->GetUnitType ()) + " requested!");
+        unitsNode = GetManagersHub ()->GetScene ()->CreateChild ("units", Urho3D::REPLICATED);
     }
 
-    const UnitType &unitType = unitsTypes_ [unit->GetUnitType ()];
+    Urho3D::Node *unitNode = unitsNode->CreateChild (Urho3D::String::EMPTY, Urho3D::REPLICATED);
+    unitNode->SetWorldPosition ({position.x_, 0.0f, position.y_});
+
+    Unit *unit = unitNode->CreateComponent <Unit> (Urho3D::REPLICATED);
+    unit->SetUnitType (unitType);
+    unit->SetBelongsToFirst (belongsToFirst);
+    unit->SetRouteIndex (route);
+    return unit;
+}
+
+void UnitsManager::SetupUnit (Unit *unit)
+{
+    const UnitType &unitType = GetUnitType (unit->GetUnitType ());
     unit->GetNode ()->SetVar (UNIT_PREFAB_VAR_HASH, unitType.GetPrefabPath ());
     Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->CreateComponent <Urho3D::CrowdAgent> (Urho3D::LOCAL);
 
