@@ -49,10 +49,11 @@ int main(int argc, char **argv)
     CastlesStrategy::UnitsManager *unitsManager =
             dynamic_cast <CastlesStrategy::UnitsManager *> (managersHub.GetManager (CastlesStrategy::MI_UNITS_MANAGER));
     SetupUnitsManager (unitsManager, context);
-    const CastlesStrategy::UnitType &unitType = unitsManager->GetUnitType (0);
 
+    const unsigned UNIT_TYPE = 1;
+    const CastlesStrategy::UnitType &unitType = unitsManager->GetUnitType (UNIT_TYPE);
     CastlesStrategy::Player player (&managersHub);
-    player.AddOrder (0);
+    player.AddOrder (UNIT_TYPE);
 
     float maxTime = unitType.GetRecruitmentTime ();
     const float TIME_STEP = 1.0f / 60.0f;
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
         elapsedTime += TIME_STEP;
     }
 
-    if (player.GetUnitsPullCount (0) != 0)
+    if (player.GetUnitsPullCount (UNIT_TYPE) != 0)
     {
         URHO3D_LOGERROR ("Test 1: expected 0 units in pull!");
         return 1;
@@ -77,7 +78,7 @@ int main(int argc, char **argv)
 
     for (unsigned index = 0; index < UNITS_ORDERED; index++)
     {
-        player.AddOrder (0);
+        player.AddOrder (UNIT_TYPE);
     }
 
     if (player.GetOrders ().Size () != UNITS_ORDERED)
@@ -93,13 +94,13 @@ int main(int argc, char **argv)
         player.HandleUpdate (TIME_STEP);
         if (elapsedTime >= maxTime / 2.0f && !removeCalled)
         {
-            player.RemoveOrder (0);
+            player.RemoveOrder (UNIT_TYPE);
             removeCalled = true;
         }
         elapsedTime += TIME_STEP;
     }
 
-    if (player.GetUnitsPullCount (0) != UNITS_ORDERED - 1)
+    if (player.GetUnitsPullCount (UNIT_TYPE) != UNITS_ORDERED - 1)
     {
         URHO3D_LOGERROR ("Test 3: expected " + Urho3D::String (UNITS_ORDERED - 1) + " units in pool, " +
                          "but there is " + Urho3D::String (player.GetUnitsPullCount (0)) + " units in pool!");
@@ -113,8 +114,8 @@ int main(int argc, char **argv)
         return 4;
     }
 
-    player.TakeUnitFromPull (0);
-    if (player.GetUnitsPullCount (0) != UNITS_ORDERED - 2)
+    player.TakeUnitFromPull (UNIT_TYPE);
+    if (player.GetUnitsPullCount (UNIT_TYPE) != UNITS_ORDERED - 2)
     {
         URHO3D_LOGERROR ("Test 5: expected " + Urho3D::String (UNITS_ORDERED - 2) + " units in pool, " +
                          "but there is " + Urho3D::String (player.GetUnitsPullCount (0)) + " units in pool!");

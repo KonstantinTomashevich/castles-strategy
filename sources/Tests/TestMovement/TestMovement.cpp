@@ -165,7 +165,7 @@ CastlesStrategy::Unit *SpawnUnit (Urho3D::Context *context, Urho3D::Scene *scene
     unit->GetNode ()->SetPosition (navMesh->FindNearestPoint ({nearestWaypoint.x_, 0.0f, nearestWaypoint.y_}));
 
     unit->SetBelongsToFirst (true);
-    unit->SetUnitType (0);
+    unit->SetUnitType (1);
     unit->SetRouteIndex (0);
     return unit;
 }
