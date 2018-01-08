@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     SetupEngine (engine);
     Urho3D::SharedPtr <Urho3D::Scene> scene (SetupScene (context));
 
-    CastlesStrategy::ManagersHub managersHub;
+    CastlesStrategy::ManagersHub managersHub (scene);
     CastlesStrategy::Map *map = dynamic_cast <CastlesStrategy::Map *> (managersHub.GetManager (CastlesStrategy::MI_MAP));
     SetupMap (map, context);
 
