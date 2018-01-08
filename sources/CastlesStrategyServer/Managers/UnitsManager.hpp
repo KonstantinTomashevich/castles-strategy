@@ -16,7 +16,10 @@ public:
     virtual ~UnitsManager ();
 
     void AddUnit (Unit *unit);
-    unsigned SpawnUnit (unsigned spawnId, unsigned unitType);
+    const Unit *GetSpawn (unsigned route, bool belongsToFirst) const;
+
+    const Unit *SpawnUnit (unsigned route, bool belongsToFirst, unsigned unitType);
+    const Unit *SpawnUnit (unsigned spawnId, unsigned unitType);
 
     const Unit *GetUnit (unsigned int id) const;
     const Unit *GetNearestEnemy (Unit *unit) const;
@@ -34,6 +37,7 @@ public:
     void LoadSpawnsFromXML (const Urho3D::XMLElement &input);
 
 private:
+    const Unit *SpawnUnit (const Unit *spawn, unsigned unitType);
     unsigned GetUnitIndex (unsigned id, bool &found) const;
     void ProcessUnits (float timeStep);
     void ClearDeadUnits ();
