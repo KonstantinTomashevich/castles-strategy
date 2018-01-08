@@ -6,8 +6,9 @@
 
 namespace CastlesStrategy
 {
-ManagersHub::ManagersHub () :
-        managers_ (MI_MANAGERS_COUNT)
+ManagersHub::ManagersHub (Urho3D::Scene *scene) :
+        managers_ (MI_MANAGERS_COUNT),
+        scene_ (scene)
 {
     managers_ [MI_UNITS_MANAGER] = new UnitsManager (this);
     managers_ [MI_MAP] = new Map (this);
@@ -40,6 +41,11 @@ const Manager * ManagersHub::GetManager (ManagerIndex index) const
     }
 
     return managers_ [index];
+}
+
+Urho3D::Scene *ManagersHub::GetScene () const
+{
+    return scene_;
 }
 
 void ManagersHub::HandleUpdate (float timeStep)

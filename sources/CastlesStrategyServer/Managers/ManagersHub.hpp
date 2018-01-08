@@ -1,5 +1,6 @@
 #pragma once
 #include <Urho3D/Container/Vector.h>
+#include <Urho3D/Scene/Scene.h>
 #include <CastlesStrategyServer/Managers/Manager.hpp>
 
 namespace CastlesStrategy
@@ -15,14 +16,17 @@ enum ManagerIndex
 class ManagersHub
 {
 public:
-    ManagersHub ();
+    ManagersHub (Urho3D::Scene *scene);
     virtual ~ManagersHub ();
 
     Manager *GetManager (ManagerIndex index);
     const Manager *GetManager (ManagerIndex index) const;
+
+    Urho3D::Scene *GetScene () const;
     void HandleUpdate (float timeStep);
 
 private:
     Urho3D::PODVector <Manager *> managers_;
+    Urho3D::Scene *scene_;
 };
 }
