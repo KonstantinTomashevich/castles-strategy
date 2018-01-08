@@ -89,6 +89,19 @@ void UnitsManager::HandleUpdate (float timeStep)
     ClearDeadUnits ();
 }
 
+GameStatus UnitsManager::CheckGameStatus () const
+{
+    for (const Unit *unit : units_)
+    {
+        if (unit->GetUnitType () == spawnUnitType_ && unit->GetHp () == 0)
+        {
+            return unit->IsBelongsToFirst () ? GS_SECOND_WON : GS_FIRST_WON;
+        }
+    }
+
+    return GS_PLAYING;
+}
+
 unsigned int UnitsManager::GetUnitsTypesCount () const
 {
     return unitsTypes_.size ();
