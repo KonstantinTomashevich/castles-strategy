@@ -35,6 +35,7 @@ public:
 
     void TakeUnitFromPull (unsigned int unitType);
     unsigned int GetUnitsPullCount (unsigned int unitType) const;
+    Player &operator = (const Player &another);
 
 private:
     const ManagersHub *managersHub_;

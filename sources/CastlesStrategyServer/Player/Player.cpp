@@ -16,16 +16,9 @@ Player::Player (const ManagersHub *managersHub) :
 
 }
 
-Player::Player (const Player &another) :
-    managersHub_ (another.managersHub_),
-    coins_ (another.coins_),
-    name_ (another.name_),
-    belongingMaterialIndex_ (another.belongingMaterialIndex_),
-
-    orders_ (another.orders_),
-    unitsPull_ (another.unitsPull_)
+Player::Player (const Player &another) : Player (another.managersHub_)
 {
-
+    *this = another;
 }
 
 Player::~Player ()
@@ -140,5 +133,15 @@ unsigned int Player::GetUnitsPullCount (unsigned int unitType) const
                                                  " requested, but there is only " + Urho3D::String (unitsPull_.Size ()) + " unit types!");
     }
     return unitsPull_ [unitType];
+}
+
+Player &Player::operator = (const Player &another)
+{
+    coins_ = another.coins_;
+    name_ = another.name_;
+    belongingMaterialIndex_ = another.belongingMaterialIndex_;
+
+    orders_ = another.orders_;
+    unitsPull_ = another.unitsPull_;
 }
 }
