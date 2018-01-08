@@ -8,6 +8,7 @@ enum ManagerIndex
 {
     MI_UNITS_MANAGER = 0,
     MI_MAP,
+    MI_PLAYERS_MANAGER,
     MI_MANAGERS_COUNT
 };
 

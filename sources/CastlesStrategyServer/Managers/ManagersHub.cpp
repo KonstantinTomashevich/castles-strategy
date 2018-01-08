@@ -1,6 +1,7 @@
 #include "ManagersHub.hpp"
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
 #include <CastlesStrategyServer/Managers/Map.hpp>
+#include <CastlesStrategyServer/Managers/PlayersManager.hpp>
 #include <ActivitiesApplication/UniversalException.hpp>
 
 namespace CastlesStrategy
@@ -10,6 +11,7 @@ ManagersHub::ManagersHub () :
 {
     managers_ [MI_UNITS_MANAGER] = new UnitsManager (this);
     managers_ [MI_MAP] = new Map (this);
+    managers_ [MI_PLAYERS_MANAGER] = new PlayersManager (this);
 }
 
 ManagersHub::~ManagersHub ()
