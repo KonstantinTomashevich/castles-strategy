@@ -54,5 +54,10 @@ void ManagersHub::HandleUpdate (float timeStep)
     {
         manager->HandleUpdate (timeStep);
     }
+
+    if (scene_ != nullptr)
+    {
+        scene_->Update (timeStep);
+    }
 }
 }
