@@ -29,7 +29,7 @@ Urho3D::Scene *SetupScene (Urho3D::Context *context);
 void SetupUnitsManager (CastlesStrategy::UnitsManager *unitsManager, Urho3D::Context *context);
 void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context);
 
-int main(int argc, char **argv)
+int main (int argc, char **argv)
 {
     std::set_terminate (CustomTerminate);
     Urho3D::SharedPtr <Urho3D::Context> context (new Urho3D::Context());
