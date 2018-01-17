@@ -7,7 +7,6 @@ namespace CastlesStrategy
 Player::Player (const ManagersHub *managersHub) :
     managersHub_ (managersHub),
     coins_ (0),
-    name_ (),
     belongingMaterialIndex_ (0),
 
     orders_ (),
@@ -49,16 +48,6 @@ unsigned int Player::GetCoins () const
 void Player::SetCoins (unsigned int coins)
 {
     coins_ = coins;
-}
-
-const Urho3D::String &Player::GetName () const
-{
-    return name_;
-}
-
-void Player::SetName (const Urho3D::String &name)
-{
-    name_ = name;
 }
 
 unsigned int Player::GetBelongingMaterialIndex () const
@@ -138,7 +127,6 @@ unsigned int Player::GetUnitsPullCount (unsigned int unitType) const
 Player &Player::operator = (const Player &another)
 {
     coins_ = another.coins_;
-    name_ = another.name_;
     belongingMaterialIndex_ = another.belongingMaterialIndex_;
 
     orders_ = another.orders_;

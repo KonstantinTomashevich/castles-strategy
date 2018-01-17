@@ -1,7 +1,6 @@
 #pragma once
 #include <Urho3D/Container/Vector.h>
 #include <Urho3D/Container/List.h>
-#include <Urho3D/Container/Str.h>
 #include <CastlesStrategyServer/Managers/ManagersHub.hpp>
 
 namespace CastlesStrategy
@@ -23,9 +22,6 @@ public:
     unsigned int GetCoins () const;
     void SetCoins (unsigned int coins);
 
-    const Urho3D::String &GetName () const;
-    void SetName (const Urho3D::String &name);
-
     unsigned int GetBelongingMaterialIndex () const;
     void SetBelongingMaterialIndex (unsigned int belongingMaterialIndex);
 
@@ -40,7 +36,6 @@ public:
 private:
     const ManagersHub *managersHub_;
     unsigned int coins_;
-    Urho3D::String name_;
     unsigned int belongingMaterialIndex_;
 
     Urho3D::List <RecruitmentOrder> orders_;
