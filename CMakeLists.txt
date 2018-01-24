@@ -39,6 +39,21 @@ if (NOT EXISTS "${CMAKE_SOURCE_DIR}/bin/CoreData")
     endif ()
 endif ()
 
+# Copy Urho3DEditorData.
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/bin/Urho3DEditorData")
+    message (STATUS "Copying Urho3D's Data asset (for editor)...")
+    if (NOT EXISTS "$ENV{URHO3D_HOME}/share/Resources/Data/")
+        file (COPY "$ENV{URHO3D_HOME}/share/Urho3D/Resources/Data/" DESTINATION "${CMAKE_SOURCE_DIR}/bin/Urho3DEditorData")
+    else ()
+        file (COPY "$ENV{URHO3D_HOME}/share/Resources/Data/" DESTINATION "${CMAKE_SOURCE_DIR}/bin/Urho3DEditorData")
+    endif ()
+endif ()
+
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/bin/Urho3DEditorData")
+    message (STATUS "Copying Urho3D's Data asset (for editor) to binary dir...")
+    file (COPY "${CMAKE_SOURCE_DIR}/bin/Urho3DEditorData/" DESTINATION "${CMAKE_BINARY_DIR}/bin/Urho3DEditorData")
+endif ()
+
 include (UrhoCommon)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})

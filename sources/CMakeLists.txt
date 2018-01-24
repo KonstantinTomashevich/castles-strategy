@@ -3,6 +3,8 @@ add_subdirectory (ActivitiesApplication)
 add_subdirectory (CastlesStrategyServer)
 add_subdirectory (CastlesStrategyClient)
 add_subdirectory (CastlesStrategyLauncher)
+add_subdirectory (Utils)
+add_subdirectory (EditorLauncher)
 
 if (CASTLES_STRATEGY_ENABLE_TESTS)
     add_subdirectory (Tests)
