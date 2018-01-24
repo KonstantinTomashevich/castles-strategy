@@ -1,18 +1,20 @@
 #pragma once
 #include <ActivitiesApplication/Activity.hpp>
+#include <Utils/UIResizer.hpp>
 
 namespace CastlesStrategy
 {
-class ClientActivity : public ActivitiesApplication::Activity
+class StartGameActivity : public ActivitiesApplication::Activity
 {
 public:
-    ClientActivity (Urho3D::Context *context);
-    virtual ~ClientActivity ();
+    StartGameActivity (Urho3D::Context *context);
+    virtual ~StartGameActivity ();
 
     virtual void Start ();
     virtual void Update (float timeStep);
     virtual void Stop ();
 
 private:
+    UIResizer *uiResizer_;
 };
 }

@@ -101,7 +101,7 @@
 			<attribute name="Size" value="630 42" />
 			<attribute name="Pivot" value="0 0" />
 			<attribute name="Variables">
-				<variant hash="307414576" type="Float" value="0.6" name="VWidth" />
+				<variant hash="307414576" type="Float" value="0.7" name="VWidth" />
 				<variant hash="3464421821" type="Float" value="0.04" name="VHeight" />
 				<variant hash="7740802" type="Float" value="0" name="VX" />
 				<variant hash="7740803" type="Float" value="0" name="VY" />
@@ -229,7 +229,7 @@
 					<attribute name="Size" value="210 42" />
 					<attribute name="Pivot" value="0 0" />
 					<attribute name="Variables">
-						<variant hash="307414576" type="Float" value="0.2" name="VWidth" />
+						<variant hash="307414576" type="Float" value="0.25" name="VWidth" />
 						<variant hash="3464421821" type="Float" value="0.04" name="VHeight" />
 						<variant hash="7740802" type="Float" value="0" name="VX" />
 						<variant hash="7740803" type="Float" value="0" name="VY" />
@@ -313,7 +313,7 @@
 					<attribute name="Size" value="210 42" />
 					<attribute name="Pivot" value="0 0" />
 					<attribute name="Variables">
-						<variant hash="307414576" type="Float" value="0.2" name="VWidth" />
+						<variant hash="307414576" type="Float" value="0.25" name="VWidth" />
 						<variant hash="3464421821" type="Float" value="0.04" name="VHeight" />
 						<variant hash="7740802" type="Float" value="0" name="VX" />
 						<variant hash="7740803" type="Float" value="0" name="VY" />
@@ -351,7 +351,7 @@
 				<attribute name="Size" value="315 52" />
 				<attribute name="Pivot" value="0 0" />
 				<attribute name="Variables">
-					<variant hash="307414576" type="Float" value="0.3" name="VWidth" />
+					<variant hash="307414576" type="Float" value="0.35" name="VWidth" />
 					<variant hash="3464421821" type="Float" value="0.05" name="VHeight" />
 					<variant hash="7740802" type="Float" value="0" name="VX" />
 					<variant hash="7740803" type="Float" value="0" name="VY" />
@@ -421,7 +421,7 @@
 				<attribute name="Size" value="315 52" />
 				<attribute name="Pivot" value="0 0" />
 				<attribute name="Variables">
-					<variant hash="307414576" type="Float" value="0.3" name="VWidth" />
+					<variant hash="307414576" type="Float" value="0.35" name="VWidth" />
 					<variant hash="3464421821" type="Float" value="0.05" name="VHeight" />
 					<variant hash="7740802" type="Float" value="0" name="VX" />
 					<variant hash="7740803" type="Float" value="0" name="VY" />

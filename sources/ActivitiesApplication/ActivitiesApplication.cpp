@@ -40,27 +40,23 @@ void ActivitiesApplication::UpdateActivities (Urho3D::StringHash eventType, Urho
     float timeStep = eventData [Urho3D::Update::P_TIMESTEP].GetFloat ();
     if (!activitiesToStop_.Empty ())
     {
-        while (!activitiesToStop_.Empty ())
+        for (Urho3D::SharedPtr <Activity> &activity : activitiesToStop_)
         {
-            Urho3D::SharedPtr <Activity> activity = activitiesToStop_.Front ();
-            activitiesToStop_.Remove (activity);
-
             currentActivities_.Remove (activity);
             activity->Stop ();
         }
+        activitiesToStop_.Clear ();
     }
 
     if (!activitiesToSetup_.Empty ())
     {
-        while (!activitiesToSetup_.Empty ())
+        for (Urho3D::SharedPtr <Activity> &activity : activitiesToSetup_)
         {
-            Urho3D::SharedPtr <Activity> activity = activitiesToSetup_.Front ();
-            activitiesToSetup_.Remove (activity);
-
             currentActivities_.Push (activity);
             activity->SetApplication (this);
             activity->Start ();
         }
+        activitiesToSetup_.Clear ();
     }
 
     if (!currentActivities_.Empty ())
