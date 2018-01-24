@@ -14,7 +14,7 @@
 #include <CastlesStrategyServer/Activity/IncomingNetworkMessageType.hpp>
 #include <CastlesStrategyServer/Activity/OutcomingNetworkMessageType.hpp>
 #include <CastlesStrategyServer/Activity/IncomingNetworkMessageProcessors.hpp>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
 {

@@ -10,7 +10,7 @@
 #include <CastlesStrategyServer/Unit/BasicUnitAI.hpp>
 #include <CastlesStrategyServer/Managers/Map.hpp>
 #include <CastlesStrategyServer/Managers/ManagersHub.hpp>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
 {

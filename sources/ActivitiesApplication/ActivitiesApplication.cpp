@@ -1,6 +1,6 @@
 #include "ActivitiesApplication.hpp"
 #include <Urho3D/Core/CoreEvents.h>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace ActivitiesApplication
 {

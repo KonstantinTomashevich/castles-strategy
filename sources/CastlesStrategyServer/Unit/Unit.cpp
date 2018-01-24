@@ -1,6 +1,6 @@
 #include "Unit.hpp"
 #include <Urho3D/Core/Context.h>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
 {

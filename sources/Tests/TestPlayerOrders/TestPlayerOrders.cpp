@@ -14,7 +14,7 @@
 #include <Urho3D/Navigation/CrowdManager.h>
 #include <Urho3D/Navigation/Navigable.h>
 
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 #include <CastlesStrategyServer/Unit/Unit.hpp>
 #include <CastlesStrategyServer/Unit/UnitType.hpp>
 #include <CastlesStrategyServer/Player/Player.hpp>

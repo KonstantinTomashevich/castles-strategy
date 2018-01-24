@@ -2,7 +2,7 @@
 #include <CastlesStrategyServer/Managers/UnitsManager.hpp>
 #include <CastlesStrategyServer/Managers/Map.hpp>
 #include <CastlesStrategyServer/Managers/PlayersManager.hpp>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
 {

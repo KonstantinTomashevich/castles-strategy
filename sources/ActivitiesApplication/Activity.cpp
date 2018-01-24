@@ -1,6 +1,6 @@
 #include "Activity.hpp"
 #include <ActivitiesApplication/ActivitiesApplication.hpp>
-#include <ActivitiesApplication/UniversalException.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace ActivitiesApplication
 {
