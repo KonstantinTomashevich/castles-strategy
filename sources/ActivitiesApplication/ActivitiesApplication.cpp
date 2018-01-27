@@ -26,56 +26,17 @@ void ActivitiesApplication::Start ()
 {
     SubscribeToEvent (Urho3D::E_UPDATE, URHO3D_HANDLER (ActivitiesApplication, UpdateActivities));
 
-    if (!currentActivities_.Empty ())
+    for (Urho3D::SharedPtr <Activity> &activity : currentActivities_)
     {
-        for (int index = 0; index < currentActivities_.Size (); index++)
-        {
-            currentActivities_.At (index)->Start ();
-        }
-    }
-}
-
-void ActivitiesApplication::UpdateActivities (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
-{
-    float timeStep = eventData [Urho3D::Update::P_TIMESTEP].GetFloat ();
-    if (!activitiesToStop_.Empty ())
-    {
-        for (Urho3D::SharedPtr <Activity> &activity : activitiesToStop_)
-        {
-            currentActivities_.Remove (activity);
-            activity->Stop ();
-        }
-        activitiesToStop_.Clear ();
-    }
-
-    if (!activitiesToSetup_.Empty ())
-    {
-        for (Urho3D::SharedPtr <Activity> &activity : activitiesToSetup_)
-        {
-            currentActivities_.Push (activity);
-            activity->SetApplication (this);
-            activity->Start ();
-        }
-        activitiesToSetup_.Clear ();
-    }
-
-    if (!currentActivities_.Empty ())
-    {
-        for (int index = 0; index < currentActivities_.Size (); index++)
-        {
-            currentActivities_.At (index)->Update (timeStep);
-        }
+        activity->Start ();
     }
 }
 
 void ActivitiesApplication::Stop ()
 {
-    if (!currentActivities_.Empty ())
+    for (Urho3D::SharedPtr <Activity> &activity : currentActivities_)
     {
-        for (int index = 0; index < currentActivities_.Size (); index++)
-        {
-            currentActivities_.At (index)->Stop ();
-        }
+        activity->Stop ();
     }
 }
 
@@ -97,7 +58,7 @@ void ActivitiesApplication::StopActivityNextFrame (Activity *activity)
     activitiesToStop_.Push (Urho3D::SharedPtr <Activity> (activity));
 }
 
-unsigned ActivitiesApplication::GetActivitiesCount ()
+unsigned ActivitiesApplication::GetActivitiesCount () const
 {
     return currentActivities_.Size ();
 }
@@ -112,6 +73,40 @@ Activity *ActivitiesApplication::GetActivityByIndex (int index)
         );
     }
     return currentActivities_.At (index);
+}
+
+void ActivitiesApplication::StopAllActivitiesNextFrame ()
+{
+    for (Urho3D::SharedPtr <Activity> &activity : activitiesToStop_)
+    {
+        activitiesToStop_.Push (activity);
+    }
+}
+
+void ActivitiesApplication::UpdateActivities (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    float timeStep = eventData[Urho3D::Update::P_TIMESTEP].GetFloat ();
+
+    for (Urho3D::SharedPtr <Activity> &activity : activitiesToStop_)
+    {
+        currentActivities_.Remove (activity);
+        activity->Stop ();
+    }
+    activitiesToStop_.Clear ();
+
+
+    for (Urho3D::SharedPtr <Activity> &activity : activitiesToSetup_)
+    {
+        currentActivities_.Push (activity);
+        activity->SetApplication (this);
+        activity->Start ();
+    }
+    activitiesToSetup_.Clear ();
+
+    for (Urho3D::SharedPtr <Activity> &activity : currentActivities_)
+    {
+        activity->Update (timeStep);
+    }
 }
 }
 

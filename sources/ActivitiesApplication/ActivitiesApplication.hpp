@@ -16,7 +16,6 @@ public:
 
     virtual void Setup ();
     virtual void Start ();
-    void UpdateActivities (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     virtual void Stop ();
 
     //@ASBindGen Function AddRef_arg0
@@ -24,11 +23,15 @@ public:
     //@ASBindGen Function AddRef_arg0
     void StopActivityNextFrame (Activity *activity);
     //@ASBindGen Function OverrideName=get_activitiesCount
-    unsigned GetActivitiesCount ();
+    unsigned GetActivitiesCount () const;
     //@ASBindGen Function AddRef_arg-1
     Activity *GetActivityByIndex (int index);
+    //@ASBindGen Function
+    void StopAllActivitiesNextFrame ();
 
 private:
+    void UpdateActivities (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+
     Urho3D::Vector <Urho3D::SharedPtr <Activity> > currentActivities_;
     Urho3D::Vector <Urho3D::SharedPtr <Activity> > activitiesToSetup_;
     Urho3D::Vector <Urho3D::SharedPtr <Activity> > activitiesToStop_;
