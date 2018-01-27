@@ -178,7 +178,7 @@
 				<string value="UIResizer" />
 			</attribute>
 			<element>
-				<attribute name="Name" value="AdressInput" />
+				<attribute name="Name" value="AddressInput" />
 				<attribute name="Position" value="21 21" />
 				<attribute name="Size" value="315 42" />
 				<attribute name="Pivot" value="0 0" />
@@ -221,7 +221,7 @@
 						<string value="UIResizer" />
 					</attribute>
 					<attribute name="Font Size" value="21.02" />
-					<attribute name="Text" value="Adress:" />
+					<attribute name="Text" value="Address:" />
 				</element>
 				<element type="LineEdit">
 					<attribute name="Name" value="Edit" />
