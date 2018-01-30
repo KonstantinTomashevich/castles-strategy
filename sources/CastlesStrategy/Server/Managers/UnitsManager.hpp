@@ -4,8 +4,8 @@
 
 #include <CastlesStrategy/Server/Managers/Manager.hpp>
 #include <CastlesStrategy/Server/Managers/GameStatus.hpp>
-#include <CastlesStrategy/Server/Unit/Unit.hpp>
-#include <CastlesStrategy/Server/Unit/UnitType.hpp>
+#include <CastlesStrategy/Shared/Unit/Unit.hpp>
+#include <CastlesStrategy/Shared/Unit/UnitType.hpp>
 
 namespace CastlesStrategy
 {

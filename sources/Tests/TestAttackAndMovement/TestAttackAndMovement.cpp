@@ -15,8 +15,8 @@
 #include <Urho3D/Navigation/Navigable.h>
 
 #include <Utils/UniversalException.hpp>
-#include <CastlesStrategy/Server/Unit/Unit.hpp>
-#include <CastlesStrategy/Server/Unit/UnitType.hpp>
+#include <CastlesStrategy/Shared/Unit/Unit.hpp>
+#include <CastlesStrategy/Shared/Unit/UnitType.hpp>
 
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>

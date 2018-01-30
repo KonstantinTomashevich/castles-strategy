@@ -1,4 +1,4 @@
-#include <CastlesStrategy/Server/Unit/UnitType.hpp>
+#include <CastlesStrategy/Shared/Unit/UnitType.hpp>
 
 namespace CastlesStrategy
 {
