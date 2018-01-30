@@ -1,7 +1,7 @@
 #include "LauncherApplication.hpp"
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
-#include <CastlesStrategy/Client/Activity/StartGameActivity.hpp>
+#include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)
 LauncherApplication::LauncherApplication (Urho3D::Context *context) : ActivitiesApplication::ActivitiesApplication (context)
@@ -30,7 +30,7 @@ void LauncherApplication::Start ()
     input->SetMouseVisible (true);
     input->SetMouseMode (Urho3D::MM_FREE);
 
-    CastlesStrategy::StartGameActivity *clientActivity = new CastlesStrategy::StartGameActivity (context_);
+    CastlesStrategy::MainMenuActivity *clientActivity = new CastlesStrategy::MainMenuActivity (context_);
     SetupActivityNextFrame (clientActivity);
 }
 

@@ -1,4 +1,4 @@
-#include "StartGameActivity.hpp"
+#include "MainMenuActivity.hpp"
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -10,35 +10,35 @@
 
 namespace CastlesStrategy
 {
-StartGameActivity::StartGameActivity (Urho3D::Context *context) : ActivitiesApplication::Activity (context),
+MainMenuActivity::MainMenuActivity (Urho3D::Context *context) : ActivitiesApplication::Activity (context),
     uiResizer_ (new UIResizer (context))
 {
 
 }
 
-StartGameActivity::~StartGameActivity ()
+MainMenuActivity::~MainMenuActivity ()
 {
     delete uiResizer_;
 }
 
-void StartGameActivity::Start ()
+void MainMenuActivity::Start ()
 {
     LoadUILayout ();
     SubscribeToEvents ();
 }
 
-void StartGameActivity::Update (float timeStep)
+void MainMenuActivity::Update (float timeStep)
 {
     uiResizer_->Update (timeStep);
 }
 
-void StartGameActivity::Stop ()
+void MainMenuActivity::Stop ()
 {
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     ui->GetRoot ()->RemoveAllChildren ();
 }
 
-void StartGameActivity::LoadUILayout ()
+void MainMenuActivity::LoadUILayout ()
 {
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
@@ -49,7 +49,7 @@ void StartGameActivity::LoadUILayout ()
     uiResizer_->SetScanRootElement ("StartGameWindow");
 }
 
-void StartGameActivity::SubscribeToEvents ()
+void MainMenuActivity::SubscribeToEvents ()
 {
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::Button *connectToServerButton = dynamic_cast <Urho3D::Button *> (
@@ -60,11 +60,11 @@ void StartGameActivity::SubscribeToEvents ()
             ui->GetRoot ()->GetChild ("StartGameWindow", false)->GetChild ("SplitView", false)->
                     GetChild ("StartServerWindow", false)->GetChild ("StartServerButton", false));
 
-    SubscribeToEvent (connectToServerButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (StartGameActivity, HandleConnectToServerClick));
-    SubscribeToEvent (startServerButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (StartGameActivity, HandleStartServerClick));
+    SubscribeToEvent (connectToServerButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (MainMenuActivity, HandleConnectToServerClick));
+    SubscribeToEvent (startServerButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (MainMenuActivity, HandleStartServerClick));
 }
 
-void StartGameActivity::HandleConnectToServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void MainMenuActivity::HandleConnectToServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::String playerName = dynamic_cast <Urho3D::LineEdit *> (
@@ -87,7 +87,7 @@ void StartGameActivity::HandleConnectToServerClick (Urho3D::StringHash eventType
     SendEvent (CONNECT_TO_SERVER_REQUEST, newEventData);
 }
 
-void StartGameActivity::HandleStartServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void MainMenuActivity::HandleStartServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::String playerName = dynamic_cast <Urho3D::LineEdit *> (

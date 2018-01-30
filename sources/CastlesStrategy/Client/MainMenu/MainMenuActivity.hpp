@@ -4,11 +4,11 @@
 
 namespace CastlesStrategy
 {
-class StartGameActivity : public ActivitiesApplication::Activity
+class MainMenuActivity : public ActivitiesApplication::Activity
 {
 public:
-    StartGameActivity (Urho3D::Context *context);
-    virtual ~StartGameActivity ();
+    MainMenuActivity (Urho3D::Context *context);
+    virtual ~MainMenuActivity ();
 
     virtual void Start ();
     virtual void Update (float timeStep);
