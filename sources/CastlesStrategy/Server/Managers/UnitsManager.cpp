@@ -14,12 +14,21 @@
 
 namespace CastlesStrategy
 {
+void ProcessUnitCommandMoveOrFollow (
+        UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
+
+void ProcessUnitCommandAttackUnit (
+        UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
+
 UnitsManager::UnitsManager (ManagersHub *managersHub) : Manager (managersHub),
     spawnUnitType_ (0),
     units_ (),
-    unitsTypes_ ()
+    unitsTypes_ (),
+    unitCommandProcessors_ (UCT_COMMANDS_COUNT)
 {
-
+    unitCommandProcessors_ [UCT_FOLLOW_UNIT] = ProcessUnitCommandMoveOrFollow;
+    unitCommandProcessors_ [UCT_MOVE_TO_WAYPOINT] = ProcessUnitCommandMoveOrFollow;
+    unitCommandProcessors_ [UCT_ATTACK_UNIT] = ProcessUnitCommandAttackUnit;
 }
 
 UnitsManager::~UnitsManager ()
@@ -76,6 +85,13 @@ const Unit *UnitsManager::SpawnUnit (unsigned spawnId, unsigned unitType)
 }
 
 const Unit *UnitsManager::GetUnit (unsigned int id) const
+{
+    bool found;
+    unsigned index = GetUnitIndex (id, found);
+    return found ? units_ [index] : nullptr;
+}
+
+Unit *UnitsManager::GetUnit (unsigned int id)
 {
     bool found;
     unsigned index = GetUnitIndex (id, found);
@@ -311,80 +327,67 @@ void UnitsManager::SetupUnit (Unit *unit)
 
 void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, const UnitType &unitType)
 {
-    if (command.commandType_ == UCT_ATTACK_UNIT)
-    {
-        unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetTargetVelocity (Urho3D::Vector3::ZERO);
-        Unit *another = nullptr;
-        {
-            bool found;
-            unsigned index = GetUnitIndex (command.argument_, found);
-
-            if (!found)
-            {
-                throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
-                                                         " does not exists, can not attack! AI error?");
-            }
-            else
-            {
-                another = units_[index];
-            }
-        }
-
-        if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
-            unitType.GetAttackRange ())
-        {
-            throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
-                                                     " is too far, can not attack! AI error?");
-        }
-
-        if (unit->GetAttackCooldown () <= 0.0f)
-        {
-            another->SetHp (another->GetHp () > unitType.GetAttackForce () ?
-                another->GetHp () - unitType.GetAttackForce () : 0);
-            unit->SetAttackCooldown (unitType.GetAttackSpeed ());
-        }
-    }
-
-    else if (command.commandType_ == UCT_MOVE_TO_WAYPOINT || command.commandType_ == UCT_FOLLOW_UNIT)
-    {
-        Urho3D::Vector3 target;
-        if (command.commandType_ == UCT_MOVE_TO_WAYPOINT)
-        {
-            const Map *map = dynamic_cast <const Map *> (GetManagersHub ()->GetManager (MI_MAP));
-            Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
-                    unit->GetRouteIndex (), unit->GetCurrentWaypointIndex (), unit->IsBelongsToFirst ());
-            target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
-        }
-        else
-        {
-            Unit *another = nullptr;
-            {
-                bool found;
-                unsigned index = GetUnitIndex (command.argument_, found);
-
-                if (!found)
-                {
-                    throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
-                                                             " does not exists, can not follow! AI error?");
-                }
-                else
-                {
-                    another = units_[index];
-                }
-            }
-            target = another->GetNode ()->GetWorldPosition ();
-        }
-
-        target = unit->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target,
-            Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
-
-        Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
-        crowdAgent->SetTargetPosition (target);
-    }
+    unitCommandProcessors_ [command.commandType_] (this, unit, command, unitType);
 }
 
 void UnitsManager::MakeUnitDead (Unit *unit)
 {
     // TODO: Implement.
+}
+
+void ProcessUnitCommandMoveOrFollow (UnitsManager *unitsManager, Unit *unit, const UnitCommand &command,
+                                     const UnitType &unitType)
+{
+    Urho3D::Vector3 target;
+    if (command.commandType_ == UCT_MOVE_TO_WAYPOINT)
+    {
+        const Map *map = dynamic_cast <const Map *> (unitsManager->GetManagersHub ()->GetManager (MI_MAP));
+        Urho3D::Vector2 nextWaypoint = map->GetWaypoint (
+                unit->GetRouteIndex (), unit->GetCurrentWaypointIndex (), unit->IsBelongsToFirst ());
+        target = {nextWaypoint.x_, 0.0f, nextWaypoint.y_};
+    }
+    else
+    {
+        Unit *another = unitsManager->GetUnit (command.argument_);
+        if (another == nullptr)
+        {
+            throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
+                                                     " does not exists, can not follow! AI error?");
+        }
+        target = another->GetNode ()->GetWorldPosition ();
+    }
+
+    target = unit->GetScene ()->GetComponent <Urho3D::NavigationMesh> ()->FindNearestPoint (target,
+                                                                                            Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
+
+    Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
+    crowdAgent->SetTargetPosition (target);
+}
+
+void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const UnitCommand &command,
+                                   const UnitType &unitType)
+{
+    unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetTargetVelocity (Urho3D::Vector3::ZERO);
+    Unit *another = unitsManager->GetUnit (command.argument_);
+
+    if (another == nullptr)
+    {
+        throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
+                                                 " does not exists, can not attack! AI error?");
+    }
+
+    if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
+        unitType.GetAttackRange ())
+    {
+        throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
+                                                 " is too far, can not attack! AI error?");
+    }
+
+    if (unit->GetAttackCooldown () <= 0.0f)
+    {
+        another->SetHp (another->GetHp () > unitType.GetAttackForce () ?
+                        another->GetHp () - unitType.GetAttackForce () : 0);
+        unit->SetAttackCooldown (unitType.GetAttackSpeed ());
+    }
 }
 }

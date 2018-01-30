@@ -22,6 +22,7 @@ public:
     const Unit *SpawnUnit (unsigned spawnId, unsigned unitType);
 
     const Unit *GetUnit (unsigned int id) const;
+    Unit *GetUnit (unsigned int id);
     const Unit *GetNearestEnemy (Unit *unit) const;
 
     virtual void HandleUpdate (float timeStep);
@@ -47,8 +48,18 @@ private:
     void ProcessUnitCommand (Unit *unit, const UnitCommand &command, const UnitType &unitType);
     void MakeUnitDead (Unit *unit);
 
+    friend void ProcessUnitCommandMoveOrFollow (
+            UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
+
+    friend void ProcessUnitCommandAttackUnit (
+            UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
+
+    typedef void (*UnitCommandProcessor) (
+            UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
+
     unsigned spawnUnitType_;
     std::vector <UnitType> unitsTypes_;
     Urho3D::PODVector <Unit *> units_;
+    Urho3D::PODVector <UnitCommandProcessor> unitCommandProcessors_;
 };
 }

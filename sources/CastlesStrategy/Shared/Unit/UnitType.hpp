@@ -13,7 +13,8 @@ enum UnitCommandType
 {
     UCT_MOVE_TO_WAYPOINT = 0,
     UCT_FOLLOW_UNIT,
-    UCT_ATTACK_UNIT
+    UCT_ATTACK_UNIT,
+    UCT_COMMANDS_COUNT
 };
 
 struct UnitCommand
