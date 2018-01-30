@@ -1,18 +1,18 @@
 #include "ServerActivity.hpp"
+#include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Network/Network.h>
 
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/Resource/XMLElement.h>
 
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
 
-#include <CastlesStrategy/Server/Activity/IncomingNetworkMessageType.hpp>
-#include <CastlesStrategy/Server/Activity/OutcomingNetworkMessageType.hpp>
+#include <CastlesStrategy/Shared/Network/IncomingNetworkMessageType.hpp>
+#include <CastlesStrategy/Shared/Network/OutcomingNetworkMessageType.hpp>
 #include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
 #include <Utils/UniversalException.hpp>
 
@@ -221,6 +221,10 @@ void ServerActivity::LoadResources (unsigned int &startCoins)
 
     unitsManager->LoadUnitsTypesFromXML (unitsTypesXMLFile->GetRoot ());
     unitsManager->LoadSpawnsFromXML (mapXML);
+
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteString (unitsTypesXMLFile->ToString ("    "));
+    //firstPlayer_->SendMessage ();
 
     Urho3D::XMLFile *sceneXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Scene.xml");
     if (sceneXMLFile == nullptr)
