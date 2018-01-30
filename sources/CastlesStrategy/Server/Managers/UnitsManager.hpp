@@ -2,10 +2,10 @@
 #include <vector>
 #include <Urho3D/Container/Vector.h>
 
-#include <CastlesStrategyServer/Managers/Manager.hpp>
-#include <CastlesStrategyServer/Managers/GameStatus.hpp>
-#include <CastlesStrategyServer/Unit/Unit.hpp>
-#include <CastlesStrategyServer/Unit/UnitType.hpp>
+#include <CastlesStrategy/Server/Managers/Manager.hpp>
+#include <CastlesStrategy/Server/Managers/GameStatus.hpp>
+#include <CastlesStrategy/Server/Unit/Unit.hpp>
+#include <CastlesStrategy/Server/Unit/UnitType.hpp>
 
 namespace CastlesStrategy
 {

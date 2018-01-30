@@ -1,7 +1,7 @@
 #include "ManagersHub.hpp"
-#include <CastlesStrategyServer/Managers/UnitsManager.hpp>
-#include <CastlesStrategyServer/Managers/Map.hpp>
-#include <CastlesStrategyServer/Managers/PlayersManager.hpp>
+#include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy

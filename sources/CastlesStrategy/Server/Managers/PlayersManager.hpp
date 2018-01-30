@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
-#include <CastlesStrategyServer/Managers/Manager.hpp>
-#include <CastlesStrategyServer/Player/Player.hpp>
+#include <CastlesStrategy/Server/Managers/Manager.hpp>
+#include <CastlesStrategy/Server/Player/Player.hpp>
 
 namespace CastlesStrategy
 {

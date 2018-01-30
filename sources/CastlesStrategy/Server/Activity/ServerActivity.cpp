@@ -7,13 +7,13 @@
 #include <Urho3D/Resource/XMLFile.h>
 #include <Urho3D/Resource/XMLElement.h>
 
-#include <CastlesStrategyServer/Managers/UnitsManager.hpp>
-#include <CastlesStrategyServer/Managers/PlayersManager.hpp>
-#include <CastlesStrategyServer/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
+#include <CastlesStrategy/Server/Managers/Map.hpp>
 
-#include <CastlesStrategyServer/Activity/IncomingNetworkMessageType.hpp>
-#include <CastlesStrategyServer/Activity/OutcomingNetworkMessageType.hpp>
-#include <CastlesStrategyServer/Activity/IncomingNetworkMessageProcessors.hpp>
+#include <CastlesStrategy/Server/Activity/IncomingNetworkMessageType.hpp>
+#include <CastlesStrategy/Server/Activity/OutcomingNetworkMessageType.hpp>
+#include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy

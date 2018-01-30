@@ -1,5 +1,5 @@
 #include "Player.hpp"
-#include <CastlesStrategyServer/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy

@@ -1,7 +1,7 @@
 #include "LauncherApplication.hpp"
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
-#include <CastlesStrategyClient/Activity/StartGameActivity.hpp>
+#include <CastlesStrategy/Client/Activity/StartGameActivity.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)
 LauncherApplication::LauncherApplication (Urho3D::Context *context) : ActivitiesApplication::ActivitiesApplication (context)

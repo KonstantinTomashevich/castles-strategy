@@ -6,9 +6,9 @@
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Navigation/NavigationMesh.h>
 
-#include <CastlesStrategyServer/Managers/UnitsManager.hpp>
-#include <CastlesStrategyServer/Managers/Map.hpp>
-#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
+#include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
 
 namespace CastlesStrategy
 {

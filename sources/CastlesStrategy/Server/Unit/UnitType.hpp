@@ -1,7 +1,7 @@
 #pragma once
 #include <Urho3D/Container/Str.h>
 #include <Urho3D/Resource/XMLElement.h>
-#include <CastlesStrategyServer/Unit/Unit.hpp>
+#include <CastlesStrategy/Server/Unit/Unit.hpp>
 
 namespace CastlesStrategy
 {

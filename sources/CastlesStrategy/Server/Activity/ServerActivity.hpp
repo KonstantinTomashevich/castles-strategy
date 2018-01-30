@@ -4,8 +4,8 @@
 #include <Urho3D/Scene/Scene.h>
 
 #include <ActivitiesApplication/Activity.hpp>
-#include <CastlesStrategyServer/Managers/GameStatus.hpp>
-#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
+#include <CastlesStrategy/Server/Managers/GameStatus.hpp>
+#include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
 
 namespace CastlesStrategy
 {

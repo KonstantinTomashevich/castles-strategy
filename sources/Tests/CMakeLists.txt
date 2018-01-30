@@ -4,7 +4,7 @@ macro(setup_test_executable ARG_NAME)
     define_resource_dirs ()
     setup_main_executable ()
 
-    target_link_libraries (${ARG_NAME} CastlesStrategyServer)
+    target_link_libraries (${ARG_NAME} CastlesStrategy)
     add_test (NAME ${ARG_NAME} COMMAND ${ARG_NAME})
     set_target_properties (
             ${ARG_NAME}

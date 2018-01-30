@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 
-#include <CastlesStrategyServer/Managers/Manager.hpp>
-#include <CastlesStrategyServer/Map/Route.hpp>
+#include <CastlesStrategy/Server/Managers/Manager.hpp>
+#include <CastlesStrategy/Server/Map/Route.hpp>
 
 namespace CastlesStrategy
 {

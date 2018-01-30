@@ -15,12 +15,12 @@
 #include <Urho3D/Navigation/Navigable.h>
 
 #include <Utils/UniversalException.hpp>
-#include <CastlesStrategyServer/Unit/Unit.hpp>
-#include <CastlesStrategyServer/Unit/UnitType.hpp>
+#include <CastlesStrategy/Server/Unit/Unit.hpp>
+#include <CastlesStrategy/Server/Unit/UnitType.hpp>
 
-#include <CastlesStrategyServer/Managers/UnitsManager.hpp>
-#include <CastlesStrategyServer/Managers/Map.hpp>
-#include <CastlesStrategyServer/Managers/ManagersHub.hpp>
+#include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
 
 void CustomTerminate ();
 void SetupEngine (Urho3D::Engine *engine);

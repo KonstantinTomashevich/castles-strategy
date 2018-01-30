@@ -1,7 +1,7 @@
 #pragma once
 #include <Urho3D/Container/Vector.h>
 #include <Urho3D/Scene/Scene.h>
-#include <CastlesStrategyServer/Managers/Manager.hpp>
+#include <CastlesStrategy/Server/Managers/Manager.hpp>
 
 namespace CastlesStrategy
 {
