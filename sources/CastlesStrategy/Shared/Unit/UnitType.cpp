@@ -27,7 +27,7 @@ bool UnitCommand::operator != (const UnitCommand &rhs) const
 
 UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
                     float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
-                    unsigned int maxHp, const Urho3D::String &prefabPath) :
+                    unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath) :
         id_ (id),
         recruitmentCost_ (recruitmentCost),
         recruitmentTime_ (recruitmentTime),
@@ -40,7 +40,10 @@ UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruit
         navigationRadius_ (navigationRadius),
         moveSpeed_ (moveSpeed),
         maxHp_ (maxHp),
-        prefabPath_ (prefabPath)
+
+        prefabPath_ (prefabPath),
+        iconPath_ (iconPath),
+        aiProcessor_ (nullptr)
 {
     Check ();
 }
@@ -134,6 +137,11 @@ void UnitType::SetAiProcessor (UnitAIProcessor aiProcessor)
     aiProcessor_ = aiProcessor;
 }
 
+const Urho3D::String &UnitType::GetIconPath () const
+{
+    return iconPath_;
+}
+
 void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 {
     output.SetUInt ("recruitmentCost", recruitmentCost_);
@@ -147,15 +155,17 @@ void UnitType::SaveToXML (Urho3D::XMLElement &output) const
     output.SetFloat ("navigationRadius", navigationRadius_);
     output.SetFloat ("moveSpeed", moveSpeed_);
     output.SetUInt ("maxHp", maxHp_);
+
     output.SetAttribute ("prefabPath", prefabPath_);
+    output.SetAttribute ("iconPath", iconPath_);
 }
 
 UnitType UnitType::LoadFromXML (unsigned int id, const Urho3D::XMLElement &input)
 {
     return UnitType (id, input.GetUInt ("recruitmentCost"), input.GetFloat ("recruitmentTime"),
-                     input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"),
-                     input.GetUInt ("attackForce"), input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"),
-                     input.GetFloat ("moveSpeed"), input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"));
+                     input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"), input.GetUInt ("attackForce"),
+                     input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"), input.GetFloat ("moveSpeed"),
+                     input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"), input.GetAttribute ("iconPath"));
 }
 
 void UnitType::Check ()
@@ -197,7 +207,17 @@ void UnitType::Check ()
 
     if (prefabPath_.Empty ())
     {
-        throw UniversalException <UnitType> ("UnitType: model path must not be more empty!");
+        throw UniversalException <UnitType> ("UnitType: prefab path must not be more empty!");
+    }
+
+    if (iconPath_.Empty ())
+    {
+        throw UniversalException <UnitType> ("UnitType: icon path must not be more empty!");
+    }
+
+    if (prefabPath_.Empty ())
+    {
+        throw UniversalException <UnitType> ("UnitType: prefab path must not be more empty!");
     }
 }
 }

@@ -13,6 +13,7 @@
             moveSpeed="2"
             maxHp="1000"
             prefabPath="Not specified!"
+            iconPath="Not specified!"
     />
 
     <unitType
@@ -27,7 +28,9 @@
             navigationRadius="0.3"
             moveSpeed="2"
             maxHp="100"
+
             prefabPath="Not specified!"
+            iconPath="Not specified!"
     />
 
     <unitType
@@ -43,5 +46,6 @@
             moveSpeed="2"
             maxHp="10"
             prefabPath="Not specified!"
+            iconPath="Not specified!"
     />
 </unitTypes>

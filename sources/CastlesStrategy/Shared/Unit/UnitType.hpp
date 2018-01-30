@@ -35,7 +35,7 @@ class UnitType
 public:
     UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
                   float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
-                  unsigned int maxHp, const Urho3D::String &prefabPath);
+                  unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath);
     UnitType (const UnitType &another);
     virtual ~UnitType ();
 
@@ -51,8 +51,9 @@ public:
     float GetNavigationRadius () const;
     float GetMoveSpeed () const;
     unsigned int GetMaxHp () const;
-    const Urho3D::String &GetPrefabPath () const;
 
+    const Urho3D::String &GetPrefabPath () const;
+    const Urho3D::String &GetIconPath () const;
     UnitAIProcessor GetAiProcessor () const;
     void SetAiProcessor (UnitAIProcessor aiProcessor);
 
@@ -74,7 +75,9 @@ private:
     float navigationRadius_;
     float moveSpeed_;
     unsigned int maxHp_;
+
     Urho3D::String prefabPath_;
+    Urho3D::String iconPath_;
     UnitAIProcessor aiProcessor_;
 };
 }
