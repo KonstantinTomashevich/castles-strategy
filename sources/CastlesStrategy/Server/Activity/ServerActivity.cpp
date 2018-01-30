@@ -191,8 +191,17 @@ void ServerActivity::ReportGameStatus (GameStatus gameStatus) const
 
 void ServerActivity::LoadResources (unsigned int &startCoins)
 {
-    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::String mapFolder = DEFAULT_MAPS_FOLDER + Urho3D::String ("/") + mapName_ + "/";
+    bool useDefaultUnitTypes;
+
+    LoadMap (mapFolder, startCoins, useDefaultUnitTypes);
+    LoadUnitTypesAndSpawns (mapFolder, useDefaultUnitTypes);
+    LoadScene (mapFolder);
+}
+
+void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::XMLFile *mapXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml");
 
     if (mapXMLFile == nullptr)
@@ -205,12 +214,16 @@ void ServerActivity::LoadResources (unsigned int &startCoins)
     startCoins = mapXML.GetUInt ("startCoins");
 
     Map *map = dynamic_cast <Map *> (managersHub_->GetManager (MI_MAP));
-    UnitsManager *unitsManager = dynamic_cast <UnitsManager *> (managersHub_->GetManager (MI_UNITS_MANAGER));
-
     map->SetSize (mapXML.GetIntVector2 ("size"));
     map->LoadRoutesFromXML (mapXML);
+}
 
-    Urho3D::String unitsTypesXMLPath = useDefaultUnitsTypes ? DEFAULT_UNITS_TYPES_PATH : mapFolder + "UnitsTypes.xml";
+void ServerActivity::LoadUnitTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    UnitsManager *unitsManager = dynamic_cast <UnitsManager *> (managersHub_->GetManager (MI_UNITS_MANAGER));
+
+    Urho3D::String unitsTypesXMLPath = useDefaultUnitTypes ? DEFAULT_UNITS_TYPES_PATH : mapFolder + "UnitsTypes.xml";
     Urho3D::XMLFile *unitsTypesXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (unitsTypesXMLPath);
 
     if (unitsTypesXMLFile == nullptr)
@@ -220,12 +233,21 @@ void ServerActivity::LoadResources (unsigned int &startCoins)
     }
 
     unitsManager->LoadUnitsTypesFromXML (unitsTypesXMLFile->GetRoot ());
-    unitsManager->LoadSpawnsFromXML (mapXML);
+    unitsManager->LoadSpawnsFromXML (resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml")->GetRoot ());
+    SendUnitsTypesXMLToPlayers (unitsTypesXMLFile);
+}
 
+void ServerActivity::SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTypesXMLFile) const
+{
     Urho3D::VectorBuffer messageData;
     messageData.WriteString (unitsTypesXMLFile->ToString ("    "));
-    //firstPlayer_->SendMessage ();
+    firstPlayer_->SendMessage (ONMT_UNITS_TYPES_XML, true, false, messageData);
+    secondPlayer_->SendMessage (ONMT_UNITS_TYPES_XML, true, false, messageData);
+}
 
+void ServerActivity::LoadScene (const Urho3D::String &mapFolder)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::XMLFile *sceneXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Scene.xml");
     if (sceneXMLFile == nullptr)
     {
