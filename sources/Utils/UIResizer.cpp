@@ -32,27 +32,34 @@ void UIResizer::Update (float timeStep)
     Urho3D::Graphics *graphics = context_->GetSubsystem <Urho3D::Graphics> ();
     if (continuousUpdate_ || lastScreenSize_.x_ != graphics->GetWidth () || lastScreenSize_.y_ != graphics->GetHeight ())
     {
-        lastScreenSize_.x_ = graphics->GetWidth ();
-        lastScreenSize_.y_ = graphics->GetHeight ();
+        RecalculateUI ();
 
-        Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
-        Urho3D::UIElement *rootElement = ui->GetRoot ();
+    }
+}
 
-        if (scanRootElement_ != "UIRoot")
-        {
-            rootElement = rootElement->GetChild (scanRootElement_, true);
-        }
+void UIResizer::RecalculateUI ()
+{
+    Urho3D::Graphics *graphics = context_->GetSubsystem <Urho3D::Graphics> ();
+    lastScreenSize_.x_ = graphics->GetWidth ();
+    lastScreenSize_.y_ = graphics->GetHeight ();
 
-        if (rootElement != nullptr && rootElement->HasTag ("UIResizer"))
-        {
-            Urho3D::HashMap <Urho3D::StringHash, int> dependenciesValues;
-            dependenciesValues ["SW"] = lastScreenSize_.x_;
-            dependenciesValues ["SH"] = lastScreenSize_.y_;
+    Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
+    Urho3D::UIElement *rootElement = ui->GetRoot ();
 
-            ProcessElement (rootElement, dependenciesValues);
-            ProcessElementChildren (rootElement, dependenciesValues);
-            ProcessElementLayout (rootElement, dependenciesValues);
-        }
+    if (scanRootElement_ != "UIRoot")
+    {
+        rootElement = rootElement->GetChild (scanRootElement_, true);
+    }
+
+    if (rootElement != nullptr && rootElement->HasTag ("UIResizer"))
+    {
+        Urho3D::HashMap <Urho3D::StringHash, int> dependenciesValues;
+        dependenciesValues["SW"] = lastScreenSize_.x_;
+        dependenciesValues["SH"] = lastScreenSize_.y_;
+
+        ProcessElement (rootElement, dependenciesValues);
+        ProcessElementChildren (rootElement, dependenciesValues);
+        ProcessElementLayout (rootElement, dependenciesValues);
     }
 }
 

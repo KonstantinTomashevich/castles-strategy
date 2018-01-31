@@ -12,6 +12,8 @@ public:
     static void RegisterObject (Urho3D::Context *context);
 
     virtual void Update (float timeStep);
+    void RecalculateUI ();
+
     bool IsContinuousUpdate () const;
     void SetContinuousUpdate (bool continuousUpdate);
 
