@@ -111,7 +111,7 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
 {
     Urho3D::Connection *connection =
             dynamic_cast <Urho3D::Connection *> (eventData[Urho3D::ClientConnected::P_CONNECTION].GetPtr ());
-    Urho3D::String name = eventData[P_IDENTITY_NAME].GetString ();
+    Urho3D::String name = eventData [IdentityFields::NAME].GetString ();
 
     RemoveUnidentifiedConnection (connection);
     identifiedConnections_.Push (Urho3D::MakePair (connection, name));

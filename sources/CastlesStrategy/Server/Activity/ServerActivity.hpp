@@ -14,6 +14,7 @@ typedef void (*IncomingNetworkMessageProcessor) (ManagersHub *managersHub,
 
 class ServerActivity : public ActivitiesApplication::Activity
 {
+URHO3D_OBJECT (ServerActivity, Activity)
 public:
     ServerActivity (Urho3D::Context *context);
     virtual ~ServerActivity ();

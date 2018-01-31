@@ -6,6 +6,7 @@ namespace CastlesStrategy
 {
 class MainMenuActivity : public ActivitiesApplication::Activity
 {
+URHO3D_OBJECT (MainMenuActivity, Activity)
 public:
     MainMenuActivity (Urho3D::Context *context);
     virtual ~MainMenuActivity ();
