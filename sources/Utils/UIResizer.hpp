@@ -22,9 +22,7 @@ public:
     void SetScanRootElement (const Urho3D::String &scanRootElement);
 
 private:
-    void
-    ProcessElement (Urho3D::UIElement *element, Urho3D::HashMap <Urho3D::StringHash, int> &dependenciesValues) const;
-
+    void ProcessElement (Urho3D::UIElement *element, Urho3D::HashMap <Urho3D::StringHash, int> &dependenciesValues) const;
     void ProcessElementChildren (Urho3D::UIElement *element,
                                      Urho3D::HashMap <Urho3D::StringHash, int> &dependenciesValues) const;
 

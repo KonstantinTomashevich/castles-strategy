@@ -54,12 +54,19 @@ void UIResizer::RecalculateUI ()
     if (rootElement != nullptr && rootElement->HasTag ("UIResizer"))
     {
         Urho3D::HashMap <Urho3D::StringHash, int> dependenciesValues;
-        dependenciesValues["SW"] = lastScreenSize_.x_;
-        dependenciesValues["SH"] = lastScreenSize_.y_;
+        dependenciesValues ["SW"] = lastScreenSize_.x_;
+        dependenciesValues ["SH"] = lastScreenSize_.y_;
 
-        ProcessElement (rootElement, dependenciesValues);
+        if (rootElement != ui->GetRoot ())
+        {
+            ProcessElement (rootElement, dependenciesValues);
+        }
+
         ProcessElementChildren (rootElement, dependenciesValues);
-        ProcessElementLayout (rootElement, dependenciesValues);
+        if (rootElement != ui->GetRoot ())
+        {
+            ProcessElementLayout (rootElement, dependenciesValues);
+        }
     }
 }
 
