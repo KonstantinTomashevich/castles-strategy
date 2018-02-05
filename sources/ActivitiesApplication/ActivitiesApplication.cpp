@@ -77,7 +77,7 @@ Activity *ActivitiesApplication::GetActivityByIndex (int index)
 
 void ActivitiesApplication::StopAllActivitiesNextFrame ()
 {
-    for (Urho3D::SharedPtr <Activity> &activity : activitiesToStop_)
+    for (Urho3D::SharedPtr <Activity> &activity : currentActivities_)
     {
         activitiesToStop_.Push (activity);
     }
