@@ -24,16 +24,4 @@ private:
 
     UIResizer *uiResizer_;
 };
-
-URHO3D_EVENT (CONNECT_TO_SERVER_REQUEST, ConnectToServerRequest)
-{
-    URHO3D_PARAM (PLAYER_NAME, PlayerName);
-    URHO3D_PARAM (ADDRESS, Address);
-    URHO3D_PARAM (PORT, Port);
-}
-
-URHO3D_EVENT (START_SERVER_REQUEST, StartServerRequest)
-{
-    URHO3D_PARAM (PLAYER_NAME, PlayerName);
-}
 }

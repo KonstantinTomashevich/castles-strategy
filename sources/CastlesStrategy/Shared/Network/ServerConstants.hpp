@@ -12,6 +12,6 @@ namespace IdentityFields
 const Urho3D::StringHash NAME ("Name");
 }
 
-const char *DEFAULT_MAPS_FOLDER = "Maps";
-const char *DEFAULT_UNITS_TYPES_PATH = "DefaultUnitsTypes.xml";
+const Urho3D::String DEFAULT_MAPS_FOLDER ("Maps");
+const Urho3D::String DEFAULT_UNITS_TYPES_PATH ("DefaultUnitsTypes.xml");
 }
