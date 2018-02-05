@@ -13,6 +13,7 @@
 
 #include <Utils/UIResizer.hpp>
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
+#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
 
 namespace CastlesStrategy
 {
@@ -22,9 +23,12 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
           playerName_ (playerName),
           serverAddress_ (serverAddress),
           port_ (port),
-          scene_ (new Urho3D::Scene (context))
+          scene_ (new Urho3D::Scene (context)),
+
+          ingameUI_ (nullptr)
 {
     InitScene ();
+    ingameUI_ = new IngameUI (this);
 }
 
 IngameActivity::~IngameActivity ()
@@ -34,6 +38,7 @@ IngameActivity::~IngameActivity ()
 
 void IngameActivity::Start ()
 {
+    ingameUI_->LoadUI ();
     SubscribeToEvents ();
     ConnectToServer ();
     SetupViewport ();
@@ -99,21 +104,26 @@ void IngameActivity::SetupViewport () const
 
 void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-
+    ingameUI_->ShowError ("Connection failed!", "Couldn't connect to specified server!",
+        [] (IngameActivity *activity) -> void
+        {
+            activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+            activity->SendEvent (START_MAIN_MENU);
+        });
 }
 
 void IngameActivity::HandleServerConnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-
+    // TODO: Implement.
 }
 
 void IngameActivity::HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-
+    // TODO: Implement.
 }
 
 void IngameActivity::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-
+    // TODO: Implement.
 }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <ActivitiesApplication/Activity.hpp>
 #include <Urho3D/Scene/Scene.h>
+#include <CastlesStrategy/Client/Ingame/IngameUI.hpp>
 
 namespace CastlesStrategy
 {
@@ -35,6 +36,8 @@ private:
     Urho3D::String serverAddress_;
     unsigned int port_;
     Urho3D::Scene *scene_;
+
+    IngameUI *ingameUI_;
 };
 }
 
