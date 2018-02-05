@@ -34,6 +34,7 @@ void LauncherApplication::Start ()
     input->SetMouseVisible (true);
     input->SetMouseMode (Urho3D::MM_FREE);
 
+    UIResizer::RegisterObject (context_);
     SubscribeToEvents ();
     SendEvent (CastlesStrategy::START_MAIN_MENU);
 }

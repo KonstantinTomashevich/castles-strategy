@@ -51,7 +51,7 @@ void IngameActivity::Update (float timeStep)
 
 void IngameActivity::Stop ()
 {
-
+    ingameUI_->ClearUI ();
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
@@ -104,12 +104,12 @@ void IngameActivity::SetupViewport () const
 
 void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    ingameUI_->ShowError ("Connection failed!", "Couldn't connect to specified server!",
-        [] (IngameActivity *activity) -> void
-        {
-            activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-            activity->SendEvent (START_MAIN_MENU);
-        });
+    ingameUI_->ShowError ("Connection failed!", "Couldn't connect to specified server!", "Go to main menu.",
+                          [] (IngameActivity *activity) -> void
+                          {
+                              activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+                              activity->SendEvent (START_MAIN_MENU);
+                          });
 }
 
 void IngameActivity::HandleServerConnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

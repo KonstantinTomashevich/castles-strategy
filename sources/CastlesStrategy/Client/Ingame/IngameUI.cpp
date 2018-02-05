@@ -56,10 +56,12 @@ void IngameUI::SetupUnitsIcons ()
     // TODO: Implement.
 }
 
-void IngameUI::ShowError (const Urho3D::String &title, const Urho3D::String &description, UICallback callback)
+void IngameUI::ShowError (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
+                          UICallback callback)
 {
     dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("Title", false))->SetText (title);
     dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("Description", false))->SetText (description);
+    dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (okButtonText);
     errorWindow_->SetVisible (true);
     errorWindowOkCallback_ = callback;
 }

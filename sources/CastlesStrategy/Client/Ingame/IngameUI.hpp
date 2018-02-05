@@ -22,7 +22,8 @@ public:
 
     void LoadUI ();
     void SetupUnitsIcons ();
-    void ShowError (const Urho3D::String &title, const Urho3D::String &description, UICallback callback);
+    void ShowError (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
+                        UICallback callback);
     void ClearUI ();
 
 private:
