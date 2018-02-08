@@ -2,13 +2,13 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/UI/Window.h>
+#include <Urho3D/Container/List.h>
 
 namespace CastlesStrategy
 {
 class IngameActivity;
 typedef void (*UICallback) (IngameActivity *activity);
 
-// TODO: Add errors stack!
 class IngameUI : public Urho3D::Object
 {
 URHO3D_OBJECT (IngameUI, Object)
@@ -27,7 +27,17 @@ public:
     void ClearUI ();
 
 private:
+    struct MessageData
+    {
+        Urho3D::String title;
+        Urho3D::String description;
+        Urho3D::String okButtonText;
+        UICallback uiCallback;
+    };
+
     void LoadElements ();
+    void ShowNextMessage ();
+
     void SubscribeToEvents ();
     void SubscribeToTopBarEvents ();
     void SubscribeToMenuEvents ();
@@ -45,6 +55,6 @@ private:
     Urho3D::Window *topBar_;
     Urho3D::Window *menu_;
     Urho3D::Window *messageWindow_;
-    UICallback messageWindowOkCallback_;
+    Urho3D::List <MessageData> requestedMessages_;
 };
 }

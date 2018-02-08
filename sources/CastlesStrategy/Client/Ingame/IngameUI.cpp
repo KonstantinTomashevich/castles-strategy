@@ -21,7 +21,7 @@ IngameUI::IngameUI (IngameActivity *owner) : Urho3D::Object (owner->GetContext (
     topBar_ (nullptr),
     menu_ (nullptr),
     messageWindow_ (nullptr),
-    messageWindowOkCallback_ (nullptr)
+    requestedMessages_ ()
 {
 
 }
@@ -60,11 +60,11 @@ void IngameUI::SetupUnitsIcons ()
 void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
                           UICallback callback)
 {
-    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Title", false))->SetText (title);
-    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Description", false))->SetText (description);
-    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (okButtonText);
-    messageWindow_->SetVisible (true);
-    messageWindowOkCallback_ = callback;
+    requestedMessages_.Push ({title, description, okButtonText, callback});
+    if (!messageWindow_->IsVisible ())
+    {
+        ShowNextMessage ();
+    }
 }
 
 void IngameUI::ClearUI ()
@@ -97,6 +97,15 @@ void IngameUI::LoadElements ()
     messageWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/MessageWindow.xml")->GetRoot (), style));
     messageWindow_->SetVisible (false);
+}
+
+void IngameUI::ShowNextMessage ()
+{
+    const MessageData &messageData = requestedMessages_.Front ();
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Title", false))->SetText (messageData.title);
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Description", false))->SetText (messageData.description);
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (messageData.okButtonText);
+    messageWindow_->SetVisible (true);
 }
 
 void IngameUI::SubscribeToEvents ()
@@ -152,7 +161,16 @@ void IngameUI::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho
 
 void IngameUI::HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    messageWindow_->SetVisible (false);
-    messageWindowOkCallback_ (owner_);
+    requestedMessages_.Front ().uiCallback (owner_);
+    requestedMessages_.PopFront ();
+
+    if (requestedMessages_.Empty ())
+    {
+        messageWindow_->SetVisible (false);
+    }
+    else
+    {
+        ShowNextMessage ();
+    }
 }
 }
