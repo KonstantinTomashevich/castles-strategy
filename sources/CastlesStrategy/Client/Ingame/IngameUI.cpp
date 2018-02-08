@@ -20,8 +20,8 @@ IngameUI::IngameUI (IngameActivity *owner) : Urho3D::Object (owner->GetContext (
 
     topBar_ (nullptr),
     menu_ (nullptr),
-    errorWindow_ (nullptr),
-    errorWindowOkCallback_ (nullptr)
+    messageWindow_ (nullptr),
+    messageWindowOkCallback_ (nullptr)
 {
 
 }
@@ -57,25 +57,25 @@ void IngameUI::SetupUnitsIcons ()
     // TODO: Implement.
 }
 
-void IngameUI::ShowError (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
+void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
                           UICallback callback)
 {
-    dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("Title", false))->SetText (title);
-    dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("Description", false))->SetText (description);
-    dynamic_cast <Urho3D::Text *> (errorWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (okButtonText);
-    errorWindow_->SetVisible (true);
-    errorWindowOkCallback_ = callback;
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Title", false))->SetText (title);
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Description", false))->SetText (description);
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (okButtonText);
+    messageWindow_->SetVisible (true);
+    messageWindowOkCallback_ = callback;
 }
 
 void IngameUI::ClearUI ()
 {
     topBar_->Remove ();
     menu_->Remove ();
-    errorWindow_->Remove ();
+    messageWindow_->Remove ();
 
     topBar_ = nullptr;
     menu_ = nullptr;
-    errorWindow_ = nullptr;
+    messageWindow_ = nullptr;
 }
 
 void IngameUI::LoadElements ()
@@ -94,16 +94,16 @@ void IngameUI::LoadElements ()
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/IngameMenuWindow.xml")->GetRoot (), style));
     menu_->SetVisible (false);
 
-    errorWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
-            resourceCache->GetResource <Urho3D::XMLFile> ("UI/ErrorWindow.xml")->GetRoot (), style));
-    errorWindow_->SetVisible (false);
+    messageWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/MessageWindow.xml")->GetRoot (), style));
+    messageWindow_->SetVisible (false);
 }
 
 void IngameUI::SubscribeToEvents ()
 {
     SubscribeToTopBarEvents ();
     SubscribeToMenuEvents ();
-    SubscribeToErrorWindowEvents ();
+    SubscribeToMessageWindowEvents ();
 }
 
 void IngameUI::SubscribeToTopBarEvents ()
@@ -123,10 +123,10 @@ void IngameUI::SubscribeToMenuEvents ()
     SubscribeToEvent (exitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuExitFromGameClicked));
 }
 
-void IngameUI::SubscribeToErrorWindowEvents ()
+void IngameUI::SubscribeToMessageWindowEvents ()
 {
-    Urho3D::Button *okButton = dynamic_cast <Urho3D::Button *> (errorWindow_->GetChild ("OkButton", false));
-    SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleErrorWindowOkClicked));
+    Urho3D::Button *okButton = dynamic_cast <Urho3D::Button *> (messageWindow_->GetChild ("OkButton", false));
+    SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMessageWindowOkClicked));
 }
 
 void IngameUI::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
@@ -147,13 +147,12 @@ void IngameUI::HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D
 
 void IngameUI::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
     context_->GetSubsystem <Urho3D::Engine> ()->Exit ();
 }
 
-void IngameUI::HandleErrorWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUI::HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    errorWindow_->SetVisible (false);
-    errorWindowOkCallback_ (owner_);
+    messageWindow_->SetVisible (false);
+    messageWindowOkCallback_ (owner_);
 }
 }

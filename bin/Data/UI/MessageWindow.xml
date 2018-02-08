@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <element type="Window">
-	<attribute name="Name" value="ErrorWindow" />
+	<attribute name="Name" value="MessageWindow" />
 	<attribute name="Size" value="462 179" />
 	<attribute name="Min Anchor" value="0.5 0.5" />
 	<attribute name="Max Anchor" value="0.5 0.5" />
@@ -47,7 +47,7 @@
 			<string value="UIResizer" />
 		</attribute>
 		<attribute name="Font Size" value="31.53" />
-		<attribute name="Text" value="${ErrorTitle}" />
+		<attribute name="Text" value="${MessageTitle}" />
 	</element>
 	<element type="Text">
 		<attribute name="Name" value="Description" />
@@ -73,7 +73,7 @@
 			<string value="UIResizer" />
 		</attribute>
 		<attribute name="Font Size" value="15.765" />
-		<attribute name="Text" value="${ErrorDescription}" />
+		<attribute name="Text" value="${MessageDescription}" />
 		<attribute name="Word Wrap" value="true" />
 	</element>
 	<element type="Button">

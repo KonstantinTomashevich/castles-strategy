@@ -22,7 +22,7 @@ public:
 
     void LoadUI ();
     void SetupUnitsIcons ();
-    void ShowError (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
+    void ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
                         UICallback callback);
     void ClearUI ();
 
@@ -31,20 +31,20 @@ private:
     void SubscribeToEvents ();
     void SubscribeToTopBarEvents ();
     void SubscribeToMenuEvents ();
-    void SubscribeToErrorWindowEvents ();
+    void SubscribeToMessageWindowEvents ();
 
     void HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
-    void HandleErrorWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     IngameActivity *owner_;
     bool inputEnabled_;
 
     Urho3D::Window *topBar_;
     Urho3D::Window *menu_;
-    Urho3D::Window *errorWindow_;
-    UICallback errorWindowOkCallback_;
+    Urho3D::Window *messageWindow_;
+    UICallback messageWindowOkCallback_;
 };
 }
