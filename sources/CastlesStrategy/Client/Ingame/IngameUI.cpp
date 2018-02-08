@@ -10,6 +10,7 @@
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <Urho3D/Engine/Engine.h>
 
 namespace CastlesStrategy
 {
@@ -100,17 +101,54 @@ void IngameUI::LoadElements ()
 
 void IngameUI::SubscribeToEvents ()
 {
-    // TODO: TopBar events.
-    // TODO: Menu events.
-
+    SubscribeToTopBarEvents ();
+    SubscribeToMenuEvents ();
     SubscribeToErrorWindowEvents ();
+}
+
+void IngameUI::SubscribeToTopBarEvents ()
+{
+    Urho3D::Button *menuButton = dynamic_cast <Urho3D::Button *> (topBar_->GetChild ("MenuButton", false));
+    SubscribeToEvent (menuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarMenuClicked));
+}
+
+void IngameUI::SubscribeToMenuEvents ()
+{
+    Urho3D::Button *closeMenuButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("CloseMenuButton", false));
+    Urho3D::Button *exitToMainMenuButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("ExitToMainMenuButton", false));
+    Urho3D::Button *exitButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("ExitButton", false));
+
+    SubscribeToEvent (closeMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuCloseClicked));
+    SubscribeToEvent (exitToMainMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuExitToMainClicked));
+    SubscribeToEvent (exitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuExitFromGameClicked));
 }
 
 void IngameUI::SubscribeToErrorWindowEvents ()
 {
-    Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::Button *okButton = dynamic_cast <Urho3D::Button *> (errorWindow_->GetChild ("OkButton", false));
     SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleErrorWindowOkClicked));
+}
+
+void IngameUI::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    menu_->SetVisible (true);
+}
+
+void IngameUI::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    menu_->SetVisible (false);
+}
+
+void IngameUI::HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+    SendEvent (START_MAIN_MENU);
+}
+
+void IngameUI::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+    context_->GetSubsystem <Urho3D::Engine> ()->Exit ();
 }
 
 void IngameUI::HandleErrorWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

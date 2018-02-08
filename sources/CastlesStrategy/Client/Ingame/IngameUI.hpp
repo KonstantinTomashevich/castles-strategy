@@ -29,8 +29,14 @@ public:
 private:
     void LoadElements ();
     void SubscribeToEvents ();
+    void SubscribeToTopBarEvents ();
+    void SubscribeToMenuEvents ();
     void SubscribeToErrorWindowEvents ();
 
+    void HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleErrorWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     IngameActivity *owner_;
