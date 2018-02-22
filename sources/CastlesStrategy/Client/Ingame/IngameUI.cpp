@@ -69,6 +69,7 @@ void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &d
 
 void IngameUI::ClearUI ()
 {
+    UnsubscribeFromAllEvents ();
     topBar_->Remove ();
     menu_->Remove ();
     messageWindow_->Remove ();

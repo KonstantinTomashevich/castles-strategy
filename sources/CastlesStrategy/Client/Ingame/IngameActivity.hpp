@@ -1,7 +1,10 @@
 #pragma once
 #include <ActivitiesApplication/Activity.hpp>
 #include <Urho3D/Scene/Scene.h>
+
 #include <CastlesStrategy/Client/Ingame/IngameUI.hpp>
+#include <CastlesStrategy/Client/Ingame/NetworkMessagesProcessor.hpp>
+#include <CastlesStrategy/Client/Ingame/DataProcessor.hpp>
 
 namespace CastlesStrategy
 {
@@ -21,6 +24,12 @@ public:
     unsigned int GetPort () const;
     const Urho3D::Scene *GetScene () const;
 
+    IngameUI *GetIngameUI () const;
+
+    NetworkMessagesProcessor *GetNetworkMessagesProcessor () const;
+
+    DataProcessor *GetDataProcessor () const;
+
 private:
     void InitScene () const;
     void SubscribeToEvents ();
@@ -30,7 +39,6 @@ private:
     void HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleServerConnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
-    void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     Urho3D::String playerName_;
     Urho3D::String serverAddress_;
@@ -38,6 +46,8 @@ private:
     Urho3D::Scene *scene_;
 
     IngameUI *ingameUI_;
+    NetworkMessagesProcessor *networkMessagesProcessor_;
+    DataProcessor *dataProcessor_;
 };
 }
 

@@ -29,11 +29,16 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
 {
     InitScene ();
     ingameUI_ = new IngameUI (this);
+    networkMessagesProcessor_ = new NetworkMessagesProcessor (this);
+    dataProcessor_ = new DataProcessor (this);
 }
 
 IngameActivity::~IngameActivity ()
 {
     delete scene_;
+    delete ingameUI_;
+    delete networkMessagesProcessor_;
+    delete dataProcessor_;
 }
 
 void IngameActivity::Start ()
@@ -69,6 +74,21 @@ const Urho3D::Scene *IngameActivity::GetScene () const
     return scene_;
 }
 
+IngameUI *IngameActivity::GetIngameUI () const
+{
+    return ingameUI_;
+}
+
+NetworkMessagesProcessor *IngameActivity::GetNetworkMessagesProcessor () const
+{
+    return networkMessagesProcessor_;
+}
+
+DataProcessor *IngameActivity::GetDataProcessor () const
+{
+    return dataProcessor_;
+}
+
 void IngameActivity::InitScene () const
 {
     UIResizer *uiResizer = scene_->CreateComponent <UIResizer> (Urho3D::LOCAL);
@@ -82,7 +102,6 @@ void IngameActivity::SubscribeToEvents ()
     SubscribeToEvent (Urho3D::E_CONNECTFAILED, URHO3D_HANDLER (IngameActivity, HandleConnectFailed));
     SubscribeToEvent (Urho3D::E_SERVERCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerConnected));
     SubscribeToEvent (Urho3D::E_SERVERDISCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerDisconnected));
-    SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (IngameActivity, HandleNetworkMessage));
 }
 
 void IngameActivity::ConnectToServer () const
@@ -118,11 +137,6 @@ void IngameActivity::HandleServerConnected (Urho3D::StringHash eventType, Urho3D
 }
 
 void IngameActivity::HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
-{
-    // TODO: Implement.
-}
-
-void IngameActivity::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     // TODO: Implement.
 }
