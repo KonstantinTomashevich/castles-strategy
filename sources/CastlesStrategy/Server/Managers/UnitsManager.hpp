@@ -3,7 +3,7 @@
 #include <Urho3D/Container/Vector.h>
 
 #include <CastlesStrategy/Server/Managers/Manager.hpp>
-#include <CastlesStrategy/Server/Managers/GameStatus.hpp>
+#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
 #include <CastlesStrategy/Shared/Unit/Unit.hpp>
 #include <CastlesStrategy/Shared/Unit/UnitType.hpp>
 
@@ -57,7 +57,7 @@ private:
     typedef void (*UnitCommandProcessor) (
             UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
 
-    unsigned spawnUnitType_;
+    unsigned spawnsUnitType_;
     std::vector <UnitType> unitsTypes_;
     Urho3D::PODVector <Unit *> units_;
     Urho3D::PODVector <UnitCommandProcessor> unitCommandProcessors_;

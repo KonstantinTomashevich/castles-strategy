@@ -21,7 +21,7 @@ void ProcessUnitCommandAttackUnit (
         UnitsManager *unitsManager, Unit *unit, const UnitCommand &command, const UnitType &unitType);
 
 UnitsManager::UnitsManager (ManagersHub *managersHub) : Manager (managersHub),
-    spawnUnitType_ (0),
+    spawnsUnitType_ (0),
     units_ (),
     unitsTypes_ (),
     unitCommandProcessors_ (UCT_COMMANDS_COUNT)
@@ -51,7 +51,7 @@ const Unit *UnitsManager::GetSpawn (unsigned route, bool belongsToFirst) const
 {
     for (const Unit *unit : units_)
     {
-        if (unit->GetUnitType () == spawnUnitType_ && unit->GetRouteIndex () == route &&
+        if (unit->GetUnitType () == spawnsUnitType_ && unit->GetRouteIndex () == route &&
             unit->IsBelongsToFirst () == belongsToFirst)
         {
             return unit;
@@ -129,7 +129,7 @@ GameStatus UnitsManager::CheckGameStatus () const
 {
     for (const Unit *unit : units_)
     {
-        if (unit->GetUnitType () == spawnUnitType_ && unit->GetHp () == 0)
+        if (unit->GetUnitType () == spawnsUnitType_ && unit->GetHp () == 0)
         {
             return unit->IsBelongsToFirst () ? GS_SECOND_WON : GS_FIRST_WON;
         }
@@ -156,7 +156,7 @@ const UnitType &UnitsManager::GetUnitType (unsigned int index) const
 
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 {
-    output.SetUInt ("spawnsUnitType", spawnUnitType_);
+    output.SetUInt ("spawnsUnitType", spawnsUnitType_);
     for (const UnitType &unitType : unitsTypes_)
     {
         Urho3D::XMLElement newChild = output.CreateChild ("unitType");
@@ -166,7 +166,7 @@ void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
 
 void UnitsManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
 {
-    spawnUnitType_ = input.GetUInt ("spawnsUnitType");
+    spawnsUnitType_ = input.GetUInt ("spawnsUnitType");
     Urho3D::XMLElement element = input.GetChild ("unitType");
     unsigned int id = 0;
 
@@ -185,7 +185,7 @@ void UnitsManager::SaveSpawnsToXML (Urho3D::XMLElement &output) const
 {
     for (const Unit *unit : units_)
     {
-        if (unit->GetUnitType () == spawnUnitType_)
+        if (unit->GetUnitType () == spawnsUnitType_)
         {
             Urho3D::XMLElement newChild = output.CreateChild ("spawn");
             Urho3D::Vector3 worldPosition = unit->GetNode ()->GetWorldPosition ();
@@ -202,7 +202,7 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
     Urho3D::XMLElement element = input.GetChild ("spawn");
     while (element.NotNull ())
     {
-        Unit *unit = CreateUnit (element.GetVector2 ("position"), spawnUnitType_,
+        Unit *unit = CreateUnit (element.GetVector2 ("position"), spawnsUnitType_,
                                  element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
         AddUnit (unit);
 
