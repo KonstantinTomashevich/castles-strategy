@@ -11,8 +11,8 @@
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
 
-#include <CastlesStrategy/Shared/Network/IncomingNetworkMessageType.hpp>
-#include <CastlesStrategy/Shared/Network/OutcomingNetworkMessageType.hpp>
+#include <CastlesStrategy/Shared/Network/ClientToServerNetworkMessageType.hpp>
+#include <CastlesStrategy/Shared/Network/ServerToClientNetworkMessageType.hpp>
 #include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
 #include <Utils/UniversalException.hpp>
 
@@ -26,13 +26,13 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     managersHub_ (nullptr),
     scene_ (new Urho3D::Scene (context_)),
     mapName_ (),
-    incomingNetworkMessageProcessors_ (INMT_TYPES_COUNT),
+    incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT),
 
     firstPlayer_ (nullptr),
     secondPlayer_ (nullptr)
 {
-    incomingNetworkMessageProcessors_ [INMT_ADD_ORDER] = IncomingNetworkMessageProcessors::AddOrder;
-    incomingNetworkMessageProcessors_ [INMT_SPAWN_UNIT] = IncomingNetworkMessageProcessors::SpawnUnit;
+    incomingNetworkMessageProcessors_ [CTSNMT_ADD_ORDER] = IncomingNetworkMessageProcessors::AddOrder;
+    incomingNetworkMessageProcessors_ [CTSNMT_SPAWN_UNIT] = IncomingNetworkMessageProcessors::SpawnUnit;
 
     SubscribeToEvent (Urho3D::E_CLIENTCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientConnected));
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
@@ -71,12 +71,12 @@ void ServerActivity::Update (float timeStep)
         }
     }
 
-    // TODO: It's temporary. Auto start game when 2 or more players are connected.
+    // TODO: It's temporary. Autostarts game when 2 or more players are connected.
     else if (identifiedConnections_.Size () >= 2)
     {
         managersHub_ = new ManagersHub (scene_);
-        firstPlayer_ = identifiedConnections_ [0].first_;
-        secondPlayer_ = identifiedConnections_ [1].first_;
+        firstPlayer_ = identifiedConnections_.Front ().first_;
+        secondPlayer_ = identifiedConnections_.Back ().first_;
 
         unsigned int startCoins;
         LoadResources (startCoins);
@@ -114,11 +114,11 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
     Urho3D::String name = eventData [IdentityFields::NAME].GetString ();
 
     RemoveUnidentifiedConnection (connection);
-    identifiedConnections_.Push (Urho3D::MakePair (connection, name));
+    identifiedConnections_ [connection] = name;
 
     Urho3D::VectorBuffer data;
     data.WriteInt (currentGameStatus_);
-    connection->SendMessage (ONMT_GAME_STATUS, true, false, data);
+    connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
 }
 
 void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
@@ -144,12 +144,14 @@ void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urh
 void ServerActivity::HandleNetworkMessage (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
 {
     int messageId = eventData [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
-    if (messageId < 0 || messageId >= INMT_TYPES_COUNT)
+    if (messageId < 0 || messageId >= CTSNMT_TYPES_COUNT)
     {
         throw UniversalException <ServerActivity> ("ServerActivity: received message with incorrect id " +
             Urho3D::String (messageId) + "!");
     }
-    incomingNetworkMessageProcessors_ [messageId] (managersHub_, identifiedConnections_);
+
+    incomingNetworkMessageProcessors_ [messageId] (managersHub_, identifiedConnections_,
+        static_cast <Urho3D::Connection *> (eventData [Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
 }
 
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)
@@ -183,23 +185,23 @@ void ServerActivity::ReportGameStatus (GameStatus gameStatus) const
     Urho3D::VectorBuffer data;
     data.WriteInt (gameStatus);
 
-    for (const Urho3D::Pair <Urho3D::Connection *, Urho3D::String> &connectionData : identifiedConnections_)
+    for (auto &connectionData : identifiedConnections_)
     {
-        connectionData.first_->SendMessage (ONMT_GAME_STATUS, true, false, data);
+        connectionData.first_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
     }
 }
 
 void ServerActivity::LoadResources (unsigned int &startCoins)
 {
     Urho3D::String mapFolder = DEFAULT_MAPS_FOLDER + Urho3D::String ("/") + mapName_ + "/";
-    bool useDefaultUnitTypes;
+    bool useDefaultUnitsTypes;
 
-    LoadMap (mapFolder, startCoins, useDefaultUnitTypes);
-    LoadUnitTypesAndSpawns (mapFolder, useDefaultUnitTypes);
+    LoadMap (mapFolder, startCoins, useDefaultUnitsTypes);
+    LoadUnitsTypesAndSpawns (mapFolder, useDefaultUnitsTypes);
     LoadScene (mapFolder);
 }
 
-void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes)
+void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitsTypes)
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::XMLFile *mapXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml");
@@ -210,7 +212,7 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     }
 
     Urho3D::XMLElement mapXML = mapXMLFile->GetRoot ();
-    bool useDefaultUnitsTypes = mapXML.GetBool ("useDefaultUnitsTypes");
+    useDefaultUnitsTypes = mapXML.GetBool ("useDefaultUnitsTypes");
     startCoins = mapXML.GetUInt ("startCoins");
 
     Map *map = dynamic_cast <Map *> (managersHub_->GetManager (MI_MAP));
@@ -218,12 +220,12 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     map->LoadRoutesFromXML (mapXML);
 }
 
-void ServerActivity::LoadUnitTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes)
+void ServerActivity::LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitsTypes)
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     UnitsManager *unitsManager = dynamic_cast <UnitsManager *> (managersHub_->GetManager (MI_UNITS_MANAGER));
 
-    Urho3D::String unitsTypesXMLPath = useDefaultUnitTypes ? DEFAULT_UNITS_TYPES_PATH : mapFolder + "UnitsTypes.xml";
+    Urho3D::String unitsTypesXMLPath = useDefaultUnitsTypes ? DEFAULT_UNITS_TYPES_PATH : mapFolder + "UnitsTypes.xml";
     Urho3D::XMLFile *unitsTypesXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (unitsTypesXMLPath);
 
     if (unitsTypesXMLFile == nullptr)
@@ -241,8 +243,8 @@ void ServerActivity::SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTyp
 {
     Urho3D::VectorBuffer messageData;
     messageData.WriteString (unitsTypesXMLFile->ToString ("    "));
-    firstPlayer_->SendMessage (ONMT_UNITS_TYPES_XML, true, false, messageData);
-    secondPlayer_->SendMessage (ONMT_UNITS_TYPES_XML, true, false, messageData);
+    firstPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
+    secondPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
 }
 
 void ServerActivity::LoadScene (const Urho3D::String &mapFolder)

@@ -4,13 +4,14 @@
 #include <Urho3D/Scene/Scene.h>
 
 #include <ActivitiesApplication/Activity.hpp>
-#include <CastlesStrategy/Server/Managers/GameStatus.hpp>
+#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
 #include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
 
 namespace CastlesStrategy
 {
 typedef void (*IncomingNetworkMessageProcessor) (ManagersHub *managersHub,
-        const Urho3D::Vector <Urho3D::Pair <Urho3D::Connection *, Urho3D::String> > &identifiedConnections);
+        const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &identifiedConnections,
+        Urho3D::Connection *sender);
 
 class ServerActivity : public ActivitiesApplication::Activity
 {
@@ -38,14 +39,14 @@ private:
 
     void LoadResources (unsigned int &startCoins);
     void LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes);
-    void LoadUnitTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
+    void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTypesXMLFile) const;
     void LoadScene (const Urho3D::String &mapFolder);
     void SetupPlayers (unsigned int startCoins);
 
     GameStatus currentGameStatus_;
     Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > unidentifiedConnections_;
-    Urho3D::Vector <Urho3D::Pair <Urho3D::Connection *, Urho3D::String> > identifiedConnections_;
+    Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> identifiedConnections_;
 
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;
