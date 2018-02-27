@@ -7,10 +7,11 @@
 #include <Urho3D/Resource/XMLFile.h>
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Engine/Engine.h>
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
-#include <Urho3D/Engine/Engine.h>
+#include <Utils/UIResizer.hpp>
 
 namespace CastlesStrategy
 {
@@ -54,7 +55,16 @@ void IngameUI::LoadUI ()
 
 void IngameUI::SetupUnitsIcons ()
 {
-    // TODO: Implement.
+    DataProcessor *dataProcessor = owner_->GetDataProcessor ();
+    for (unsigned int index = 0; index < dataProcessor->GetUnitsTypesCount (); index++)
+    {
+        if (index != dataProcessor->GetSpawnsUnitType ())
+        {
+            const UnitType &unitType = dataProcessor->GetUnitTypeByIndex (index);
+            AddNewUnitTypeToTopBar (unitType);
+        }
+    }
+    SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
 }
 
 void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
@@ -109,6 +119,29 @@ void IngameUI::ShowNextMessage ()
     messageWindow_->SetVisible (true);
 }
 
+void IngameUI::AddNewUnitTypeToTopBar (const UnitType &unitType)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::XMLFile *style = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
+
+    Urho3D::UIElement *unitPullElement = topBar_->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/UnitPullElement.xml")->GetRoot (), style);
+
+    Urho3D::BorderImage *iconElement = dynamic_cast <Urho3D::BorderImage *> (unitPullElement->GetChild ("Icon", false));
+    iconElement->SetTexture (resourceCache->GetResource <Urho3D::Texture> (unitType.GetIconPath ()));
+
+    Urho3D::Button *recruitButton = dynamic_cast <Urho3D::Button *> (
+            unitPullElement->GetChild ("RecruitButton", false));
+    recruitButton->SetVar (BUTTON_UNIT_TYPE_VAR, unitType.GetId ());
+
+    Urho3D::Button *spawnButton = dynamic_cast <Urho3D::Button *> (
+            unitPullElement->GetChild ("SpawnButton", false));
+    spawnButton->SetVar (BUTTON_UNIT_TYPE_VAR, unitType.GetId ());
+
+    SubscribeToEvent (recruitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarRecruitClicked));
+    SubscribeToEvent (spawnButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarSpawnClicked));
+}
+
 void IngameUI::SubscribeToEvents ()
 {
     SubscribeToTopBarEvents ();
@@ -142,6 +175,16 @@ void IngameUI::SubscribeToMessageWindowEvents ()
 void IngameUI::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     menu_->SetVisible (true);
+}
+
+void IngameUI::HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    // TODO: Implement.
+}
+
+void IngameUI::HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    // TODO: Implement.
 }
 
 void IngameUI::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

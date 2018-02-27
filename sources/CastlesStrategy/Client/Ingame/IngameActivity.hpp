@@ -25,9 +25,7 @@ public:
     const Urho3D::Scene *GetScene () const;
 
     IngameUI *GetIngameUI () const;
-
     NetworkMessagesProcessor *GetNetworkMessagesProcessor () const;
-
     DataProcessor *GetDataProcessor () const;
 
 private:

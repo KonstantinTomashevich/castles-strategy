@@ -3,11 +3,13 @@
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/UI/Window.h>
 #include <Urho3D/Container/List.h>
+#include <CastlesStrategy/Shared/Unit/UnitType.hpp>
 
 namespace CastlesStrategy
 {
 class IngameActivity;
 typedef void (*UICallback) (IngameActivity *activity);
+const Urho3D::StringHash BUTTON_UNIT_TYPE_VAR ("ButtonUnitType");
 
 class IngameUI : public Urho3D::Object
 {
@@ -37,6 +39,7 @@ private:
 
     void LoadElements ();
     void ShowNextMessage ();
+    void AddNewUnitTypeToTopBar (const UnitType &unitType);
 
     void SubscribeToEvents ();
     void SubscribeToTopBarEvents ();
@@ -44,6 +47,9 @@ private:
     void SubscribeToMessageWindowEvents ();
 
     void HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+
     void HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
