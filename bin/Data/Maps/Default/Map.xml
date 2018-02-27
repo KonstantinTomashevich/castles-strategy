@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map size="50 100">
+<map size="50 100" useDefaultUnitsTypes="true">
     <route>
         <waypoint coord="20 10" />
         <waypoint coord="10 30" />

@@ -11,7 +11,7 @@
             visionRange="10"
 
             navigationRadius="0.3"
-            moveSpeed="0"
+            moveSpeed="0.1"
             maxHp="2000"
             prefabPath="DefaultUnits/Tower/Prefab.xml"
             iconPath="DefaultUnits/Tower/Icon.png"
