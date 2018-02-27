@@ -1,4 +1,5 @@
 #include "DataProcessor.hpp"
+#include <Utils/UniversalException.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 
 namespace CastlesStrategy
@@ -39,8 +40,23 @@ void DataProcessor::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
     }
 }
 
-const std::vector <UnitType> &DataProcessor::GetUnitTypes () const
+const std::vector <UnitType> &DataProcessor::GetUnitsTypes () const
 {
     return unitsTypes_;
+}
+
+unsigned int DataProcessor::GetUnitsTypesCount () const
+{
+    return unitsTypes_.size ();
+}
+
+const UnitType &DataProcessor::GetUnitTypeByIndex (unsigned int index) const
+{
+    if (index >= unitsTypes_.size ())
+    {
+        throw UniversalException <DataProcessor> ("DataProcessor: can not find scene xml!");
+    }
+
+    return unitsTypes_ [index];
 }
 }

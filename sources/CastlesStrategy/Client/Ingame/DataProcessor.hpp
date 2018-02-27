@@ -14,11 +14,13 @@ public:
     virtual ~DataProcessor ();
 
     unsigned int GetSpawnsUnitType () const;
-
     void SetSpawnsUnitType (unsigned int spawnsUnitType);
 
     void LoadUnitsTypesFromXML (const Urho3D::XMLElement &input);
-    const std::vector <UnitType> &GetUnitTypes () const;
+    const std::vector <UnitType> &GetUnitsTypes () const;
+
+    unsigned int GetUnitsTypesCount () const;
+    const UnitType &GetUnitTypeByIndex (unsigned int index) const;
 
 private:
     IngameActivity *owner_;
