@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unitTypes spawnsUnitType="0">
+    <unitType
+            name="Tower"
+            recruitmentCost="0"
+            recruitmentTime="1.0"
+
+            attackRange="6"
+            attackSpeed="0.2"
+            attackForce="20"
+            visionRange="10"
+
+            navigationRadius="0.3"
+            moveSpeed="0"
+            maxHp="2000"
+            prefabPath="DefaultUnits/Tower/Prefab.xml"
+            iconPath="DefaultUnits/Tower/Icon.png"
+
+            BonusVS=""
+    />
+
+    <unitType
+            name="Swordsman"
+            recruitmentCost="310"
+            recruitmentTime="1.0"
+
+            attackRange="1"
+            attackSpeed="1"
+            attackForce="40"
+            visionRange="5"
+
+            navigationRadius="0.3"
+            moveSpeed="1.5"
+            maxHp="150"
+            prefabPath="DefaultUnits/Swordsman/Prefab.xml"
+            iconPath="DefaultUnits/Swordsman/Icon.png"
+
+            BonusVS="2;3"
+    />
+
+    <unitType
+            name="Archer"
+            recruitmentCost="260"
+            recruitmentTime="1.0"
+
+            attackRange="7"
+            attackSpeed="3"
+            attackForce="60"
+            visionRange="6"
+
+            navigationRadius="0.3"
+            moveSpeed="2"
+            maxHp="100"
+            prefabPath="DefaultUnits/Archer/Prefab.xml"
+            iconPath="DefaultUnits/Archer/Icon.png"
+
+            BonusVS="3;4"
+    />
+
+    <unitType
+            name="Spearman"
+            recruitmentCost="310"
+            recruitmentTime="1.0"
+
+            attackRange="2"
+            attackSpeed="2"
+            attackForce="80"
+            visionRange="5"
+
+            navigationRadius="0.3"
+            moveSpeed="2"
+            maxHp="150"
+            prefabPath="DefaultUnits/Spearman/Prefab.xml"
+            iconPath="DefaultUnits/Spearman/Icon.png"
+
+            BonusVS="4;5"
+    />
+
+    <unitType
+            name="Raider"
+            recruitmentCost="520"
+            recruitmentTime="1.0"
+
+            attackRange="2"
+            attackSpeed="1.5"
+            attackForce="120"
+            visionRange="5"
+
+            navigationRadius="0.6"
+            moveSpeed="4"
+            maxHp="200"
+            prefabPath="DefaultUnits/Raider/Prefab.xml"
+            iconPath="DefaultUnits/Raider/Icon.png"
+
+            BonusVS="1;5"
+    />
+
+    <unitType
+            name="Knight"
+            recruitmentCost="880"
+            recruitmentTime="2.0"
+
+            attackRange="2"
+            attackSpeed="0.75"
+            attackForce="80"
+            visionRange="5"
+
+            navigationRadius="0.6"
+            moveSpeed="4"
+            maxHp="400"
+            prefabPath="DefaultUnits/Knight/Prefab.xml"
+            iconPath="DefaultUnits/Knight/Icon.png"
+
+            BonusVS="1;2"
+    />
+</unitTypes>
