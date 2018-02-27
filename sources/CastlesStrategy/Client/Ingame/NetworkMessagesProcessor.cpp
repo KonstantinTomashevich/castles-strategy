@@ -20,7 +20,7 @@ NetworkMessagesProcessor::~NetworkMessagesProcessor ()
 void NetworkMessagesProcessor::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
 {
     int messageID = data [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
-    const Urho3D::VariantMap &messageData = data [Urho3D::NetworkMessage::P_DATA].GetVariantMap ();
+    Urho3D::VectorBuffer messageData = data [Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
 
     switch (messageID)
     {
@@ -30,13 +30,18 @@ void NetworkMessagesProcessor::HandleNetworkMessage (Urho3D::StringHash eventTyp
     }
 }
 
-void NetworkMessagesProcessor::ProcessGameStatusMessage (const Urho3D::VariantMap &messageData)
+void NetworkMessagesProcessor::ProcessGameStatusMessage (Urho3D::VectorBuffer &messageData)
 {
     // TODO: Implement.
 }
 
-void NetworkMessagesProcessor::ProcessUnitsTypesXMLMessage (const Urho3D::VariantMap &messageData)
+void NetworkMessagesProcessor::ProcessUnitsTypesXMLMessage (Urho3D::VectorBuffer &messageData)
 {
-    // TODO: Implement.
+    Urho3D::String xmlText = messageData.ReadString ();
+    Urho3D::XMLFile *xmlFile = new Urho3D::XMLFile (context_);
+    xmlFile->FromString (xmlText);
+
+    owner_->GetDataProcessor ()->LoadUnitsTypesFromXML (xmlFile->GetRoot ());
+    owner_->GetIngameUI ()->SetupUnitsIcons ();
 }
 }
