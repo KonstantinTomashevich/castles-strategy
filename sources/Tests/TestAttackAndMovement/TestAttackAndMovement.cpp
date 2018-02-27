@@ -97,29 +97,9 @@ void CustomTerminate ()
         std::rethrow_exception (std::current_exception ());
     }
 
-    catch (UniversalException <CastlesStrategy::UnitsManager> &exception)
+    catch (AnyUniversalException &exception)
     {
         URHO3D_LOGERROR (exception.GetException ());
-    }
-
-    catch (UniversalException <CastlesStrategy::UnitType> &exception)
-    {
-        URHO3D_LOGERROR (exception.GetException ());
-    }
-
-    catch (UniversalException <CastlesStrategy::Map> &exception)
-    {
-        URHO3D_LOGERROR (exception.GetException ());
-    }
-
-    catch (UniversalException <CastlesStrategy::ManagersHub> &exception)
-    {
-        URHO3D_LOGERROR (exception.GetException ());
-    }
-
-    catch (...)
-    {
-        URHO3D_LOGERROR ("Unknown exception!");
     }
     abort ();
 }
