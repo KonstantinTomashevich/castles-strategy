@@ -1,13 +1,29 @@
 #include "LauncherApplication.hpp"
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
 
 #include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Server/Activity/ServerActivity.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <Utils/UniversalException.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)
+void CustomTerminate ()
+{
+    try
+    {
+        std::rethrow_exception (std::current_exception ());
+    }
+
+    catch (AnyUniversalException &exception)
+    {
+        URHO3D_LOGERROR (exception.GetException ());
+    }
+    abort ();
+}
+
 LauncherApplication::LauncherApplication (Urho3D::Context *context) : ActivitiesApplication::ActivitiesApplication (context)
 {
 
@@ -20,16 +36,22 @@ LauncherApplication::~LauncherApplication ()
 
 void LauncherApplication::Setup ()
 {
+    Urho3D::String time = Urho3D::Time::GetTimeStamp ();
+    time.Replace (':', ' ');
+    std::set_terminate (CustomTerminate);
     ActivitiesApplication::Setup ();
+
     engineParameters_ [Urho3D::EP_FULL_SCREEN] = false;
     engineParameters_ [Urho3D::EP_WINDOW_RESIZABLE] = true;
-    engineParameters_ [Urho3D::EP_LOG_NAME] = "CastlesStrategy.log";
+    engineParameters_ [Urho3D::EP_LOG_NAME] = "CastlesStrategy " + time + ".log";
     engineParameters_ [Urho3D::EP_WINDOW_TITLE] = "Castles Strategy";
 }
 
 void LauncherApplication::Start ()
 {
     ActivitiesApplication::Start ();
+    CastlesStrategy::Unit::RegisterObjectType (context_);
+
     Urho3D::Input *input = context_->GetSubsystem <Urho3D::Input> ();
     input->SetMouseVisible (true);
     input->SetMouseMode (Urho3D::MM_FREE);
@@ -75,5 +97,7 @@ void LauncherApplication::HandleStartClient (Urho3D::StringHash eventType, Urho3
 void LauncherApplication::HandleStartServer (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     CastlesStrategy::ServerActivity *server = new CastlesStrategy::ServerActivity (context_);
+    // TODO: Select a map.
+    server->SetMapName ("Default");
     SetupActivityNextFrame (server);
 }
