@@ -26,13 +26,13 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     managersHub_ (nullptr),
     scene_ (new Urho3D::Scene (context_)),
     mapName_ (),
-    incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT),
+    incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT - CTSNMT_START),
 
     firstPlayer_ (nullptr),
     secondPlayer_ (nullptr)
 {
-    incomingNetworkMessageProcessors_ [CTSNMT_ADD_ORDER] = IncomingNetworkMessageProcessors::AddOrder;
-    incomingNetworkMessageProcessors_ [CTSNMT_SPAWN_UNIT] = IncomingNetworkMessageProcessors::SpawnUnit;
+    incomingNetworkMessageProcessors_ [CTSNMT_ADD_ORDER - CTSNMT_START] = IncomingNetworkMessageProcessors::AddOrder;
+    incomingNetworkMessageProcessors_ [CTSNMT_SPAWN_UNIT - CTSNMT_START] = IncomingNetworkMessageProcessors::SpawnUnit;
 
     SubscribeToEvent (Urho3D::E_CLIENTCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientConnected));
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
@@ -150,8 +150,11 @@ void ServerActivity::HandleNetworkMessage (Urho3D::StringHash eventHash, Urho3D:
             Urho3D::String (messageId) + "!");
     }
 
-    incomingNetworkMessageProcessors_ [messageId] (managersHub_, identifiedConnections_,
-        static_cast <Urho3D::Connection *> (eventData [Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
+    if (messageId >= CTSNMT_START)
+    {
+        incomingNetworkMessageProcessors_[messageId - CTSNMT_START] (managersHub_, identifiedConnections_,
+                static_cast <Urho3D::Connection *> (eventData[Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
+    }
 }
 
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)

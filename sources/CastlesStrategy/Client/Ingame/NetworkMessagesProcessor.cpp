@@ -22,6 +22,7 @@ void NetworkMessagesProcessor::HandleNetworkMessage (Urho3D::StringHash eventTyp
     int messageID = data [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
     Urho3D::VectorBuffer messageData = data [Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
 
+    // TODO: Use vector of processors instead of switching!
     switch (messageID)
     {
         case STCNMT_GAME_STATUS: ProcessGameStatusMessage (messageData); break;
