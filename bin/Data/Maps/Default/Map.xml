@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map size="50 100">
+    <route>
+        <waypoint coord="20 10" />
+        <waypoint coord="10 30" />
+        <waypoint coord="25 50" />
+        <waypoint coord="40 70" />
+        <waypoint coord="30 90" />
+    </route>
+
+    <route>
+        <waypoint coord="30 10" />
+        <waypoint coord="40 30" />
+        <waypoint coord="25 50" />
+        <waypoint coord="10 70" />
+        <waypoint coord="20 90" />
+    </route>
+
+    <spawn position="20 8" belongsToFirst="true" route="0" />
+    <spawn position="30 92" belongsToFirst="false" route="0" />
+
+    <spawn position="30 8" belongsToFirst="true" route="1" />
+    <spawn position="20 92" belongsToFirst="false" route="1" />
+</map>
