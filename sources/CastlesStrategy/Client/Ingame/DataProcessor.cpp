@@ -5,6 +5,7 @@
 namespace CastlesStrategy
 {
 DataProcessor::DataProcessor (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+        owner_ (owner),
         unitsTypes_ ()
 {
 

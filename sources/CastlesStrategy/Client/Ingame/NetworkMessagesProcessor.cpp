@@ -7,7 +7,8 @@
 
 namespace CastlesStrategy
 {
-NetworkMessagesProcessor::NetworkMessagesProcessor (IngameActivity *owner) : Urho3D::Object (owner->GetContext ())
+NetworkMessagesProcessor::NetworkMessagesProcessor (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+    owner_ (owner)
 {
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkMessagesProcessor, HandleNetworkMessage));
 }
