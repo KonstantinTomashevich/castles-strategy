@@ -12,12 +12,12 @@ UIResizer::UIResizer (Urho3D::Context *context) : LogicComponent (context),
     lastScreenSize_ (0, 0),
     scanRootElement_ ("UIRoot")
 {
-
+    SubscribeToEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST, URHO3D_HANDLER (UIResizer, HandleRecalculateUIRequest));
 }
 
 UIResizer::~UIResizer ()
 {
-
+    UnsubscribeFromAllEvents ();
 }
 
 void UIResizer::RegisterObject (Urho3D::Context *context)
@@ -202,3 +202,9 @@ void UIResizer::ProcessElementLayout (Urho3D::UIElement *element,
         }
     }
 }
+
+void UIResizer::HandleRecalculateUIRequest (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    RecalculateUI ();
+}
+
