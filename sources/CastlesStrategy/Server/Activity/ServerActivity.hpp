@@ -38,10 +38,10 @@ private:
     void ReportGameStatus (GameStatus gameStatus) const;
 
     void LoadResources (unsigned int &startCoins);
+    void LoadScene (const Urho3D::String &mapFolder);
     void LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes);
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTypesXMLFile) const;
-    void LoadScene (const Urho3D::String &mapFolder);
     void SetupPlayers (unsigned int startCoins);
 
     GameStatus currentGameStatus_;

@@ -199,9 +199,24 @@ void ServerActivity::LoadResources (unsigned int &startCoins)
     Urho3D::String mapFolder = DEFAULT_MAPS_FOLDER + Urho3D::String ("/") + mapName_ + "/";
     bool useDefaultUnitsTypes;
 
+    LoadScene (mapFolder);
     LoadMap (mapFolder, startCoins, useDefaultUnitsTypes);
     LoadUnitsTypesAndSpawns (mapFolder, useDefaultUnitsTypes);
-    LoadScene (mapFolder);
+}
+
+void ServerActivity::LoadScene (const Urho3D::String &mapFolder)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::XMLFile *sceneXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Scene.xml");
+    if (sceneXMLFile == nullptr)
+    {
+        throw UniversalException <ServerActivity> ("ServerActivity: can not find scene xml!");
+    }
+
+    if (!scene_->LoadXML (sceneXMLFile->GetRoot ()))
+    {
+        throw UniversalException <ServerActivity> ("ServerActivity: can not load scene from xml!");
+    }
 }
 
 void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitsTypes)
@@ -248,21 +263,6 @@ void ServerActivity::SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTyp
     messageData.WriteString (unitsTypesXMLFile->ToString ("    "));
     firstPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
     secondPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
-}
-
-void ServerActivity::LoadScene (const Urho3D::String &mapFolder)
-{
-    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
-    Urho3D::XMLFile *sceneXMLFile = resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Scene.xml");
-    if (sceneXMLFile == nullptr)
-    {
-        throw UniversalException <ServerActivity> ("ServerActivity: can not find scene xml!");
-    }
-
-    if (!scene_->LoadXML (sceneXMLFile->GetRoot ()))
-    {
-        throw UniversalException <ServerActivity> ("ServerActivity: can not load scene from xml!");
-    }
 }
 
 void ServerActivity::SetupPlayers (unsigned int startCoins)

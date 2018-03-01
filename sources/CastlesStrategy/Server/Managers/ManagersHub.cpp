@@ -50,14 +50,14 @@ Urho3D::Scene *ManagersHub::GetScene () const
 
 void ManagersHub::HandleUpdate (float timeStep)
 {
-    for (Manager *&manager : managers_)
-    {
-        manager->HandleUpdate (timeStep);
-    }
-
     if (scene_ != nullptr)
     {
         scene_->Update (timeStep);
+    }
+
+    for (Manager *&manager : managers_)
+    {
+        manager->HandleUpdate (timeStep);
     }
 }
 }
