@@ -14,7 +14,7 @@ public:
 private:
     void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data);
     void ProcessGameStatusMessage (Urho3D::VectorBuffer &messageData);
-    void ProcessUnitsTypesXMLMessage (Urho3D::VectorBuffer &messageData);
+    void ProcessMapPathMessage (Urho3D::VectorBuffer &messageData);
 
     IngameActivity *owner_;
 };

@@ -119,6 +119,7 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
     Urho3D::VectorBuffer data;
     data.WriteInt (currentGameStatus_);
     connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
+    connection->SetScene (scene_);
 }
 
 void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
@@ -236,6 +237,17 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     Map *map = dynamic_cast <Map *> (managersHub_->GetManager (MI_MAP));
     map->SetSize (mapXML.GetIntVector2 ("size"));
     map->LoadRoutesFromXML (mapXML);
+    SendMapPathToPlayers (mapFolder);
+}
+
+void ServerActivity::SendMapPathToPlayers (const Urho3D::String &mapPath) const
+{
+    for (auto identifiedConnection : identifiedConnections_)
+    {
+        Urho3D::VectorBuffer messageBuffer;
+        messageBuffer.WriteString (mapPath);
+        identifiedConnection.first_->SendMessage (STCNMT_MAP_PATH, true, false, messageBuffer);
+    }
 }
 
 void ServerActivity::LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitsTypes)
@@ -254,15 +266,6 @@ void ServerActivity::LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, b
 
     unitsManager->LoadUnitsTypesFromXML (unitsTypesXMLFile->GetRoot ());
     unitsManager->LoadSpawnsFromXML (resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml")->GetRoot ());
-    SendUnitsTypesXMLToPlayers (unitsTypesXMLFile);
-}
-
-void ServerActivity::SendUnitsTypesXMLToPlayers (const Urho3D::XMLFile *unitsTypesXMLFile) const
-{
-    Urho3D::VectorBuffer messageData;
-    messageData.WriteString (unitsTypesXMLFile->ToString ("    "));
-    firstPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
-    secondPlayer_->SendMessage (STCNMT_UNITS_TYPES_XML, true, false, messageData);
 }
 
 void ServerActivity::SetupPlayers (unsigned int startCoins)

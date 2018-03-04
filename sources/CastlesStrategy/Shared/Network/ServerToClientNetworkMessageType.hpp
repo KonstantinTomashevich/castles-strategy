@@ -7,8 +7,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_START = 100,
     // GameStatus : Int.
     STCNMT_GAME_STATUS = 100,
-    // UnitsTypesXML : String.
-    STCNMT_UNITS_TYPES_XML,
+    // MapPath : String.
+    STCNMT_MAP_PATH,
     STCNMT_TYPES_COUNT
 };
 }
