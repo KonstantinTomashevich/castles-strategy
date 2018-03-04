@@ -43,6 +43,11 @@ void CameraHandler::SetupCamera (const Urho3D::Vector3 &position, const Urho3D::
 
 void CameraHandler::Update (float timeStep)
 {
+    if (cameraNode_ == nullptr)
+    {
+        return;
+    }
+
     Urho3D::Input *input = context_->GetSubsystem <Urho3D::Input> ();
     Urho3D::Graphics *graphics = context_->GetSubsystem <Urho3D::Graphics> ();
     float deltaX = 0;

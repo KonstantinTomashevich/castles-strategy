@@ -52,5 +52,7 @@ void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer
 
     ingameActivity->GetDataProcessor ()->LoadUnitsTypesFromXML (unitsXml);
     ingameActivity->GetIngameUI ()->SetupUnitsIcons ();
+    ingameActivity->GetCameraHandler ()->SetupCamera (
+            mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
 }
 }

@@ -107,7 +107,6 @@ void IngameActivity::InitScene () const
 {
     scene_->CreateComponent <Urho3D::Octree> (Urho3D::LOCAL);
     scene_->CreateComponent <UIResizer> (Urho3D::LOCAL);
-    cameraHandler_->SetupCamera ({0, 20, 0}, {30, 0 ,0});
 }
 
 void IngameActivity::SubscribeToEvents ()
