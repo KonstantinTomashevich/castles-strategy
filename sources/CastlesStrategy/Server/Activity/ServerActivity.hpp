@@ -9,7 +9,7 @@
 
 namespace CastlesStrategy
 {
-typedef void (*IncomingNetworkMessageProcessor) (ManagersHub *managersHub,
+typedef void (*ServerIncomingNetworkMessageProcessor) (ManagersHub *managersHub,
         const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &identifiedConnections,
         Urho3D::Connection *sender);
 
@@ -51,7 +51,7 @@ private:
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;
     Urho3D::String mapName_;
-    Urho3D::PODVector <IncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
+    Urho3D::PODVector <ServerIncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
 
     Urho3D::Connection *firstPlayer_;
     Urho3D::Connection *secondPlayer_;
