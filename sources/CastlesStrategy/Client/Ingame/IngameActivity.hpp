@@ -5,6 +5,7 @@
 #include <CastlesStrategy/Client/Ingame/IngameUI.hpp>
 #include <CastlesStrategy/Client/Ingame/NetworkMessagesProcessor.hpp>
 #include <CastlesStrategy/Client/Ingame/DataProcessor.hpp>
+#include <CastlesStrategy/Client/Ingame/CameraHandler.hpp>
 
 namespace CastlesStrategy
 {
@@ -22,17 +23,17 @@ public:
 
     const Urho3D::String &GetServerAddress () const;
     unsigned int GetPort () const;
-    const Urho3D::Scene *GetScene () const;
+    Urho3D::Scene *GetScene () const;
 
     IngameUI *GetIngameUI () const;
     NetworkMessagesProcessor *GetNetworkMessagesProcessor () const;
     DataProcessor *GetDataProcessor () const;
+    CameraHandler *GetCameraHandler () const;
 
 private:
     void InitScene () const;
     void SubscribeToEvents ();
     void ConnectToServer () const;
-    void SetupViewport () const;
 
     void HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleServerConnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
@@ -46,6 +47,7 @@ private:
     IngameUI *ingameUI_;
     NetworkMessagesProcessor *networkMessagesProcessor_;
     DataProcessor *dataProcessor_;
+    CameraHandler *cameraHandler_;
 };
 }
 

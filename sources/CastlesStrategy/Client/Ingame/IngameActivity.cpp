@@ -5,15 +5,16 @@
 
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/Application.h>
+#include <Urho3D/IO/Log.h>
 
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
-#include <Urho3D/Graphics/Viewport.h>
-#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/StaticModel.h>
 
 #include <Utils/UIResizer.hpp>
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <Urho3D/Graphics/StaticModel.h>
 
 namespace CastlesStrategy
 {
@@ -25,12 +26,12 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
           port_ (port),
           scene_ (new Urho3D::Scene (context)),
 
-          ingameUI_ (nullptr)
+          ingameUI_ (nullptr),
+          networkMessagesProcessor_ (nullptr),
+          dataProcessor_ (nullptr),
+          cameraHandler_ (nullptr)
 {
-    InitScene ();
-    ingameUI_ = new IngameUI (this);
-    networkMessagesProcessor_ = new NetworkMessagesProcessor (this);
-    dataProcessor_ = new DataProcessor (this);
+
 }
 
 IngameActivity::~IngameActivity ()
@@ -39,19 +40,27 @@ IngameActivity::~IngameActivity ()
     delete ingameUI_;
     delete networkMessagesProcessor_;
     delete dataProcessor_;
+    delete cameraHandler_;
 }
 
 void IngameActivity::Start ()
 {
+    ingameUI_ = new IngameUI (this);
     ingameUI_->LoadUI ();
+
+    networkMessagesProcessor_ = new NetworkMessagesProcessor (this);
+    dataProcessor_ = new DataProcessor (this);
+
     SubscribeToEvents ();
     ConnectToServer ();
-    SetupViewport ();
+
+    cameraHandler_ = new CameraHandler (this);
+    InitScene ();
 }
 
 void IngameActivity::Update (float timeStep)
 {
-
+    cameraHandler_->Update (timeStep);
 }
 
 void IngameActivity::Stop ()
@@ -69,7 +78,7 @@ unsigned int IngameActivity::GetPort () const
     return port_;
 }
 
-const Urho3D::Scene *IngameActivity::GetScene () const
+Urho3D::Scene *IngameActivity::GetScene () const
 {
     return scene_;
 }
@@ -89,12 +98,16 @@ DataProcessor *IngameActivity::GetDataProcessor () const
     return dataProcessor_;
 }
 
+CameraHandler *IngameActivity::GetCameraHandler () const
+{
+    return cameraHandler_;
+}
+
 void IngameActivity::InitScene () const
 {
-    UIResizer *uiResizer = scene_->CreateComponent <UIResizer> (Urho3D::LOCAL);
     scene_->CreateComponent <Urho3D::Octree> (Urho3D::LOCAL);
-    Urho3D::Camera *camera = scene_->CreateChild ("Camera", Urho3D::REPLICATED)->
-            CreateComponent <Urho3D::Camera> (Urho3D::LOCAL);
+    scene_->CreateComponent <UIResizer> (Urho3D::LOCAL);
+    cameraHandler_->SetupCamera ({0, 20, 0}, {30, 0 ,0});
 }
 
 void IngameActivity::SubscribeToEvents ()
@@ -111,14 +124,6 @@ void IngameActivity::ConnectToServer () const
 
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->Connect (serverAddress_, port_, scene_, identity);
-}
-
-void IngameActivity::SetupViewport () const
-{
-    Urho3D::Renderer *renderer = context_->GetSubsystem <Urho3D::Renderer> ();
-    renderer->SetNumViewports (1);
-    renderer->SetViewport (0, new Urho3D::Viewport (
-            context_, scene_, scene_->GetChild ("Camera")->GetComponent <Urho3D::Camera> ()));
 }
 
 void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
