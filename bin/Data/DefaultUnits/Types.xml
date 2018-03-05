@@ -46,7 +46,7 @@
             attackRange="7"
             attackSpeed="3"
             attackForce="60"
-            visionRange="6"
+            visionRange="7"
 
             navigationRadius="0.3"
             moveSpeed="2"
