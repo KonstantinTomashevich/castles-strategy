@@ -8,6 +8,7 @@
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Texture2D.h>
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
@@ -128,7 +129,8 @@ void IngameUI::AddNewUnitTypeToTopBar (const UnitType &unitType)
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/UnitPullElement.xml")->GetRoot (), style);
 
     Urho3D::BorderImage *iconElement = dynamic_cast <Urho3D::BorderImage *> (unitPullElement->GetChild ("Icon", false));
-    iconElement->SetTexture (resourceCache->GetResource <Urho3D::Texture> (unitType.GetIconPath ()));
+    iconElement->SetTexture (resourceCache->GetResource <Urho3D::Texture2D> (unitType.GetIconPath ()));
+    iconElement->SetFullImageRect ();
 
     Urho3D::Button *recruitButton = dynamic_cast <Urho3D::Button *> (
             unitPullElement->GetChild ("RecruitButton", false));
