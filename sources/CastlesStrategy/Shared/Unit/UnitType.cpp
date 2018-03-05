@@ -62,6 +62,7 @@ UnitType::UnitType (const UnitType &another) :
         moveSpeed_ (another.moveSpeed_),
         maxHp_ (another.maxHp_),
         prefabPath_ (another.prefabPath_),
+        iconPath_ (another.iconPath_),
         aiProcessor_ (another.aiProcessor_)
 {
 
