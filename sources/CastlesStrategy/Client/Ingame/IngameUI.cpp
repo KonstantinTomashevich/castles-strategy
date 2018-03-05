@@ -128,7 +128,8 @@ void IngameUI::AddNewUnitTypeToTopBar (const UnitType &unitType)
     Urho3D::UIElement *unitPullElement = topBar_->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/UnitPullElement.xml")->GetRoot (), style);
 
-    Urho3D::BorderImage *iconElement = dynamic_cast <Urho3D::BorderImage *> (unitPullElement->GetChild ("Icon", false));
+    Urho3D::BorderImage *iconElement = dynamic_cast <Urho3D::BorderImage *> (unitPullElement->
+            GetChild ("IconAndCountElement", false)->GetChild ("Icon", false));
     iconElement->SetTexture (resourceCache->GetResource <Urho3D::Texture2D> (unitType.GetIconPath ()));
     iconElement->SetFullImageRect ();
 
