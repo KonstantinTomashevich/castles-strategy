@@ -1,4 +1,4 @@
-#include "IngameUI.hpp"
+#include "IngameUIManager.hpp"
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Text.h>
@@ -16,7 +16,7 @@
 
 namespace CastlesStrategy
 {
-IngameUI::IngameUI (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
     inputEnabled_ (true),
 
@@ -28,35 +28,35 @@ IngameUI::IngameUI (IngameActivity *owner) : Urho3D::Object (owner->GetContext (
 
 }
 
-IngameUI::~IngameUI ()
+IngameUIManager::~IngameUIManager ()
 {
 
 }
 
-const IngameActivity *IngameUI::GetOwner () const
+const IngameActivity *IngameUIManager::GetOwner () const
 {
     return owner_;
 }
 
-bool IngameUI::IsInputEnabled () const
+bool IngameUIManager::IsInputEnabled () const
 {
     return inputEnabled_;
 }
 
-void IngameUI::SetInputEnabled (bool inputEnabled)
+void IngameUIManager::SetInputEnabled (bool inputEnabled)
 {
     inputEnabled_ = inputEnabled;
 }
 
-void IngameUI::LoadUI ()
+void IngameUIManager::LoadUI ()
 {
     LoadElements ();
     SubscribeToEvents ();
 }
 
-void IngameUI::SetupUnitsIcons ()
+void IngameUIManager::SetupUnitsIcons ()
 {
-    DataProcessor *dataProcessor = owner_->GetDataProcessor ();
+    DataManager *dataProcessor = owner_->GetDataManager ();
     for (unsigned int index = 0; index < dataProcessor->GetUnitsTypesCount (); index++)
     {
         if (index != dataProcessor->GetSpawnsUnitType ())
@@ -68,7 +68,7 @@ void IngameUI::SetupUnitsIcons ()
     SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
 }
 
-void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
+void IngameUIManager::ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
                           UICallback callback)
 {
     requestedMessages_.Push ({title, description, okButtonText, callback});
@@ -78,7 +78,7 @@ void IngameUI::ShowMessage (const Urho3D::String &title, const Urho3D::String &d
     }
 }
 
-void IngameUI::ClearUI ()
+void IngameUIManager::ClearUI ()
 {
     UnsubscribeFromAllEvents ();
     topBar_->Remove ();
@@ -90,7 +90,7 @@ void IngameUI::ClearUI ()
     messageWindow_ = nullptr;
 }
 
-void IngameUI::LoadElements ()
+void IngameUIManager::LoadElements ()
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
@@ -111,7 +111,7 @@ void IngameUI::LoadElements ()
     messageWindow_->SetVisible (false);
 }
 
-void IngameUI::ShowNextMessage ()
+void IngameUIManager::ShowNextMessage ()
 {
     const MessageData &messageData = requestedMessages_.Front ();
     dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Title", false))->SetText (messageData.title);
@@ -120,7 +120,7 @@ void IngameUI::ShowNextMessage ()
     messageWindow_->SetVisible (true);
 }
 
-void IngameUI::AddNewUnitTypeToTopBar (const UnitType &unitType)
+void IngameUIManager::AddNewUnitTypeToTopBar (const UnitType &unitType)
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::XMLFile *style = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
@@ -141,72 +141,72 @@ void IngameUI::AddNewUnitTypeToTopBar (const UnitType &unitType)
             unitPullElement->GetChild ("SpawnButton", false));
     spawnButton->SetVar (BUTTON_UNIT_TYPE_VAR, unitType.GetId ());
 
-    SubscribeToEvent (recruitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarRecruitClicked));
-    SubscribeToEvent (spawnButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarSpawnClicked));
+    SubscribeToEvent (recruitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarRecruitClicked));
+    SubscribeToEvent (spawnButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarSpawnClicked));
 }
 
-void IngameUI::SubscribeToEvents ()
+void IngameUIManager::SubscribeToEvents ()
 {
     SubscribeToTopBarEvents ();
     SubscribeToMenuEvents ();
     SubscribeToMessageWindowEvents ();
 }
 
-void IngameUI::SubscribeToTopBarEvents ()
+void IngameUIManager::SubscribeToTopBarEvents ()
 {
     Urho3D::Button *menuButton = dynamic_cast <Urho3D::Button *> (topBar_->GetChild ("MenuButton", false));
-    SubscribeToEvent (menuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleTopBarMenuClicked));
+    SubscribeToEvent (menuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarMenuClicked));
 }
 
-void IngameUI::SubscribeToMenuEvents ()
+void IngameUIManager::SubscribeToMenuEvents ()
 {
     Urho3D::Button *closeMenuButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("CloseMenuButton", false));
     Urho3D::Button *exitToMainMenuButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("ExitToMainMenuButton", false));
     Urho3D::Button *exitButton = dynamic_cast <Urho3D::Button *> (menu_->GetChild ("ExitButton", false));
 
-    SubscribeToEvent (closeMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuCloseClicked));
-    SubscribeToEvent (exitToMainMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuExitToMainClicked));
-    SubscribeToEvent (exitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMenuExitFromGameClicked));
+    SubscribeToEvent (closeMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleMenuCloseClicked));
+    SubscribeToEvent (exitToMainMenuButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleMenuExitToMainClicked));
+    SubscribeToEvent (exitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleMenuExitFromGameClicked));
 }
 
-void IngameUI::SubscribeToMessageWindowEvents ()
+void IngameUIManager::SubscribeToMessageWindowEvents ()
 {
     Urho3D::Button *okButton = dynamic_cast <Urho3D::Button *> (messageWindow_->GetChild ("OkButton", false));
-    SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUI, HandleMessageWindowOkClicked));
+    SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleMessageWindowOkClicked));
 }
 
-void IngameUI::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     menu_->SetVisible (true);
 }
 
-void IngameUI::HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     // TODO: Implement.
 }
 
-void IngameUI::HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     // TODO: Implement.
 }
 
-void IngameUI::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     menu_->SetVisible (false);
 }
 
-void IngameUI::HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     SendEvent (SHUTDOWN_ALL_ACTIVITIES);
     SendEvent (START_MAIN_MENU);
 }
 
-void IngameUI::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     context_->GetSubsystem <Urho3D::Engine> ()->Exit ();
 }
 
-void IngameUI::HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+void IngameUIManager::HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     requestedMessages_.Front ().uiCallback (owner_);
     requestedMessages_.PopFront ();

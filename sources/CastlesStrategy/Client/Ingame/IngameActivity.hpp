@@ -2,10 +2,10 @@
 #include <ActivitiesApplication/Activity.hpp>
 #include <Urho3D/Scene/Scene.h>
 
-#include <CastlesStrategy/Client/Ingame/IngameUI.hpp>
-#include <CastlesStrategy/Client/Ingame/NetworkMessagesProcessor.hpp>
-#include <CastlesStrategy/Client/Ingame/DataProcessor.hpp>
-#include <CastlesStrategy/Client/Ingame/CameraHandler.hpp>
+#include <CastlesStrategy/Client/Ingame/IngameUIManager.hpp>
+#include <CastlesStrategy/Client/Ingame/NetworkManager.hpp>
+#include <CastlesStrategy/Client/Ingame/DataManager.hpp>
+#include <CastlesStrategy/Client/Ingame/CameraManager.hpp>
 
 namespace CastlesStrategy
 {
@@ -25,10 +25,10 @@ public:
     unsigned int GetPort () const;
     Urho3D::Scene *GetScene () const;
 
-    IngameUI *GetIngameUI () const;
-    NetworkMessagesProcessor *GetNetworkMessagesProcessor () const;
-    DataProcessor *GetDataProcessor () const;
-    CameraHandler *GetCameraHandler () const;
+    IngameUIManager *GetIngameUIManager () const;
+    NetworkManager *GetNetworkManager () const;
+    DataManager *GetDataManager () const;
+    CameraManager *GetCameraManager () const;
 
 private:
     void InitScene () const;
@@ -44,10 +44,10 @@ private:
     unsigned int port_;
     Urho3D::Scene *scene_;
 
-    IngameUI *ingameUI_;
-    NetworkMessagesProcessor *networkMessagesProcessor_;
-    DataProcessor *dataProcessor_;
-    CameraHandler *cameraHandler_;
+    IngameUIManager *ingameUIManager_;
+    NetworkManager *networkManager_;
+    DataManager *dataManager_;
+    CameraManager *cameraManager_;
 };
 }
 

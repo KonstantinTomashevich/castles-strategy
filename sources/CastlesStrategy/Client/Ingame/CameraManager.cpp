@@ -1,4 +1,4 @@
-#include "CameraHandler.hpp"
+#include "CameraManager.hpp"
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/Viewport.h>
 #include <Urho3D/Graphics/Camera.h>
@@ -10,7 +10,7 @@
 
 namespace CastlesStrategy
 {
-CameraHandler::CameraHandler (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+CameraManager::CameraManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
     cameraNode_ (nullptr),
     moveSpeed_ (20.0f),
@@ -24,12 +24,12 @@ CameraHandler::CameraHandler (IngameActivity *owner) : Urho3D::Object (owner->Ge
 
 }
 
-CameraHandler::~CameraHandler ()
+CameraManager::~CameraManager ()
 {
 
 }
 
-void CameraHandler::SetupCamera (const Urho3D::Vector3 &position, const Urho3D::Quaternion &rotation)
+void CameraManager::SetupCamera (const Urho3D::Vector3 &position, const Urho3D::Quaternion &rotation)
 {
     cameraNode_ = owner_->GetScene ()->CreateChild ("Camera", Urho3D::LOCAL, 0);
     cameraNode_->SetPosition (position);
@@ -41,7 +41,7 @@ void CameraHandler::SetupCamera (const Urho3D::Vector3 &position, const Urho3D::
     renderer->SetViewport (0, new Urho3D::Viewport (context_, owner_->GetScene (), camera));
 }
 
-void CameraHandler::Update (float timeStep)
+void CameraManager::Update (float timeStep)
 {
     if (cameraNode_ == nullptr)
     {
@@ -71,62 +71,62 @@ void CameraHandler::Update (float timeStep)
             Urho3D::Vector3 (moveSpeed_ * deltaX * timeStep, 0.0f, moveSpeed_ * deltaZ * timeStep), Urho3D::TS_WORLD);
 }
 
-float CameraHandler::GetMoveSpeed () const
+float CameraManager::GetMoveSpeed () const
 {
     return moveSpeed_;
 }
 
-void CameraHandler::SetMoveSpeed (float moveSpeed)
+void CameraManager::SetMoveSpeed (float moveSpeed)
 {
     moveSpeed_ = moveSpeed;
 }
 
-MouseButtonCode CameraHandler::GetMouseButtonMove () const
+MouseButtonCode CameraManager::GetMouseButtonMove () const
 {
     return mouseButtonMove_;
 }
 
-void CameraHandler::SetMouseButtonMove (MouseButtonCode mouseButtonMove)
+void CameraManager::SetMouseButtonMove (MouseButtonCode mouseButtonMove)
 {
     mouseButtonMove_ = mouseButtonMove;
 }
 
-KeyCode CameraHandler::GetKeyForward () const
+KeyCode CameraManager::GetKeyForward () const
 {
     return keyForward_;
 }
 
-void CameraHandler::SetKeyForward (KeyCode keyForward)
+void CameraManager::SetKeyForward (KeyCode keyForward)
 {
     keyForward_ = keyForward;
 }
 
-KeyCode CameraHandler::GetKeyBackward () const
+KeyCode CameraManager::GetKeyBackward () const
 {
     return keyBackward_;
 }
 
-void CameraHandler::SetKeyBackward (KeyCode keyBackward)
+void CameraManager::SetKeyBackward (KeyCode keyBackward)
 {
     keyBackward_ = keyBackward;
 }
 
-KeyCode CameraHandler::GetKeyLeft () const
+KeyCode CameraManager::GetKeyLeft () const
 {
     return keyLeft_;
 }
 
-void CameraHandler::SetKeyLeft (KeyCode keyLeft)
+void CameraManager::SetKeyLeft (KeyCode keyLeft)
 {
     keyLeft_ = keyLeft;
 }
 
-KeyCode CameraHandler::GetKeyRight () const
+KeyCode CameraManager::GetKeyRight () const
 {
     return keyRight_;
 }
 
-void CameraHandler::SetKeyRight (KeyCode keyRight)
+void CameraManager::SetKeyRight (KeyCode keyRight)
 {
     keyRight_ = keyRight;
 }

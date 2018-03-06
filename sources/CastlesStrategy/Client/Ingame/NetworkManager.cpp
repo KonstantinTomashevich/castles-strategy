@@ -1,4 +1,4 @@
-#include "NetworkMessagesProcessor.hpp"
+#include "NetworkManager.hpp"
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Resource/ResourceCache.h>
 
@@ -12,21 +12,21 @@ namespace CastlesStrategy
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
-NetworkMessagesProcessor::NetworkMessagesProcessor (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
     incomingMessagesProcessors_ (STCNMT_TYPES_COUNT - STCNMT_START)
 {
-    SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkMessagesProcessor, HandleNetworkMessage));
+    SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_MAP_PATH - STCNMT_START] = ProcessMapPathMessage;
 }
 
-NetworkMessagesProcessor::~NetworkMessagesProcessor ()
+NetworkManager::~NetworkManager ()
 {
     UnsubscribeFromAllEvents ();
 }
 
-void NetworkMessagesProcessor::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
+void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
 {
     int messageID = data [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
     Urho3D::VectorBuffer messageData = data [Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
@@ -50,9 +50,9 @@ void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer
             resourceCache->GetResource <Urho3D::XMLFile> (DEFAULT_UNITS_TYPES_PATH)->GetRoot () :
             resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "UnitsTypes.xml")->GetRoot ();
 
-    ingameActivity->GetDataProcessor ()->LoadUnitsTypesFromXML (unitsXml);
-    ingameActivity->GetIngameUI ()->SetupUnitsIcons ();
-    ingameActivity->GetCameraHandler ()->SetupCamera (
+    ingameActivity->GetDataManager ()->LoadUnitsTypesFromXML (unitsXml);
+    ingameActivity->GetIngameUIManager ()->SetupUnitsIcons ();
+    ingameActivity->GetCameraManager ()->SetupCamera (
             mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
 }
 }

@@ -26,10 +26,10 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
           port_ (port),
           scene_ (new Urho3D::Scene (context)),
 
-          ingameUI_ (nullptr),
-          networkMessagesProcessor_ (nullptr),
-          dataProcessor_ (nullptr),
-          cameraHandler_ (nullptr)
+          ingameUIManager_ (nullptr),
+          networkManager_ (nullptr),
+          dataManager_ (nullptr),
+          cameraManager_ (nullptr)
 {
 
 }
@@ -37,35 +37,35 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
 IngameActivity::~IngameActivity ()
 {
     delete scene_;
-    delete ingameUI_;
-    delete networkMessagesProcessor_;
-    delete dataProcessor_;
-    delete cameraHandler_;
+    delete ingameUIManager_;
+    delete networkManager_;
+    delete dataManager_;
+    delete cameraManager_;
 }
 
 void IngameActivity::Start ()
 {
-    ingameUI_ = new IngameUI (this);
-    ingameUI_->LoadUI ();
+    ingameUIManager_ = new IngameUIManager (this);
+    ingameUIManager_->LoadUI ();
 
-    networkMessagesProcessor_ = new NetworkMessagesProcessor (this);
-    dataProcessor_ = new DataProcessor (this);
+    networkManager_ = new NetworkManager (this);
+    dataManager_ = new DataManager (this);
 
     SubscribeToEvents ();
     ConnectToServer ();
 
-    cameraHandler_ = new CameraHandler (this);
+    cameraManager_ = new CameraManager (this);
     InitScene ();
 }
 
 void IngameActivity::Update (float timeStep)
 {
-    cameraHandler_->Update (timeStep);
+    cameraManager_->Update (timeStep);
 }
 
 void IngameActivity::Stop ()
 {
-    ingameUI_->ClearUI ();
+    ingameUIManager_->ClearUI ();
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
@@ -83,24 +83,24 @@ Urho3D::Scene *IngameActivity::GetScene () const
     return scene_;
 }
 
-IngameUI *IngameActivity::GetIngameUI () const
+IngameUIManager *IngameActivity::GetIngameUIManager () const
 {
-    return ingameUI_;
+    return ingameUIManager_;
 }
 
-NetworkMessagesProcessor *IngameActivity::GetNetworkMessagesProcessor () const
+NetworkManager *IngameActivity::GetNetworkManager () const
 {
-    return networkMessagesProcessor_;
+    return networkManager_;
 }
 
-DataProcessor *IngameActivity::GetDataProcessor () const
+DataManager *IngameActivity::GetDataManager () const
 {
-    return dataProcessor_;
+    return dataManager_;
 }
 
-CameraHandler *IngameActivity::GetCameraHandler () const
+CameraManager *IngameActivity::GetCameraManager () const
 {
-    return cameraHandler_;
+    return cameraManager_;
 }
 
 void IngameActivity::InitScene () const
@@ -127,7 +127,7 @@ void IngameActivity::ConnectToServer () const
 
 void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    ingameUI_->ShowMessage ("Connection failed!", "Couldn't connect to specified server!", "Go to main menu.",
+    ingameUIManager_->ShowMessage ("Connection failed!", "Couldn't connect to specified server!", "Go to main menu.",
                             [] (IngameActivity *activity) -> void
                             {
                                 activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);

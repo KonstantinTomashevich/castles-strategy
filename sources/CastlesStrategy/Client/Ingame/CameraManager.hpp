@@ -8,12 +8,12 @@ typedef int KeyCode;
 typedef int MouseButtonCode;
 class IngameActivity;
 
-class CameraHandler : public Urho3D::Object
+class CameraManager : public Urho3D::Object
 {
-URHO3D_OBJECT (CameraHandler, Object)
+URHO3D_OBJECT (CameraManager, Object)
 public:
-    CameraHandler (IngameActivity *owner);
-    virtual ~CameraHandler ();
+    CameraManager (IngameActivity *owner);
+    virtual ~CameraManager ();
 
     void SetupCamera (const Urho3D::Vector3 &position, const Urho3D::Quaternion &rotation);
     void Update (float timeStep);

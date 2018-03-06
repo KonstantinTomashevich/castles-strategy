@@ -6,12 +6,12 @@
 namespace CastlesStrategy
 {
 class IngameActivity;
-class DataProcessor : public Urho3D::Object
+class DataManager : public Urho3D::Object
 {
-URHO3D_OBJECT (DataProcessor, Object)
+URHO3D_OBJECT (DataManager, Object)
 public:
-    explicit DataProcessor (IngameActivity *owner);
-    virtual ~DataProcessor ();
+    explicit DataManager (IngameActivity *owner);
+    virtual ~DataManager ();
 
     unsigned int GetSpawnsUnitType () const;
     void SetSpawnsUnitType (unsigned int spawnsUnitType);

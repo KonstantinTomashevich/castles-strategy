@@ -6,12 +6,12 @@ namespace CastlesStrategy
 class IngameActivity;
 typedef void (*ClientIncomingNetworkMessageProcessor) (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
-class NetworkMessagesProcessor : public Urho3D::Object
+class NetworkManager : public Urho3D::Object
 {
-URHO3D_OBJECT (NetworkMessagesProcessor, Object)
+URHO3D_OBJECT (NetworkManager, Object)
 public:
-    explicit NetworkMessagesProcessor (IngameActivity *owner);
-    virtual ~NetworkMessagesProcessor ();
+    explicit NetworkManager (IngameActivity *owner);
+    virtual ~NetworkManager ();
 
 private:
     void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data);

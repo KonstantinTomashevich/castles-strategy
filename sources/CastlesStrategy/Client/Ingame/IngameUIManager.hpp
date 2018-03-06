@@ -11,12 +11,12 @@ class IngameActivity;
 typedef void (*UICallback) (IngameActivity *activity);
 const Urho3D::StringHash BUTTON_UNIT_TYPE_VAR ("ButtonUnitType");
 
-class IngameUI : public Urho3D::Object
+class IngameUIManager : public Urho3D::Object
 {
-URHO3D_OBJECT (IngameUI, Object)
+URHO3D_OBJECT (IngameUIManager, Object)
 public:
-    IngameUI (IngameActivity *owner);
-    virtual ~IngameUI ();
+    IngameUIManager (IngameActivity *owner);
+    virtual ~IngameUIManager ();
 
     const IngameActivity *GetOwner () const;
     bool IsInputEnabled () const;

@@ -1,32 +1,32 @@
-#include "DataProcessor.hpp"
+#include "DataManager.hpp"
 #include <Utils/UniversalException.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 
 namespace CastlesStrategy
 {
-DataProcessor::DataProcessor (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
         owner_ (owner),
         unitsTypes_ ()
 {
 
 }
 
-DataProcessor::~DataProcessor ()
+DataManager::~DataManager ()
 {
 
 }
 
-unsigned int DataProcessor::GetSpawnsUnitType () const
+unsigned int DataManager::GetSpawnsUnitType () const
 {
     return spawnsUnitType_;
 }
 
-void DataProcessor::SetSpawnsUnitType (unsigned int spawnsUnitType)
+void DataManager::SetSpawnsUnitType (unsigned int spawnsUnitType)
 {
     spawnsUnitType_ = spawnsUnitType;
 }
 
-void DataProcessor::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
+void DataManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
 {
     unitsTypes_.clear ();
     spawnsUnitType_ = input.GetUInt ("spawnsUnitType");
@@ -41,21 +41,21 @@ void DataProcessor::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
     }
 }
 
-const std::vector <UnitType> &DataProcessor::GetUnitsTypes () const
+const std::vector <UnitType> &DataManager::GetUnitsTypes () const
 {
     return unitsTypes_;
 }
 
-unsigned int DataProcessor::GetUnitsTypesCount () const
+unsigned int DataManager::GetUnitsTypesCount () const
 {
     return unitsTypes_.size ();
 }
 
-const UnitType &DataProcessor::GetUnitTypeByIndex (unsigned int index) const
+const UnitType &DataManager::GetUnitTypeByIndex (unsigned int index) const
 {
     if (index >= unitsTypes_.size ())
     {
-        throw UniversalException <DataProcessor> ("DataProcessor: can not find scene xml!");
+        throw UniversalException <DataManager> ("DataManager: can not find scene xml!");
     }
 
     return unitsTypes_ [index];
