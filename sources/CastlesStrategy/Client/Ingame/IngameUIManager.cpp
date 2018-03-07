@@ -13,6 +13,7 @@
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
 #include <Utils/UIResizer.hpp>
+#include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
 {
@@ -90,6 +91,23 @@ void IngameUIManager::ClearUI ()
     messageWindow_ = nullptr;
 }
 
+void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
+{
+    Urho3D::UIElement *unitPullElement = topBar_->GetChild (("UnitsType" + Urho3D::String (unitType)));
+    if (unitPullElement == nullptr)
+    {
+        throw UniversalException <IngameUIManager> ("IngameUIManager: requested to update units pull ui of type " +
+                Urho3D::String (unitType) + " but ui element for this type is not exists!");
+    }
+
+    unsigned int predictedUnitsInPull = owner_->GetDataManager ()->GetPredictedUnitsInPull (unitType);
+    Urho3D::Text *countElement = dynamic_cast <Urho3D::Text *> (unitPullElement->
+            GetChild ("IconAndCountElement", false)->GetChild ("Count", false));
+
+    countElement->SetText (Urho3D::String (predictedUnitsInPull));
+    unitPullElement->GetChild ("SpawnButton", false)->SetVisible (predictedUnitsInPull > 0);
+}
+
 void IngameUIManager::LoadElements ()
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
@@ -116,7 +134,8 @@ void IngameUIManager::ShowNextMessage ()
     const MessageData &messageData = requestedMessages_.Front ();
     dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Title", false))->SetText (messageData.title);
     dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("Description", false))->SetText (messageData.description);
-    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->SetText (messageData.okButtonText);
+    dynamic_cast <Urho3D::Text *> (messageWindow_->GetChild ("OkButton", false)->GetChild ("Text", false))->
+            SetText (messageData.okButtonText);
     messageWindow_->SetVisible (true);
 }
 
@@ -127,6 +146,7 @@ void IngameUIManager::AddNewUnitTypeToTopBar (const UnitType &unitType)
 
     Urho3D::UIElement *unitPullElement = topBar_->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/UnitPullElement.xml")->GetRoot (), style);
+    unitPullElement->SetName ("UnitsType" + Urho3D::String (unitType.GetId ()));
 
     Urho3D::BorderImage *iconElement = dynamic_cast <Urho3D::BorderImage *> (unitPullElement->
             GetChild ("IconAndCountElement", false)->GetChild ("Icon", false));
@@ -141,6 +161,7 @@ void IngameUIManager::AddNewUnitTypeToTopBar (const UnitType &unitType)
             unitPullElement->GetChild ("SpawnButton", false));
     spawnButton->SetVar (BUTTON_UNIT_TYPE_VAR, unitType.GetId ());
 
+    CheckUIForUnitsType (unitType.GetId ());
     SubscribeToEvent (recruitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarRecruitClicked));
     SubscribeToEvent (spawnButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarSpawnClicked));
 }

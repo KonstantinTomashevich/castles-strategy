@@ -25,12 +25,17 @@ public:
     unsigned int GetUnitsTypesCount () const;
     const UnitType &GetUnitTypeByIndex (unsigned int index) const;
 
+    void UpdateUnitsPull (unsigned int unitType, unsigned int newValue);
+    unsigned int GetPredictedUnitsInPull (unsigned int unitType) const;
+
 private:
     void AttemptToAddPrefabs ();
 
     IngameActivity *owner_;
     unsigned int spawnsUnitType_;
     std::vector <UnitType> unitsTypes_;
+
     Urho3D::HashSet <unsigned int> unitNodesToAddPrefabs_;
+    Urho3D::PODVector <unsigned int> predictedUnitsPull_;
 };
 }

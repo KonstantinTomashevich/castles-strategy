@@ -40,6 +40,7 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (Urho3D::E_CLIENTDISCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientDisconnected));
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (ServerActivity, HandleNetworkMessage));
     SubscribeToEvent (Urho3D::E_COMPONENTADDED, URHO3D_HANDLER (ServerActivity, HandleComponentAdded));
+    SubscribeToEvent (PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
 }
 
 ServerActivity::~ServerActivity ()
@@ -179,6 +180,17 @@ void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D:
             }
         }
     }
+}
+
+void ServerActivity::HandlePlayerUnitsPullSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    Player *player = static_cast <Player *> (eventData [PlayerUnitsPullSync::PLAYER].GetVoidPtr ());
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUInt (eventData [PlayerUnitsPullSync::UNIT_TYPE].GetUInt ());
+    messageData.WriteUInt (eventData [PlayerUnitsPullSync::NEW_VALUE].GetUInt ());
+
+    (player == &dynamic_cast <PlayersManager *> (managersHub_->GetManager (MI_PLAYERS_MANAGER))->GetFirstPlayer () ?
+        firstPlayer_ : secondPlayer_)->SendMessage (STCNMT_UNITS_PULL_SYNC, true, false, messageData);
 }
 
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)

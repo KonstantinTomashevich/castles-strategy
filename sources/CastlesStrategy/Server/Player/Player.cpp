@@ -12,7 +12,10 @@ Player::Player (const ManagersHub *managersHub) :
     orders_ (),
     unitsPull_ (dynamic_cast <const UnitsManager *> (managersHub->GetManager (MI_UNITS_MANAGER))->GetUnitsTypesCount ())
 {
-
+    for (unsigned int index = 0; index < unitsPull_.Size (); index++)
+    {
+        unitsPull_ [index] = 0;
+    }
 }
 
 Player::Player (const Player &another) : Player (another.managersHub_)
@@ -35,6 +38,7 @@ void Player::HandleUpdate (float timeStep)
         if (order.timeLeft_ <= 0.0f)
         {
             unitsPull_[order.unitType_]++;
+            SendUnitsPullSyncRequest (order.unitType_);
             orders_.PopFront ();
         }
     }
@@ -111,7 +115,9 @@ void Player::TakeUnitFromPull (unsigned int unitType)
         throw UniversalException <UnitsManager> ("Player: unit with type " + Urho3D::String (unitType) +
                                                  " requested from pull, but there is no units of this type in the pull!");
     }
+
     unitsPull_ [unitType]--;
+    SendUnitsPullSyncRequest (unitType);
 }
 
 unsigned int Player::GetUnitsPullCount (unsigned int unitType) const
@@ -131,5 +137,14 @@ Player &Player::operator = (const Player &another)
 
     orders_ = another.orders_;
     unitsPull_ = another.unitsPull_;
+}
+
+void Player::SendUnitsPullSyncRequest (unsigned int unitType)
+{
+    Urho3D::VariantMap eventData;
+    eventData [PlayerUnitsPullSync::PLAYER] = this;
+    eventData [PlayerUnitsPullSync::UNIT_TYPE] = unitType;
+    eventData [PlayerUnitsPullSync::NEW_VALUE] = unitsPull_ [unitType];
+    managersHub_->GetScene ()->SendEvent (PLAYER_UNITS_PULL_SYNC, eventData);
 }
 }

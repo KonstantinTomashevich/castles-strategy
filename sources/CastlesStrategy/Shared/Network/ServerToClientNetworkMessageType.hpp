@@ -11,6 +11,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_MAP_PATH,
     // ID : UInt (node id).
     STCNMT_UNIT_SPAWNED,
+    // UnitType : UInt, NewValue : UInt.
+    STCNMT_UNITS_PULL_SYNC,
     STCNMT_TYPES_COUNT
 };
 }

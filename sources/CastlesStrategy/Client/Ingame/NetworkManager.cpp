@@ -12,6 +12,7 @@ namespace CastlesStrategy
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
@@ -21,6 +22,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_MAP_PATH - STCNMT_START] = ProcessMapPathMessage;
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
+    incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
 }
 
 NetworkManager::~NetworkManager ()
@@ -61,5 +63,12 @@ void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
     ingameActivity->GetDataManager ()->AddPrefabToUnit (messageData.ReadUInt ());
+}
+
+void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    unsigned int unitType = messageData.ReadUInt ();
+    unsigned int newValue = messageData.ReadUInt ();
+    ingameActivity->GetDataManager ()->UpdateUnitsPull (unitType, newValue);
 }
 }

@@ -5,6 +5,16 @@
 
 namespace CastlesStrategy
 {
+URHO3D_EVENT (PLAYER_UNITS_PULL_SYNC, PlayerUnitsPullSync)
+{
+    // Pointer.
+    URHO3D_PARAM (PLAYER, Player);
+    // UInt.
+    URHO3D_PARAM (UNIT_TYPE, UnitType);
+    // UInt.
+    URHO3D_PARAM (NEW_VALUE, NewValue);
+}
+
 struct RecruitmentOrder
 {
     unsigned int unitType_;
@@ -34,11 +44,13 @@ public:
     Player &operator = (const Player &another);
 
 private:
+    void SendUnitsPullSyncRequest (unsigned int unitType);
+
     const ManagersHub *managersHub_;
     unsigned int coins_;
     unsigned int belongingMaterialIndex_;
 
     Urho3D::List <RecruitmentOrder> orders_;
-    Urho3D::Vector <unsigned int> unitsPull_;
+    Urho3D::PODVector <unsigned int> unitsPull_;
 };
 }

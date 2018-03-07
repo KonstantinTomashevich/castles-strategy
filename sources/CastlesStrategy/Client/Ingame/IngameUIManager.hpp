@@ -26,7 +26,9 @@ public:
     void SetupUnitsIcons ();
     void ShowMessage (const Urho3D::String &title, const Urho3D::String &description, const Urho3D::String &okButtonText,
                         UICallback callback);
+
     void ClearUI ();
+    void CheckUIForUnitsType (unsigned int unitType);
 
 private:
     struct MessageData

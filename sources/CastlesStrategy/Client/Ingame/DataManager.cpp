@@ -9,7 +9,10 @@ namespace CastlesStrategy
 {
 DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
         owner_ (owner),
-        unitsTypes_ ()
+        unitsTypes_ (),
+        spawnsUnitType_ (0),
+        unitNodesToAddPrefabs_ (),
+        predictedUnitsPull_ ()
 {
 
 }
@@ -52,6 +55,12 @@ void DataManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
         element = element.GetNext ("unitType");
         id++;
     }
+
+    predictedUnitsPull_.Resize (unitsTypes_.size ());
+    for (unsigned int index = 0; index < unitsTypes_.size (); index++)
+    {
+        predictedUnitsPull_ [index] = 0;
+    }
 }
 
 const std::vector <UnitType> &DataManager::GetUnitsTypes () const
@@ -73,6 +82,34 @@ const UnitType &DataManager::GetUnitTypeByIndex (unsigned int index) const
     }
 
     return unitsTypes_ [index];
+}
+
+void DataManager::UpdateUnitsPull (unsigned int unitType, unsigned int newValue)
+{
+    if (unitType >= unitsTypes_.size ())
+    {
+        throw UniversalException <DataManager> ("DataManager: requested to update units pull of type " +
+                Urho3D::String (unitType) + " but there is only " + Urho3D::String (unitsTypes_.size ()) +
+                " units types!");
+    }
+
+    predictedUnitsPull_ [unitType] = newValue;
+    if (unitType != spawnsUnitType_)
+    {
+        owner_->GetIngameUIManager ()->CheckUIForUnitsType (unitType);
+    }
+}
+
+unsigned int DataManager::GetPredictedUnitsInPull (unsigned int unitType) const
+{
+    if (unitType >= unitsTypes_.size ())
+    {
+        throw UniversalException <DataManager> ("DataManager: requested units pull of type " +
+                Urho3D::String (unitType) + " but there is only " + Urho3D::String (unitsTypes_.size ()) +
+                " units types!");
+    }
+
+    return predictedUnitsPull_ [unitType];
 }
 
 void DataManager::AttemptToAddPrefabs ()
@@ -104,7 +141,5 @@ void DataManager::AttemptToAddPrefabs ()
         }
         iterator++;
     }
-
-
 }
 }
