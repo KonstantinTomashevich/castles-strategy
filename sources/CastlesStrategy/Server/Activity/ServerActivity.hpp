@@ -32,8 +32,10 @@ private:
     void HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandleClientDisconnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandleNetworkMessage (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+
     void HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandlePlayerUnitsPullSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+    void HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
 
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
     bool RemoveIdentifiedConnection (Urho3D::Connection *connection);

@@ -28,6 +28,9 @@ public:
     void UpdateUnitsPull (unsigned int unitType, unsigned int newValue);
     unsigned int GetPredictedUnitsInPull (unsigned int unitType) const;
 
+    unsigned int GetPredictedCoins () const;
+    void SetPredictedCoins (unsigned int predictedCoins);
+
 private:
     void AttemptToAddPrefabs ();
 
@@ -37,5 +40,6 @@ private:
 
     Urho3D::HashSet <unsigned int> unitNodesToAddPrefabs_;
     Urho3D::PODVector <unsigned int> predictedUnitsPull_;
+    unsigned int predictedCoins_;
 };
 }

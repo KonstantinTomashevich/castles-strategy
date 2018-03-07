@@ -13,6 +13,7 @@ void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuf
 void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
@@ -23,6 +24,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     incomingMessagesProcessors_ [STCNMT_MAP_PATH - STCNMT_START] = ProcessMapPathMessage;
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
+    incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
 }
 
 NetworkManager::~NetworkManager ()
@@ -70,5 +72,10 @@ void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::Vector
     unsigned int unitType = messageData.ReadUInt ();
     unsigned int newValue = messageData.ReadUInt ();
     ingameActivity->GetDataManager ()->UpdateUnitsPull (unitType, newValue);
+}
+
+void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    ingameActivity->GetDataManager ()->SetPredictedCoins (messageData.ReadUInt ());
 }
 }

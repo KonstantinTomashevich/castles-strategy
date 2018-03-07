@@ -100,12 +100,30 @@ void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
                 Urho3D::String (unitType) + " but ui element for this type is not exists!");
     }
 
-    unsigned int predictedUnitsInPull = owner_->GetDataManager ()->GetPredictedUnitsInPull (unitType);
+    DataManager *dataManager = owner_->GetDataManager ();
+    unsigned int predictedUnitsInPull = dataManager->GetPredictedUnitsInPull (unitType);
     Urho3D::Text *countElement = dynamic_cast <Urho3D::Text *> (unitPullElement->
             GetChild ("IconAndCountElement", false)->GetChild ("Count", false));
 
     countElement->SetText (Urho3D::String (predictedUnitsInPull));
     unitPullElement->GetChild ("SpawnButton", false)->SetVisible (predictedUnitsInPull > 0);
+    unitPullElement->GetChild ("RecruitButton", false)->SetVisible (
+            dataManager->GetUnitTypeByIndex (unitType).GetRecruitmentCost () <= dataManager->GetPredictedCoins ());
+}
+
+void IngameUIManager::UpdateCoins (unsigned int coins)
+{
+    DataManager *dataManager = owner_->GetDataManager ();
+    dynamic_cast <Urho3D::Text *> (
+            topBar_->GetChild ("CoinsElement", false)->GetChild ("Text", false))->SetText (Urho3D::String (coins));
+
+    for (unsigned int index = 0; index < dataManager->GetUnitsTypesCount (); index++)
+    {
+        if (index != dataManager->GetSpawnsUnitType ())
+        {
+            CheckUIForUnitsType (index);
+        }
+    }
 }
 
 void IngameUIManager::LoadElements ()

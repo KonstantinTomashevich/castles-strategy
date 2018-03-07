@@ -5,7 +5,7 @@
 
 namespace CastlesStrategy
 {
-URHO3D_EVENT (PLAYER_UNITS_PULL_SYNC, PlayerUnitsPullSync)
+URHO3D_EVENT (E_PLAYER_UNITS_PULL_SYNC, PlayerUnitsPullSync)
 {
     // Pointer.
     URHO3D_PARAM (PLAYER, Player);
@@ -13,6 +13,14 @@ URHO3D_EVENT (PLAYER_UNITS_PULL_SYNC, PlayerUnitsPullSync)
     URHO3D_PARAM (UNIT_TYPE, UnitType);
     // UInt.
     URHO3D_PARAM (NEW_VALUE, NewValue);
+}
+
+URHO3D_EVENT (E_PLAYER_COINS_SYNC, PlayerCoinsSync)
+{
+// Pointer.
+URHO3D_PARAM (PLAYER, Player);
+// UInt.
+URHO3D_PARAM (NEW_VALUE, UnitType);
 }
 
 struct RecruitmentOrder

@@ -13,6 +13,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_UNIT_SPAWNED,
     // UnitType : UInt, NewValue : UInt.
     STCNMT_UNITS_PULL_SYNC,
+    // NewValue : UInt.
+    STCNMT_COINS_SYNC,
     STCNMT_TYPES_COUNT
 };
 }

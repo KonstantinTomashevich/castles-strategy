@@ -29,6 +29,7 @@ public:
 
     void ClearUI ();
     void CheckUIForUnitsType (unsigned int unitType);
+    void UpdateCoins (unsigned int coins);
 
 private:
     struct MessageData

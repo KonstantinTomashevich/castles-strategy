@@ -52,6 +52,10 @@ unsigned int Player::GetCoins () const
 void Player::SetCoins (unsigned int coins)
 {
     coins_ = coins;
+    Urho3D::VariantMap eventData;
+    eventData [PlayerCoinsSync::PLAYER] = this;
+    eventData [PlayerCoinsSync::NEW_VALUE] = coins;
+    managersHub_->GetScene ()->SendEvent (E_PLAYER_COINS_SYNC, eventData);
 }
 
 unsigned int Player::GetBelongingMaterialIndex () const
@@ -76,7 +80,7 @@ void Player::AddOrder (unsigned int unitType)
 
     if (coins_ >= unitTypeData.GetRecruitmentCost ())
     {
-        coins_ -= unitTypeData.GetRecruitmentCost ();
+        SetCoins (coins_ - unitTypeData.GetRecruitmentCost ());
         orders_.Push ({unitType, unitTypeData.GetRecruitmentTime ()});
     }
 }
@@ -96,14 +100,14 @@ void Player::RemoveOrder (unsigned int unitType)
         if (iterator->unitType_ == unitType)
         {
             iterator = orders_.Erase (iterator);
-            coins_ += unitTypeData.GetRecruitmentCost ();
+            SetCoins (coins_ + unitTypeData.GetRecruitmentCost ());
             return;
         }
     }
 
     if (orders_.Front ().unitType_ == unitType)
     {
-        coins_ += unitTypeData.GetRecruitmentCost ();
+        SetCoins (coins_ + unitTypeData.GetRecruitmentCost ());
         orders_.PopFront ();
     }
 }
@@ -145,6 +149,6 @@ void Player::SendUnitsPullSyncRequest (unsigned int unitType)
     eventData [PlayerUnitsPullSync::PLAYER] = this;
     eventData [PlayerUnitsPullSync::UNIT_TYPE] = unitType;
     eventData [PlayerUnitsPullSync::NEW_VALUE] = unitsPull_ [unitType];
-    managersHub_->GetScene ()->SendEvent (PLAYER_UNITS_PULL_SYNC, eventData);
+    managersHub_->GetScene ()->SendEvent (E_PLAYER_UNITS_PULL_SYNC, eventData);
 }
 }

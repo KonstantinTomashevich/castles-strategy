@@ -39,8 +39,10 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
     SubscribeToEvent (Urho3D::E_CLIENTDISCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientDisconnected));
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (ServerActivity, HandleNetworkMessage));
+
     SubscribeToEvent (Urho3D::E_COMPONENTADDED, URHO3D_HANDLER (ServerActivity, HandleComponentAdded));
-    SubscribeToEvent (PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
+    SubscribeToEvent (E_PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
+    SubscribeToEvent (E_PLAYER_COINS_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerCoinsSync));
 }
 
 ServerActivity::~ServerActivity ()
@@ -193,6 +195,16 @@ void ServerActivity::HandlePlayerUnitsPullSync (Urho3D::StringHash eventHash, Ur
         firstPlayer_ : secondPlayer_)->SendMessage (STCNMT_UNITS_PULL_SYNC, true, false, messageData);
 }
 
+void ServerActivity::HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    Player *player = static_cast <Player *> (eventData [PlayerUnitsPullSync::PLAYER].GetVoidPtr ());
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUInt (eventData [PlayerCoinsSync::NEW_VALUE].GetUInt ());
+
+    (player == &dynamic_cast <PlayersManager *> (managersHub_->GetManager (MI_PLAYERS_MANAGER))->GetFirstPlayer () ?
+            firstPlayer_ : secondPlayer_)->SendMessage (STCNMT_COINS_SYNC, true, false, messageData);
+}
+
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)
 {
     for (auto iterator = unidentifiedConnections_.Begin (); iterator != unidentifiedConnections_.End (); iterator++)
@@ -308,13 +320,13 @@ void ServerActivity::SetupPlayers (unsigned int startCoins)
     PlayersManager *playersManager = dynamic_cast <PlayersManager *> (managersHub_->GetManager (MI_PLAYERS_MANAGER));
     Player firstPlayer (managersHub_);
     firstPlayer.SetBelongingMaterialIndex (0);
-    firstPlayer.SetCoins (startCoins);
     playersManager->SetFirstPlayer (firstPlayer);
+    playersManager->GetFirstPlayer ().SetCoins (startCoins);
 
     Player secondPlayer (managersHub_);
     secondPlayer.SetBelongingMaterialIndex (1);
-    secondPlayer.SetCoins (startCoins);
     playersManager->SetSecondPlayer (secondPlayer);
+    playersManager->GetSecondPlayer ().SetCoins (startCoins);
 }
 }
 

@@ -12,7 +12,8 @@ DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetCon
         unitsTypes_ (),
         spawnsUnitType_ (0),
         unitNodesToAddPrefabs_ (),
-        predictedUnitsPull_ ()
+        predictedUnitsPull_ (),
+        predictedCoins_ (0)
 {
 
 }
@@ -141,5 +142,16 @@ void DataManager::AttemptToAddPrefabs ()
         }
         iterator++;
     }
+}
+
+unsigned int DataManager::GetPredictedCoins () const
+{
+    return predictedCoins_;
+}
+
+void DataManager::SetPredictedCoins (unsigned int predictedCoins)
+{
+    predictedCoins_ = predictedCoins;
+    owner_->GetIngameUIManager ()->UpdateCoins (predictedCoins);
 }
 }
