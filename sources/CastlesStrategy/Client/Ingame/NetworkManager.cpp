@@ -11,6 +11,7 @@ namespace CastlesStrategy
 {
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
@@ -19,6 +20,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_MAP_PATH - STCNMT_START] = ProcessMapPathMessage;
+    incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
 }
 
 NetworkManager::~NetworkManager ()
@@ -54,5 +56,10 @@ void ProcessMapPathMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer
     ingameActivity->GetIngameUIManager ()->SetupUnitsIcons ();
     ingameActivity->GetCameraManager ()->SetupCamera (
             mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
+}
+
+void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    ingameActivity->GetDataManager ()->AddPrefabToUnit (messageData.ReadUInt ());
 }
 }

@@ -61,6 +61,7 @@ void IngameActivity::Start ()
 void IngameActivity::Update (float timeStep)
 {
     cameraManager_->Update (timeStep);
+    dataManager_->Update (timeStep);
 }
 
 void IngameActivity::Stop ()

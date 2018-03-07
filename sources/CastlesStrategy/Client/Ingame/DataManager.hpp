@@ -13,6 +13,9 @@ public:
     explicit DataManager (IngameActivity *owner);
     virtual ~DataManager ();
 
+    void Update (float timeStep);
+    void AddPrefabToUnit (unsigned int nodeID);
+
     unsigned int GetSpawnsUnitType () const;
     void SetSpawnsUnitType (unsigned int spawnsUnitType);
 
@@ -23,8 +26,11 @@ public:
     const UnitType &GetUnitTypeByIndex (unsigned int index) const;
 
 private:
+    void AttemptToAddPrefabs ();
+
     IngameActivity *owner_;
     unsigned int spawnsUnitType_;
     std::vector <UnitType> unitsTypes_;
+    Urho3D::HashSet <unsigned int> unitNodesToAddPrefabs_;
 };
 }

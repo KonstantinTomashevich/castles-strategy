@@ -6,6 +6,7 @@
 
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Scene/SceneEvents.h>
 
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
@@ -38,6 +39,7 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
     SubscribeToEvent (Urho3D::E_CLIENTDISCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientDisconnected));
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (ServerActivity, HandleNetworkMessage));
+    SubscribeToEvent (Urho3D::E_COMPONENTADDED, URHO3D_HANDLER (ServerActivity, HandleComponentAdded));
 }
 
 ServerActivity::~ServerActivity ()
@@ -155,6 +157,27 @@ void ServerActivity::HandleNetworkMessage (Urho3D::StringHash eventHash, Urho3D:
     {
         incomingNetworkMessageProcessors_[messageId - CTSNMT_START] (managersHub_, identifiedConnections_,
                 static_cast <Urho3D::Connection *> (eventData[Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
+    }
+}
+
+void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    Urho3D::Scene *scene = static_cast <Urho3D::Scene *> (eventData [Urho3D::ComponentAdded::P_SCENE].GetVoidPtr ());
+    if (scene == scene_)
+    {
+        Urho3D::Node *node = static_cast <Urho3D::Node *> (eventData [Urho3D::ComponentAdded::P_NODE].GetVoidPtr ());
+
+        if (dynamic_cast <Unit *> (eventData [Urho3D::ComponentAdded::P_COMPONENT].GetPtr ()) != nullptr)
+        {
+            Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+            Urho3D::VectorBuffer messageData;
+            messageData.WriteUInt (node->GetID ());
+
+            for (auto &connectionData : identifiedConnections_)
+            {
+                connectionData.first_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
+            }
+        }
     }
 }
 

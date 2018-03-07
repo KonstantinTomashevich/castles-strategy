@@ -9,6 +9,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_GAME_STATUS = 100,
     // MapPath : String.
     STCNMT_MAP_PATH,
+    // ID : UInt (node id).
+    STCNMT_UNIT_SPAWNED,
     STCNMT_TYPES_COUNT
 };
 }
