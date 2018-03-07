@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map size="50 100" useDefaultUnitsTypes="true" defaultCameraPosition="0 20 0" defaultCameraRotation="30 0 0">
+<map size="50 100" useDefaultUnitsTypes="true" defaultCameraPosition="25 20 50" defaultCameraRotation="30 0 0">
     <route>
         <waypoint coord="20 10" />
         <waypoint coord="10 30" />

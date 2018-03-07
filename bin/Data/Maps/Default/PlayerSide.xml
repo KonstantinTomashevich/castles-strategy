@@ -26,7 +26,7 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="ground" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="0 0 0" />
+		<attribute name="Position" value="25 0 50" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="50 1 100" />
 		<attribute name="Variables" />
