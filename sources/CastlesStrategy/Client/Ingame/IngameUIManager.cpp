@@ -31,7 +31,7 @@ IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner
 
 IngameUIManager::~IngameUIManager ()
 {
-
+    UnsubscribeFromAllEvents ();
 }
 
 const IngameActivity *IngameUIManager::GetOwner () const
@@ -221,7 +221,9 @@ void IngameUIManager::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urh
 
 void IngameUIManager::HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    // TODO: Implement.
+    Urho3D::UIElement *clicked = dynamic_cast <Urho3D::UIElement *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    unsigned int unitType = clicked->GetVar (BUTTON_UNIT_TYPE_VAR).GetUInt ();
+    owner_->GetDataManager ()->RecruitUnit (unitType);
 }
 
 void IngameUIManager::HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

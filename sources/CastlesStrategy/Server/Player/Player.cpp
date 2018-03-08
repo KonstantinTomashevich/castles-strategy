@@ -83,6 +83,12 @@ void Player::AddOrder (unsigned int unitType)
         SetCoins (coins_ - unitTypeData.GetRecruitmentCost ());
         orders_.Push ({unitType, unitTypeData.GetRecruitmentTime ()});
     }
+    else
+    {
+        throw UniversalException <UnitsManager> ("Player: unit type " + Urho3D::String (unitType) +
+                " is too expensive to recruit, it costs " + Urho3D::String (unitTypeData.GetRecruitmentCost ()) +
+                " coins, but there is only " + Urho3D::String (coins_) + " coins!");
+    }
 }
 
 void Player::RemoveOrder (unsigned int unitType)

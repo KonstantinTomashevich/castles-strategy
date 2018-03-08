@@ -105,6 +105,26 @@ void ServerActivity::SetMapName (const Urho3D::String &mapName)
     mapName_ = mapName;
 }
 
+const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &ServerActivity::GetIdentifiedConnections () const
+{
+    return identifiedConnections_;
+}
+
+ManagersHub *ServerActivity::GetManagersHub () const
+{
+    return managersHub_;
+}
+
+Urho3D::Connection *ServerActivity::GetFirstPlayer () const
+{
+    return firstPlayer_;
+}
+
+Urho3D::Connection *ServerActivity::GetSecondPlayer () const
+{
+    return secondPlayer_;
+}
+
 void ServerActivity::HandleClientConnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
 {
     Urho3D::Connection *connection =
@@ -150,16 +170,11 @@ void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urh
 void ServerActivity::HandleNetworkMessage (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
 {
     int messageId = eventData [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
-    if (messageId < 0 || messageId >= CTSNMT_TYPES_COUNT)
+    if (messageId >= CTSNMT_START && messageId < CTSNMT_TYPES_COUNT)
     {
-        throw UniversalException <ServerActivity> ("ServerActivity: received message with incorrect id " +
-            Urho3D::String (messageId) + "!");
-    }
-
-    if (messageId >= CTSNMT_START)
-    {
-        incomingNetworkMessageProcessors_[messageId - CTSNMT_START] (managersHub_, identifiedConnections_,
-                static_cast <Urho3D::Connection *> (eventData[Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
+        Urho3D::VectorBuffer messageData = eventData [Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
+        incomingNetworkMessageProcessors_[messageId - CTSNMT_START] (this, messageData,
+                dynamic_cast <Urho3D::Connection *> (eventData[Urho3D::NetworkMessage::P_CONNECTION].GetPtr ()));
     }
 }
 

@@ -33,6 +33,21 @@ void DataManager::AddPrefabToUnit (unsigned int nodeID)
     unitNodesToAddPrefabs_.Insert (nodeID);
 }
 
+void DataManager::RecruitUnit (unsigned int unitType)
+{
+    const UnitType &typeInfo = GetUnitTypeByIndex (unitType);
+    if (predictedCoins_ < typeInfo.GetRecruitmentCost ())
+    {
+        throw UniversalException <DataManager> ("DataManager: can not recruit unit type " + Urho3D::String (unitType) +
+                ", required " + Urho3D::String (typeInfo.GetRecruitmentCost ()) + " coins, "
+                "but only " + Urho3D::String (predictedCoins_) + " coins available!"
+        );
+    }
+
+    SetPredictedCoins (predictedCoins_ - typeInfo.GetRecruitmentCost ());
+    owner_->GetNetworkManager ()->SendAddOrderMessage (unitType);
+}
+
 unsigned int DataManager::GetSpawnsUnitType () const
 {
     return spawnsUnitType_;

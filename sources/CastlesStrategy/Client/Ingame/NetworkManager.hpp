@@ -13,6 +13,8 @@ public:
     explicit NetworkManager (IngameActivity *owner);
     virtual ~NetworkManager ();
 
+    void SendAddOrderMessage (unsigned int unitType) const;
+
 private:
     void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data);
 

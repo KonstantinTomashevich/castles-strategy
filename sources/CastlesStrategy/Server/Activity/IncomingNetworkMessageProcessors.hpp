@@ -5,12 +5,10 @@
 
 namespace CastlesStrategy
 {
+class ServerActivity;
 namespace IncomingNetworkMessageProcessors
 {
-void AddOrder (ManagersHub *managersHub,
-        const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &identifiedConnections, Urho3D::Connection *sender);
-
-void SpawnUnit (ManagersHub *managersHub,
-        const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &identifiedConnections, Urho3D::Connection *sender);
+void AddOrder (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
+void SpawnUnit (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 }
 }

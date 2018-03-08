@@ -1,4 +1,5 @@
 #include "NetworkManager.hpp"
+#include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Resource/ResourceCache.h>
 
@@ -32,11 +33,23 @@ NetworkManager::~NetworkManager ()
     UnsubscribeFromAllEvents ();
 }
 
+void NetworkManager::SendAddOrderMessage (unsigned int unitType) const
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUInt (unitType);
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_ADD_ORDER, true, true, messageData);
+}
+
 void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
 {
     int messageID = data [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
-    Urho3D::VectorBuffer messageData = data [Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
-    incomingMessagesProcessors_ [messageID - STCNMT_START] (owner_, messageData);
+    if (messageID >= STCNMT_START && messageID < STCNMT_TYPES_COUNT)
+    {
+        Urho3D::VectorBuffer messageData = data[Urho3D::NetworkMessage::P_DATA].GetVectorBuffer ();
+        incomingMessagesProcessors_[messageID - STCNMT_START] (owner_, messageData);
+    }
 }
 
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)

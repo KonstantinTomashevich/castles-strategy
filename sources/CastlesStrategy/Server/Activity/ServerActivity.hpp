@@ -9,9 +9,9 @@
 
 namespace CastlesStrategy
 {
-typedef void (*ServerIncomingNetworkMessageProcessor) (ManagersHub *managersHub,
-        const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &identifiedConnections,
-        Urho3D::Connection *sender);
+class ServerActivity;
+typedef void (*ServerIncomingNetworkMessageProcessor) (ServerActivity *activity,
+        Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 
 class ServerActivity : public ActivitiesApplication::Activity
 {
@@ -26,6 +26,12 @@ public:
 
     const Urho3D::String &GetMapName () const;
     void SetMapName (const Urho3D::String &mapName);
+
+    const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &GetIdentifiedConnections () const;
+    ManagersHub *GetManagersHub () const;
+
+    Urho3D::Connection *GetFirstPlayer () const;
+    Urho3D::Connection *GetSecondPlayer () const;
 
 private:
     void HandleClientConnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
