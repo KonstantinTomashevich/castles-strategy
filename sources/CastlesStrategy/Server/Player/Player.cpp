@@ -85,7 +85,7 @@ void Player::AddOrder (unsigned int unitType)
     }
     else
     {
-        throw UniversalException <UnitsManager> ("Player: unit type " + Urho3D::String (unitType) +
+        throw UniversalException <Player> ("Player: unit type " + Urho3D::String (unitType) +
                 " is too expensive to recruit, it costs " + Urho3D::String (unitTypeData.GetRecruitmentCost ()) +
                 " coins, but there is only " + Urho3D::String (coins_) + " coins!");
     }
@@ -122,8 +122,8 @@ void Player::TakeUnitFromPull (unsigned int unitType)
 {
     if (GetUnitsPullCount (unitType) == 0)
     {
-        throw UniversalException <UnitsManager> ("Player: unit with type " + Urho3D::String (unitType) +
-                                                 " requested from pull, but there is no units of this type in the pull!");
+        throw UniversalException <Player> ("Player: unit with type " + Urho3D::String (unitType) +
+                " requested from pull, but there is no units of this type in the pull!");
     }
 
     unitsPull_ [unitType]--;
@@ -134,8 +134,8 @@ unsigned int Player::GetUnitsPullCount (unsigned int unitType) const
 {
     if (unitType >= unitsPull_.Size ())
     {
-        throw UniversalException <UnitsManager> ("Player: unit type " + Urho3D::String (unitType) +
-                                                 " requested, but there is only " + Urho3D::String (unitsPull_.Size ()) + " unit types!");
+        throw UniversalException <Player> ("Player: unit type " + Urho3D::String (unitType) +
+                " requested, but there is only " + Urho3D::String (unitsPull_.Size ()) + " unit types!");
     }
     return unitsPull_ [unitType];
 }
