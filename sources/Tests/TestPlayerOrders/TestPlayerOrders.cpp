@@ -53,27 +53,28 @@ int main (int argc, char **argv)
     const unsigned UNIT_TYPE = 1;
     const CastlesStrategy::UnitType &unitType = unitsManager->GetUnitType (UNIT_TYPE);
     CastlesStrategy::Player player (&managersHub);
-    player.AddOrder (UNIT_TYPE);
 
-    float maxTime = unitType.GetRecruitmentTime ();
-    const float TIME_STEP = 1.0f / 60.0f;
-    float elapsedTime = 0.0f;
-
-    while (elapsedTime < maxTime + TIME_STEP)
+    bool firstTestPassed = false;
+    try
     {
-        player.HandleUpdate (TIME_STEP);
-        elapsedTime += TIME_STEP;
+        player.AddOrder (UNIT_TYPE);
+    }
+    catch (...)
+    {
+        firstTestPassed = true;
     }
 
-    if (player.GetUnitsPullCount (UNIT_TYPE) != 0)
+    if (!firstTestPassed)
     {
-        URHO3D_LOGERROR ("Test 1: expected 0 units in pull!");
+        URHO3D_LOGERROR ("Test 1: expected exception in AddOrder when not enough coins!");
         return 1;
     }
 
     const int UNITS_ORDERED = 4;
-    maxTime = unitType.GetRecruitmentTime () * (UNITS_ORDERED - 1);
-    elapsedTime = 0.0f;
+    const float TIME_STEP = 1.0f / 60.0f;
+    float elapsedTime = 0.0f;
+
+    float maxTime = unitType.GetRecruitmentTime () * (UNITS_ORDERED - 1);
     player.SetCoins (unitType.GetRecruitmentCost () * UNITS_ORDERED);
 
     for (unsigned index = 0; index < UNITS_ORDERED; index++)
