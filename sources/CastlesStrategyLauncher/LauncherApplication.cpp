@@ -2,6 +2,7 @@
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/Log.h>
+#include <Urho3D/AngelScript/Script.h>
 
 #include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
@@ -50,7 +51,10 @@ void LauncherApplication::Setup ()
 void LauncherApplication::Start ()
 {
     ActivitiesApplication::Start ();
+    UIResizer::RegisterObject (context_);
     CastlesStrategy::Unit::RegisterObject (context_);
+    Urho3D::Script *script = new Urho3D::Script (context_);
+    context_->RegisterSubsystem (script);
 
     Urho3D::Input *input = context_->GetSubsystem <Urho3D::Input> ();
     input->SetMouseVisible (true);
