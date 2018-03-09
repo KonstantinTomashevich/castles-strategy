@@ -7,6 +7,7 @@
 
 namespace CastlesStrategy
 {
+// TODO: Should we move GUI to AngelScript or Lua?
 class IngameActivity;
 typedef void (*UICallback) (IngameActivity *activity);
 const Urho3D::StringHash BUTTON_UNIT_TYPE_VAR ("ButtonUnitType");

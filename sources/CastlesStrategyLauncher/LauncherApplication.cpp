@@ -50,7 +50,7 @@ void LauncherApplication::Setup ()
 void LauncherApplication::Start ()
 {
     ActivitiesApplication::Start ();
-    CastlesStrategy::Unit::RegisterObjectType (context_);
+    CastlesStrategy::Unit::RegisterObject (context_);
 
     Urho3D::Input *input = context_->GetSubsystem <Urho3D::Input> ();
     input->SetMouseVisible (true);

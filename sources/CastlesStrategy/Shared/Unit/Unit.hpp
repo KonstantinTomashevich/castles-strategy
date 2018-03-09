@@ -12,7 +12,7 @@ public:
     Unit (Urho3D::Context *context);
     virtual ~Unit ();
 
-    static void RegisterObjectType (Urho3D::Context *context);
+    static void RegisterObject (Urho3D::Context *context);
     void UpdateCooldowns (float timeStep);
 
     bool IsBelongsToFirst () const;

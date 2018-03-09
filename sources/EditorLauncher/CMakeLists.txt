@@ -3,7 +3,7 @@ set (RESOURCE_DIRS "${CMAKE_SOURCE_DIR}/bin/CoreData;${CMAKE_SOURCE_DIR}/bin/Urh
 
 define_source_files (RECURSE GLOB_H_PATTERNS *.hpp)
 setup_main_executable ()
-target_link_libraries (EditorLauncher UIResizerComponent)
+target_link_libraries (EditorLauncher UIResizerComponent CastlesStrategy)
 
 set_target_properties (
     EditorLauncher

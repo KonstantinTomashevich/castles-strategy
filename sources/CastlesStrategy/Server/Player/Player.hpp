@@ -56,6 +56,7 @@ private:
 
     const ManagersHub *managersHub_;
     unsigned int coins_;
+    // TODO: Is belonging material index really needed? I think, it is not.
     unsigned int belongingMaterialIndex_;
 
     Urho3D::List <RecruitmentOrder> orders_;

@@ -23,9 +23,9 @@ Unit::~Unit ()
 
 }
 
-void Unit::RegisterObjectType (Urho3D::Context *context)
+void Unit::RegisterObject (Urho3D::Context *context)
 {
-    context->RegisterFactory <Unit> ();
+    context->RegisterFactory <Unit> ("Logic");
     URHO3D_ACCESSOR_ATTRIBUTE ("Is Enabled", IsEnabled, SetEnabled, bool, true, Urho3D::AM_DEFAULT);
 
     URHO3D_ACCESSOR_ATTRIBUTE ("Is Belongs To First", IsBelongsToFirst, SetBelongsToFirst, bool, false, Urho3D::AM_DEFAULT);

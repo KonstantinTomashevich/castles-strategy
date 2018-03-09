@@ -11,6 +11,7 @@
 
 #include "EditorLauncher.hpp"
 #include <Urho3D/DebugNew.h>
+#include <CastlesStrategy/Shared/Unit/Unit.hpp>
 #include <Utils/UIResizer.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (EditorLauncher)
@@ -32,6 +33,7 @@ void EditorLauncher::Setup ()
 void EditorLauncher::Start ()
 {
     UIResizer::RegisterObject (context_);
+    CastlesStrategy::Unit::RegisterObject (context_);
     Urho3D::Script *script = new Urho3D::Script (context_);
     context_->RegisterSubsystem (script);
 
