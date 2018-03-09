@@ -1,8 +1,12 @@
 #include "LauncherApplication.hpp"
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
+#include <Urho3D/Input/InputEvents.h>
+
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/AngelScript/Script.h>
+#include <Urho3D/Engine/DebugHud.h>
+#include <Urho3D/Resource/ResourceCache.h>
 
 #include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
@@ -63,6 +67,17 @@ void LauncherApplication::Start ()
     UIResizer::RegisterObject (context_);
     SubscribeToEvents ();
     SendEvent (CastlesStrategy::START_MAIN_MENU);
+
+#ifndef NDEBUG
+    Urho3D::ResourceCache *resourceCache = GetSubsystem <Urho3D::ResourceCache>();
+    Urho3D::XMLFile *defaultUIStyle = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
+
+    Urho3D::DebugHud *debugHud = new Urho3D::DebugHud (context_);
+    context_->RegisterSubsystem (debugHud);
+
+    debugHud->SetDefaultStyle (defaultUIStyle);
+    debugHud->SetMode (Urho3D::DEBUGHUD_SHOW_ALL);
+#endif
 }
 
 void LauncherApplication::Stop ()
@@ -72,10 +87,21 @@ void LauncherApplication::Stop ()
 
 void LauncherApplication::SubscribeToEvents ()
 {
+    SubscribeToEvent (Urho3D::E_KEYUP, URHO3D_HANDLER (LauncherApplication, HandleKeyPress));
     SubscribeToEvent (CastlesStrategy::SHUTDOWN_ALL_ACTIVITIES, URHO3D_HANDLER (LauncherApplication, HandleShutdownAllActivities));
     SubscribeToEvent (CastlesStrategy::START_MAIN_MENU, URHO3D_HANDLER (LauncherApplication, HandleStartMainMenu));
     SubscribeToEvent (CastlesStrategy::START_CLIENT, URHO3D_HANDLER (LauncherApplication, HandleStartClient));
     SubscribeToEvent (CastlesStrategy::START_SERVER, URHO3D_HANDLER (LauncherApplication, HandleStartServer));
+}
+
+void LauncherApplication::HandleKeyPress (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+#ifndef NDEBUG
+    if (eventData [Urho3D::KeyUp::P_KEY].GetInt () == Urho3D::KEY_F1)
+    {
+        context_->GetSubsystem <Urho3D::DebugHud> ()->ToggleAll ();
+    }
+#endif
 }
 
 void LauncherApplication::HandleShutdownAllActivities (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
