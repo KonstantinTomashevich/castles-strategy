@@ -17,12 +17,12 @@ public:
 
     void SetupCamera (const Urho3D::Vector3 &position, const Urho3D::Quaternion &rotation);
     void Update (float timeStep);
+    Urho3D::Node *RaycastNode (int screenX, int screenY, bool onlyUnits);
 
     float GetMoveSpeed () const;
     void SetMoveSpeed (float moveSpeed);
 
     MouseButtonCode GetMouseButtonMove () const;
-
     void SetMouseButtonMove (MouseButtonCode mouseButtonMove);
 
     KeyCode GetKeyForward () const;
@@ -36,6 +36,7 @@ public:
 
     KeyCode GetKeyRight () const;
     void SetKeyRight (KeyCode keyRight);
+
 
 private:
     IngameActivity *owner_;

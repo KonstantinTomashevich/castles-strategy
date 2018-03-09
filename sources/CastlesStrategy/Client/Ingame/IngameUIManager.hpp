@@ -58,6 +58,7 @@ private:
     void HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     IngameActivity *owner_;
     bool inputEnabled_;

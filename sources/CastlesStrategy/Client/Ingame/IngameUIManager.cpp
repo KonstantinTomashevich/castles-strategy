@@ -106,7 +106,9 @@ void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
             GetChild ("IconAndCountElement", false)->GetChild ("Count", false));
 
     countElement->SetText (Urho3D::String (predictedUnitsInPull));
-    unitPullElement->GetChild ("SpawnButton", false)->SetVisible (predictedUnitsInPull > 0);
+    unitPullElement->GetChild ("SpawnButton", false)->SetVisible (dataManager->GetSelectedSpawnNode () != nullptr &&
+            predictedUnitsInPull > 0);
+
     unitPullElement->GetChild ("RecruitButton", false)->SetVisible (
             dataManager->GetUnitTypeByIndex (unitType).GetRecruitmentCost () <= dataManager->GetPredictedCoins ());
 }
@@ -189,6 +191,7 @@ void IngameUIManager::SubscribeToEvents ()
     SubscribeToTopBarEvents ();
     SubscribeToMenuEvents ();
     SubscribeToMessageWindowEvents ();
+    SubscribeToEvent (Urho3D::E_UIMOUSEDOUBLECLICK, URHO3D_HANDLER (IngameUIManager, HandleDoubleClickOnMap));
 }
 
 void IngameUIManager::SubscribeToTopBarEvents ()
@@ -259,6 +262,18 @@ void IngameUIManager::HandleMessageWindowOkClicked (Urho3D::StringHash eventType
     else
     {
         ShowNextMessage ();
+    }
+}
+
+void IngameUIManager::HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    if (eventData [Urho3D::UIMouseDoubleClick::P_ELEMENT].GetPtr () == nullptr)
+    {
+        owner_->GetDataManager ()->SetSelectedSpawnNode (owner_->GetCameraManager ()->RaycastNode (
+                eventData [Urho3D::UIMouseDoubleClick::P_X].GetInt (),
+                eventData [Urho3D::UIMouseDoubleClick::P_Y].GetInt (),
+                true
+        ));
     }
 }
 }

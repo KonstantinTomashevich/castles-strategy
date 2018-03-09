@@ -3,8 +3,9 @@
 #include <Urho3D/Graphics/Viewport.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/IO/Log.h>
+#include <Urho3D/Graphics/Octree.h>
 
+#include <Urho3D/IO/Log.h>
 #include <Urho3D/Input/Input.h>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 
@@ -69,6 +70,38 @@ void CameraManager::Update (float timeStep)
 
     cameraNode_->Translate (
             Urho3D::Vector3 (moveSpeed_ * deltaX * timeStep, 0.0f, moveSpeed_ * deltaZ * timeStep), Urho3D::TS_WORLD);
+}
+
+Urho3D::Node *CameraManager::RaycastNode (int screenX, int screenY, bool onlyUnits)
+{
+    if (cameraNode_ == nullptr)
+    {
+        return nullptr;
+    }
+
+    Urho3D::Graphics *graphics = context_->GetSubsystem <Urho3D::Graphics> ();
+    Urho3D::Camera *camera = cameraNode_->GetComponent <Urho3D::Camera> ();
+    Urho3D::Ray ray = camera->GetScreenRay (screenX * 1.0f / graphics->GetWidth (),
+        screenY * 1.0f / graphics->GetHeight ());
+
+    Urho3D::PODVector <Urho3D::RayQueryResult> queryResult;
+    Urho3D::RayOctreeQuery query (queryResult, ray);
+
+    Urho3D::Octree *octree = camera->GetScene ()->GetComponent <Urho3D::Octree> ();
+    octree->RaycastSingle (query);
+
+    if (queryResult.Empty ())
+    {
+        return nullptr;
+    }
+
+    Urho3D::Node *result = queryResult.At (0).node_;
+    while (onlyUnits && result != nullptr && !result->HasComponent <Unit> ())
+    {
+        result = result->GetParent ();
+    }
+
+    return result;
 }
 
 float CameraManager::GetMoveSpeed () const

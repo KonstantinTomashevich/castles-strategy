@@ -13,7 +13,8 @@ DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetCon
         spawnsUnitType_ (0),
         unitNodesToAddPrefabs_ (),
         predictedUnitsPull_ (),
-        predictedCoins_ (0)
+        predictedCoins_ (0),
+        selectedSpawnNode_ (nullptr)
 {
 
 }
@@ -128,6 +129,50 @@ unsigned int DataManager::GetPredictedUnitsInPull (unsigned int unitType) const
     return predictedUnitsPull_ [unitType];
 }
 
+unsigned int DataManager::GetPredictedCoins () const
+{
+    return predictedCoins_;
+}
+
+void DataManager::SetPredictedCoins (unsigned int predictedCoins)
+{
+    predictedCoins_ = predictedCoins;
+    owner_->GetIngameUIManager ()->UpdateCoins (predictedCoins);
+}
+
+Urho3D::Node *DataManager::GetSelectedSpawnNode () const
+{
+    return selectedSpawnNode_;
+}
+
+void DataManager::SetSelectedSpawnNode (Urho3D::Node *selectedSpawnNode)
+{
+    if (selectedSpawnNode_ != nullptr)
+    {
+        selectedSpawnNode_->SetVar ("IsSelected", false);
+    }
+
+    selectedSpawnNode_ = selectedSpawnNode;
+    if (selectedSpawnNode != nullptr)
+    {
+        PlayerType playerType = owner_->GetPlayerType ();
+        Unit *unit = selectedSpawnNode->GetComponent <Unit> ();
+
+        if (unit == nullptr || unit->GetUnitType () != spawnsUnitType_ || playerType == PT_OBSERVER ||
+                (playerType == PT_FIRST && !unit->IsBelongsToFirst ()) ||
+                (playerType == PT_SECOND && unit->IsBelongsToFirst ()))
+        {
+            selectedSpawnNode_ = nullptr;
+        }
+    }
+
+    if (selectedSpawnNode_ != nullptr)
+    {
+        selectedSpawnNode_->SetVar ("IsSelected", true);
+    }
+    owner_->GetIngameUIManager ()->UpdateCoins (predictedCoins_);
+}
+
 void DataManager::AttemptToAddPrefabs ()
 {
     auto iterator = unitNodesToAddPrefabs_.Begin ();
@@ -157,16 +202,5 @@ void DataManager::AttemptToAddPrefabs ()
         }
         iterator++;
     }
-}
-
-unsigned int DataManager::GetPredictedCoins () const
-{
-    return predictedCoins_;
-}
-
-void DataManager::SetPredictedCoins (unsigned int predictedCoins)
-{
-    predictedCoins_ = predictedCoins;
-    owner_->GetIngameUIManager ()->UpdateCoins (predictedCoins);
 }
 }

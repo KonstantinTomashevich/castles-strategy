@@ -32,6 +32,9 @@ public:
     unsigned int GetPredictedCoins () const;
     void SetPredictedCoins (unsigned int predictedCoins);
 
+    Urho3D::Node *GetSelectedSpawnNode () const;
+    void SetSelectedSpawnNode (Urho3D::Node *selectedSpawnNode);
+
 private:
     void AttemptToAddPrefabs ();
 
@@ -42,5 +45,6 @@ private:
     Urho3D::HashSet <unsigned int> unitNodesToAddPrefabs_;
     Urho3D::PODVector <unsigned int> predictedUnitsPull_;
     unsigned int predictedCoins_;
+    Urho3D::Node *selectedSpawnNode_;
 };
 }
