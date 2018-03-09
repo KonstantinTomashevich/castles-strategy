@@ -2,6 +2,7 @@
 #include <ActivitiesApplication/Activity.hpp>
 #include <Urho3D/Scene/Scene.h>
 
+#include <CastlesStrategy/Shared/PlayerType.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameUIManager.hpp>
 #include <CastlesStrategy/Client/Ingame/NetworkManager.hpp>
 #include <CastlesStrategy/Client/Ingame/DataManager.hpp>
@@ -21,6 +22,9 @@ public:
     virtual void Update (float timeStep);
     virtual void Stop ();
 
+    PlayerType GetPlayerType () const;
+    void SetPlayerType (PlayerType playerType);
+
     const Urho3D::String &GetServerAddress () const;
     unsigned int GetPort () const;
     Urho3D::Scene *GetScene () const;
@@ -39,6 +43,7 @@ private:
     void HandleServerConnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
+    PlayerType playerType_;
     Urho3D::String playerName_;
     Urho3D::String serverAddress_;
     unsigned int port_;

@@ -11,10 +11,11 @@
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
 
 #include <CastlesStrategy/Shared/Network/ClientToServerNetworkMessageType.hpp>
 #include <CastlesStrategy/Shared/Network/ServerToClientNetworkMessageType.hpp>
-#include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
+#include <CastlesStrategy/Shared/PlayerType.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
@@ -299,16 +300,31 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     Map *map = dynamic_cast <Map *> (managersHub_->GetManager (MI_MAP));
     map->SetSize (mapXML.GetIntVector2 ("size"));
     map->LoadRoutesFromXML (mapXML);
-    SendMapPathToPlayers (mapFolder);
+    SendInitialInfoToPlayers (mapFolder);
 }
 
-void ServerActivity::SendMapPathToPlayers (const Urho3D::String &mapPath) const
+void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath) const
 {
     for (auto identifiedConnection : identifiedConnections_)
     {
+        PlayerType playerType;
+        if (identifiedConnection.first_ == firstPlayer_)
+        {
+            playerType = PT_FIRST;
+        }
+        else if (identifiedConnection.first_ == secondPlayer_)
+        {
+            playerType = PT_SECOND;
+        }
+        else
+        {
+            playerType = PT_OBSERVER;
+        }
+
         Urho3D::VectorBuffer messageBuffer;
+        messageBuffer.WriteUByte (playerType);
         messageBuffer.WriteString (mapPath);
-        identifiedConnection.first_->SendMessage (STCNMT_MAP_PATH, true, false, messageBuffer);
+        identifiedConnection.first_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
     }
 }
 

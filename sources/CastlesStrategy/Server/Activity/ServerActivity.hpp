@@ -50,7 +50,7 @@ private:
     void LoadResources (unsigned int &startCoins);
     void LoadScene (const Urho3D::String &mapFolder);
     void LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes);
-    void SendMapPathToPlayers (const Urho3D::String &mapPath) const;
+    void SendInitialInfoToPlayers (const Urho3D::String &mapPath) const;
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
 

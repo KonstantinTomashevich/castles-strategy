@@ -21,6 +21,7 @@ namespace CastlesStrategy
 IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &playerName, const Urho3D::String &serverAddress,
                                 unsigned int port)
         : ActivitiesApplication::Activity (context),
+          playerType_ (PT_OBSERVER),
           playerName_ (playerName),
           serverAddress_ (serverAddress),
           port_ (port),
@@ -67,6 +68,16 @@ void IngameActivity::Update (float timeStep)
 void IngameActivity::Stop ()
 {
     ingameUIManager_->ClearUI ();
+}
+
+PlayerType IngameActivity::GetPlayerType () const
+{
+    return playerType_;
+}
+
+void IngameActivity::SetPlayerType (PlayerType playerType)
+{
+    playerType_ = playerType;
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
