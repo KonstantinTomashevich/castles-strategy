@@ -156,7 +156,7 @@ CastlesStrategy::Unit *SpawnFirstUnit (Urho3D::Context *context, Urho3D::Scene *
     CastlesStrategy::Unit *unit = scene->CreateChild ("FirstUnitNode")->CreateComponent <CastlesStrategy::Unit> ();
     Urho3D::NavigationMesh *navMesh = scene->GetComponent <Urho3D::NavigationMesh> ();
 
-    Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, 1);
+    Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, false);
     unit->GetNode ()->SetPosition (navMesh->FindNearestPoint ({nearestWaypoint.x_, 0.0f, nearestWaypoint.y_}));
 
     unit->SetBelongsToFirst (false);
@@ -170,7 +170,7 @@ CastlesStrategy::Unit *SpawnSecondUnit (Urho3D::Context *context, Urho3D::Scene 
     CastlesStrategy::Unit *unit = scene->CreateChild ("SecondUnitNode")->CreateComponent <CastlesStrategy::Unit> ();
     Urho3D::NavigationMesh *navMesh = scene->GetComponent <Urho3D::NavigationMesh> ();
 
-    Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, 0);
+    Urho3D::Vector2 nearestWaypoint = map->GetWaypoint (0, 0, true);
     unit->GetNode ()->SetPosition (navMesh->FindNearestPoint ({nearestWaypoint.x_, 0.0f, nearestWaypoint.y_}));
 
     unit->SetBelongsToFirst (true);

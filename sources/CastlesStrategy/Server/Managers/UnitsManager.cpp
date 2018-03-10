@@ -218,6 +218,7 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
                                  element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
         AddUnit (unit);
 
+        // TODO: Removing is bad idea because now units collide with towers. Maybe just disable position update?
         unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->Remove ();
         element = element.GetNext ("spawn");
     }
@@ -344,7 +345,6 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
 void UnitsManager::MakeUnitDead (Unit *unit)
 {
     // TODO: Temporary (reimplement).
-    units_.Remove (unit);
     unit->GetNode ()->Remove ();
 }
 
@@ -396,6 +396,7 @@ void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const
                                                  " does not exists, can not attack! AI error?");
     }
 
+    // TODO: Maybe add units radius to attack distances?
     if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
         unitType.GetAttackRange ())
     {
