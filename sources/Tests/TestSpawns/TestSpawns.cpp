@@ -53,8 +53,10 @@ int main (int argc, char **argv)
     const float TIME_STEP = 1.0f / 60.0f;
     float elapsedTime = 0.0f;
 
-    const CastlesStrategy::Unit *spawnedUnit = unitsManager->SpawnUnit (0, true, 1);
-    const CastlesStrategy::Unit *oppositeSpawn = unitsManager->GetSpawn (0, false);
+    Urho3D::SharedPtr <CastlesStrategy::Unit> spawnedUnit (unitsManager->GetUnit (
+            unitsManager->SpawnUnit (0, true, 1)->GetID ()));
+    Urho3D::SharedPtr <CastlesStrategy::Unit> oppositeSpawn (unitsManager->GetUnit (
+            unitsManager->GetSpawn (0, false)->GetID ()));
 
     while (elapsedTime < MAX_TIME)
     {
@@ -72,7 +74,9 @@ int main (int argc, char **argv)
         return 1;
     }
 
+    URHO3D_LOGINFO ("Result spawned unit hp: " + Urho3D::String (spawnedUnit->GetHp ()));
     URHO3D_LOGINFO ("Result opposite spawn hp: " + Urho3D::String (oppositeSpawn->GetHp ()));
+
     if (oppositeSpawn->GetHp () > 0)
     {
         URHO3D_LOGERROR ("Opposite spawn must be destroyed!");
