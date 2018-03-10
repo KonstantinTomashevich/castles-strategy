@@ -231,7 +231,9 @@ void IngameUIManager::HandleTopBarRecruitClicked (Urho3D::StringHash eventType, 
 
 void IngameUIManager::HandleTopBarSpawnClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    // TODO: Implement.
+    Urho3D::UIElement *clicked = dynamic_cast <Urho3D::UIElement *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    unsigned int unitType = clicked->GetVar (BUTTON_UNIT_TYPE_VAR).GetUInt ();
+    owner_->GetDataManager ()->SpawnUnit (unitType);
 }
 
 void IngameUIManager::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

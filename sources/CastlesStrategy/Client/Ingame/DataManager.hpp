@@ -16,6 +16,7 @@ public:
     void Update (float timeStep);
     void AddPrefabToUnit (unsigned int nodeID);
     void RecruitUnit (unsigned int unitType);
+    void SpawnUnit (unsigned int unitType);
 
     unsigned int GetSpawnsUnitType () const;
     void SetSpawnsUnitType (unsigned int spawnsUnitType);

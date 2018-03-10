@@ -49,6 +49,24 @@ void DataManager::RecruitUnit (unsigned int unitType)
     owner_->GetNetworkManager ()->SendAddOrderMessage (unitType);
 }
 
+void DataManager::SpawnUnit (unsigned int unitType)
+{
+    if (selectedSpawnNode_ == nullptr)
+    {
+        throw UniversalException <DataManager> ("DataManager: can not spawn unit because selected spawn is nullptr!");
+    }
+
+    if (GetPredictedUnitsInPull (unitType) == 0)
+    {
+        throw UniversalException <DataManager> ("DataManager: can not spawn unit with type" +
+                Urho3D::String (unitType) + ", because there is no units of this type in predicted pool!");
+    }
+
+    predictedUnitsPull_ [unitType]--;
+    owner_->GetIngameUIManager ()->CheckUIForUnitsType (unitType);
+    owner_->GetNetworkManager ()->SendSpawnMessage (selectedSpawnNode_->GetComponent <Unit> ()->GetID (), unitType);
+}
+
 unsigned int DataManager::GetSpawnsUnitType () const
 {
     return spawnsUnitType_;

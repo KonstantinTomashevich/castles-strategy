@@ -42,6 +42,16 @@ void NetworkManager::SendAddOrderMessage (unsigned int unitType) const
     network->GetServerConnection ()->SendMessage (CTSNMT_ADD_ORDER, true, true, messageData);
 }
 
+void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitType)
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUInt (spawnID);
+    messageData.WriteUInt (unitType);
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_SPAWN_UNIT, true, true, messageData);
+}
+
 void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
 {
     int messageID = data [Urho3D::NetworkMessage::P_MESSAGEID].GetInt ();
