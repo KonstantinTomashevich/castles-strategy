@@ -30,6 +30,7 @@ public:
 
     unsigned int GetUnitsTypesCount () const;
     const UnitType &GetUnitType (unsigned int index) const;
+    unsigned int GetSpawnsUnitType () const;
 
     void SaveUnitsTypesToXML (Urho3D::XMLElement &output) const;
     void LoadUnitsTypesFromXML (const Urho3D::XMLElement &input);

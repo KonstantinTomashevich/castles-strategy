@@ -78,7 +78,13 @@ const Unit *UnitsManager::SpawnUnit (unsigned spawnId, unsigned unitType)
     if (spawn == nullptr)
     {
         throw UniversalException <UnitsManager> ("UnitsManager: spawn with id " +
-                                                         Urho3D::String (spawnId) + " does not exists!");
+                Urho3D::String (spawnId) + " does not exists!");
+    }
+
+    if (spawn->GetUnitType () != spawnsUnitType_)
+    {
+        throw UniversalException <UnitsManager> ("UnitsManager: unit with id " +
+                Urho3D::String (spawnId) + " is not a spawn!");
     }
 
     return SpawnUnit (spawn, unitType);
@@ -152,6 +158,11 @@ const UnitType &UnitsManager::GetUnitType (unsigned int index) const
     }
 
     return  unitsTypes_ [index];
+}
+
+unsigned int UnitsManager::GetSpawnsUnitType () const
+{
+    return spawnsUnitType_;
 }
 
 void UnitsManager::SaveUnitsTypesToXML (Urho3D::XMLElement &output) const
