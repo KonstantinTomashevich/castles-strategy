@@ -218,8 +218,7 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
                                  element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
         AddUnit (unit);
 
-        Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->CreateComponent <Urho3D::CrowdAgent> (Urho3D::LOCAL);
-        crowdAgent->SetEnabled (false);
+        unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->Remove ();
         element = element.GetNext ("spawn");
     }
 }
@@ -344,7 +343,9 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
 
 void UnitsManager::MakeUnitDead (Unit *unit)
 {
-    // TODO: Implement.
+    // TODO: Temporary (reimplement).
+    units_.Remove (unit);
+    unit->GetNode ()->Remove ();
 }
 
 void ProcessUnitCommandMoveOrFollow (UnitsManager *unitsManager, Unit *unit, const UnitCommand &command,
@@ -373,15 +374,22 @@ void ProcessUnitCommandMoveOrFollow (UnitsManager *unitsManager, Unit *unit, con
                                                                                             Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
 
     Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
-    crowdAgent->SetTargetPosition (target);
+    if (crowdAgent != nullptr)
+    {
+        crowdAgent->SetTargetPosition (target);
+    }
 }
 
 void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const UnitCommand &command,
                                    const UnitType &unitType)
 {
-    unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetTargetVelocity (Urho3D::Vector3::ZERO);
-    Unit *another = unitsManager->GetUnit (command.argument_);
+    Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
+    if (crowdAgent != nullptr)
+    {
+        crowdAgent->SetTargetVelocity (Urho3D::Vector3::ZERO);
+    }
 
+    Unit *another = unitsManager->GetUnit (command.argument_);
     if (another == nullptr)
     {
         throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
