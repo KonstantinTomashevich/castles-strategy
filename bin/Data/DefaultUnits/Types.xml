@@ -5,7 +5,7 @@
             recruitmentCost="0"
             recruitmentTime="1.0"
 
-            attackRange="6"
+            attackRange="10"
             attackSpeed="0.2"
             attackForce="20"
             visionRange="10"
@@ -24,10 +24,10 @@
             recruitmentCost="310"
             recruitmentTime="1.0"
 
-            attackRange="1"
+            attackRange="2"
             attackSpeed="1"
             attackForce="40"
-            visionRange="5"
+            visionRange="8"
 
             navigationRadius="0.4"
             moveSpeed="1.5"
@@ -43,10 +43,10 @@
             recruitmentCost="260"
             recruitmentTime="1.0"
 
-            attackRange="7"
+            attackRange="9"
             attackSpeed="3"
-            attackForce="60"
-            visionRange="7"
+            attackForce="45"
+            visionRange="9"
 
             navigationRadius="0.4"
             moveSpeed="2"
@@ -62,10 +62,10 @@
             recruitmentCost="310"
             recruitmentTime="1.0"
 
-            attackRange="2"
+            attackRange="3"
             attackSpeed="2"
             attackForce="80"
-            visionRange="5"
+            visionRange="8"
 
             navigationRadius="0.4"
             moveSpeed="2"
@@ -81,10 +81,10 @@
             recruitmentCost="520"
             recruitmentTime="1.0"
 
-            attackRange="2"
+            attackRange="4"
             attackSpeed="1.5"
             attackForce="120"
-            visionRange="5"
+            visionRange="10"
 
             navigationRadius="0.8"
             moveSpeed="4"
@@ -100,10 +100,10 @@
             recruitmentCost="880"
             recruitmentTime="2.0"
 
-            attackRange="2"
+            attackRange="3"
             attackSpeed="0.75"
             attackForce="80"
-            visionRange="5"
+            visionRange="10"
 
             navigationRadius="0.8"
             moveSpeed="4"
