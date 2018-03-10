@@ -1,5 +1,4 @@
 #include "UnitsManager.hpp"
-#include <climits>
 #include <Urho3D/Scene/Node.h>
 #include <Urho3D/Scene/Scene.h>
 
@@ -10,7 +9,9 @@
 #include <CastlesStrategy/Shared/Unit/BasicUnitAI.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
 #include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
+
 #include <Utils/UniversalException.hpp>
+#include <climits>
 
 namespace CastlesStrategy
 {
@@ -328,7 +329,7 @@ void UnitsManager::SetupUnit (Unit *unit)
     Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->CreateComponent <Urho3D::CrowdAgent> (Urho3D::LOCAL);
 
     crowdAgent->SetMaxSpeed (unitType.GetMoveSpeed ());
-    crowdAgent->SetMaxAccel (unitType.GetMoveSpeed ());
+    crowdAgent->SetMaxAccel (INT_MAX);
     crowdAgent->SetRadius (unitType.GetNavigationRadius ());
 
     unit->SetHp (unitType.GetMaxHp ());
