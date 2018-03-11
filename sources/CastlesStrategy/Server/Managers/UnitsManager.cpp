@@ -217,9 +217,8 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
         Unit *unit = CreateUnit (element.GetVector2 ("position"), spawnsUnitType_,
                                  element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
         AddUnit (unit);
-
-        // TODO: Removing is bad idea because now units collide with towers. Maybe just disable position update?
-        unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->Remove ();
+        
+        unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetUpdateNodePosition (false);
         element = element.GetNext ("spawn");
     }
 }
@@ -374,20 +373,14 @@ void ProcessUnitCommandMoveOrFollow (UnitsManager *unitsManager, Unit *unit, con
                                                                                             Urho3D::Vector3 (1.0f, INT_MAX, 1.0f));
 
     Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
-    if (crowdAgent != nullptr)
-    {
-        crowdAgent->SetTargetPosition (target);
-    }
+    crowdAgent->SetTargetPosition (target);
 }
 
 void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const UnitCommand &command,
                                    const UnitType &unitType)
 {
     Urho3D::CrowdAgent *crowdAgent = unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ();
-    if (crowdAgent != nullptr)
-    {
-        crowdAgent->SetTargetVelocity (Urho3D::Vector3::ZERO);
-    }
+    crowdAgent->SetTargetVelocity (Urho3D::Vector3::ZERO);
 
     Unit *another = unitsManager->GetUnit (command.argument_);
     if (another == nullptr)
