@@ -217,7 +217,7 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
         Unit *unit = CreateUnit (element.GetVector2 ("position"), spawnsUnitType_,
                                  element.GetBool ("belongsToFirst"), element.GetUInt ("route"));
         AddUnit (unit);
-        
+
         unit->GetNode ()->GetComponent <Urho3D::CrowdAgent> ()->SetUpdateNodePosition (false);
         element = element.GetNext ("spawn");
     }
@@ -389,9 +389,9 @@ void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const
                                                  " does not exists, can not attack! AI error?");
     }
 
-    // TODO: Maybe add units radius to attack distances?
+    const UnitType &anotherUnitType = unitsManager->GetUnitType (another->GetUnitType ());
     if ((unit->GetNode ()->GetWorldPosition () - another->GetNode ()->GetWorldPosition ()).Length () >
-        unitType.GetAttackRange ())
+        anotherUnitType.GetNavigationRadius () + unitType.GetAttackRange () + unitType.GetNavigationRadius ())
     {
         throw UniversalException <UnitsManager> ("UnitsManager: unit " + Urho3D::String (command.argument_) +
                                                  " is too far, can not attack! AI error?");

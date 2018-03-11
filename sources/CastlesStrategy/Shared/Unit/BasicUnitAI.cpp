@@ -19,8 +19,11 @@ UnitCommand BasicUnitAI (Unit *self, const UnitType &unitType, const ManagersHub
 
     float distance = nearestEnemy != nullptr ?
                      (self->GetNode ()->GetWorldPosition () - nearestEnemy->GetNode ()->GetWorldPosition ()).Length () : 0.0f;
+    float anotherUnitTypeNavigationRadius = nearestEnemy != nullptr ?
+            unitsManager->GetUnitType (nearestEnemy->GetUnitType ()).GetNavigationRadius () : 0.0f;
 
-    if (nearestEnemy != nullptr && distance <= unitType.GetAttackRange ())
+    if (nearestEnemy != nullptr && distance <=
+            anotherUnitTypeNavigationRadius + unitType.GetAttackRange () + unitType.GetNavigationRadius ())
     {
         return {UCT_ATTACK_UNIT, nearestEnemy->GetID ()};
     }
