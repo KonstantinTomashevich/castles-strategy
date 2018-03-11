@@ -105,7 +105,10 @@ void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
     Urho3D::Text *countElement = dynamic_cast <Urho3D::Text *> (unitPullElement->
             GetChild ("IconAndCountElement", false)->GetChild ("Count", false));
 
-    countElement->SetText (Urho3D::String (predictedUnitsInPull));
+    unsigned int orderedCount = dataManager->GetPredictedOrdedUnitsCount (unitType);
+    countElement->SetText (Urho3D::String (predictedUnitsInPull) +
+            (orderedCount != 0 ? "(+" + Urho3D::String (orderedCount) + ")" : ""));
+
     unitPullElement->GetChild ("SpawnButton", false)->SetVisible (dataManager->GetSelectedSpawnNode () != nullptr &&
             predictedUnitsInPull > 0);
 

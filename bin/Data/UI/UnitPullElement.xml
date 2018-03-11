@@ -71,7 +71,7 @@
 				<variant hash="409466183" type="String" value="SH" name="HDep" />
 				<variant hash="13959479" type="String" value="SH" name="XDep" />
 				<variant hash="794546678" type="String" value="SH" name="YDep" />
-				<variant hash="4151908868" type="Float" value="0.016" name="VTextSize" />
+				<variant hash="4151908868" type="Float" value="0.012" name="VTextSize" />
 				<variant hash="3746429424" type="String" value="SH" name="TSDep" />
 			</attribute>
 			<attribute name="Tags">

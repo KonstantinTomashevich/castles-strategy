@@ -11,10 +11,14 @@ DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetCon
         owner_ (owner),
         unitsTypes_ (),
         spawnsUnitType_ (0),
+
         unitNodesToAddPrefabs_ (),
         predictedUnitsPull_ (),
         predictedCoins_ (0),
-        selectedSpawnNode_ (nullptr)
+        selectedSpawnNode_ (nullptr),
+
+        predictedOrders_ (),
+        predictedOrderedUnitsCounts_ ()
 {
 
 }
@@ -27,6 +31,7 @@ DataManager::~DataManager ()
 void DataManager::Update (float timeStep)
 {
     AttemptToAddPrefabs ();
+    PredictOrders (timeStep);
 }
 
 void DataManager::AddPrefabToUnit (unsigned int nodeID)
@@ -44,6 +49,9 @@ void DataManager::RecruitUnit (unsigned int unitType)
                 "but only " + Urho3D::String (predictedCoins_) + " coins available!"
         );
     }
+
+    predictedOrders_.Push ({unitType, typeInfo.GetRecruitmentTime ()});
+    predictedOrderedUnitsCounts_ [unitType]++;
 
     SetPredictedCoins (predictedCoins_ - typeInfo.GetRecruitmentCost ());
     owner_->GetNetworkManager ()->SendAddOrderMessage (unitType);
@@ -92,9 +100,12 @@ void DataManager::LoadUnitsTypesFromXML (const Urho3D::XMLElement &input)
     }
 
     predictedUnitsPull_.Resize (unitsTypes_.size ());
+    predictedOrderedUnitsCounts_.Resize (unitsTypes_.size ());
+
     for (unsigned int index = 0; index < unitsTypes_.size (); index++)
     {
         predictedUnitsPull_ [index] = 0;
+        predictedOrderedUnitsCounts_ [index] = 0;
     }
 }
 
@@ -191,6 +202,18 @@ void DataManager::SetSelectedSpawnNode (Urho3D::Node *selectedSpawnNode)
     owner_->GetIngameUIManager ()->UpdateCoins (predictedCoins_);
 }
 
+unsigned int DataManager::GetPredictedOrdedUnitsCount (unsigned int unitType) const
+{
+    if (unitType >= unitsTypes_.size ())
+    {
+        throw UniversalException <DataManager> ("DataManager: requested ordered units count of type " +
+                Urho3D::String (unitType) + " but there is only " + Urho3D::String (unitsTypes_.size ()) +
+                " units types!");
+    }
+
+    return predictedOrderedUnitsCounts_ [unitType];
+}
+
 void DataManager::AttemptToAddPrefabs ()
 {
     auto iterator = unitNodesToAddPrefabs_.Begin ();
@@ -219,6 +242,21 @@ void DataManager::AttemptToAddPrefabs ()
             }
         }
         iterator++;
+    }
+}
+
+void DataManager::PredictOrders (float timeStep)
+{
+    if (!predictedOrders_.Empty ())
+    {
+        RecruitmentOrder &order = predictedOrders_.Front ();
+        order.timeLeft_ -= timeStep;
+
+        if (order.timeLeft_ <= 0.0f)
+        {
+            predictedOrderedUnitsCounts_[order.unitType_]--;
+            predictedOrders_.Erase (0);
+        }
     }
 }
 }

@@ -6,6 +6,12 @@
 namespace CastlesStrategy
 {
 class IngameActivity;
+struct RecruitmentOrder
+{
+    unsigned int unitType_;
+    float timeLeft_;
+};
+
 class DataManager : public Urho3D::Object
 {
 URHO3D_OBJECT (DataManager, Object)
@@ -35,9 +41,11 @@ public:
 
     Urho3D::Node *GetSelectedSpawnNode () const;
     void SetSelectedSpawnNode (Urho3D::Node *selectedSpawnNode);
+    unsigned int GetPredictedOrdedUnitsCount (unsigned int unitType) const;
 
 private:
     void AttemptToAddPrefabs ();
+    void PredictOrders (float timeStep);
 
     IngameActivity *owner_;
     unsigned int spawnsUnitType_;
@@ -47,5 +55,8 @@ private:
     Urho3D::PODVector <unsigned int> predictedUnitsPull_;
     unsigned int predictedCoins_;
     Urho3D::Node *selectedSpawnNode_;
+
+    Urho3D::Vector <RecruitmentOrder> predictedOrders_;
+    Urho3D::Vector <unsigned int> predictedOrderedUnitsCounts_;
 };
 }
