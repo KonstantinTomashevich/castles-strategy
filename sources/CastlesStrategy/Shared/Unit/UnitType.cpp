@@ -26,8 +26,9 @@ bool UnitCommand::operator != (const UnitCommand &rhs) const
 }
 
 UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
-                    float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
-                    unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath) :
+            float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
+            unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath,
+            const Urho3D::HashMap <unsigned int, float> &nonDefaultAttackModifiers) :
         id_ (id),
         recruitmentCost_ (recruitmentCost),
         recruitmentTime_ (recruitmentTime),
@@ -43,7 +44,8 @@ UnitType::UnitType (unsigned int id, unsigned int recruitmentCost, float recruit
 
         prefabPath_ (prefabPath),
         iconPath_ (iconPath),
-        aiProcessor_ (nullptr)
+        aiProcessor_ (nullptr),
+        nonDefaultAttackModifiers_ (nonDefaultAttackModifiers)
 {
     Check ();
 }
@@ -61,9 +63,11 @@ UnitType::UnitType (const UnitType &another) :
         navigationRadius_ (another.navigationRadius_),
         moveSpeed_ (another.moveSpeed_),
         maxHp_ (another.maxHp_),
+
         prefabPath_ (another.prefabPath_),
         iconPath_ (another.iconPath_),
-        aiProcessor_ (another.aiProcessor_)
+        aiProcessor_ (another.aiProcessor_),
+        nonDefaultAttackModifiers_ (another.nonDefaultAttackModifiers_)
 {
 
 }
@@ -143,6 +147,19 @@ const Urho3D::String &UnitType::GetIconPath () const
     return iconPath_;
 }
 
+float UnitType::GetAttackModiferVersus (unsigned int unitType) const
+{
+    auto iterator = nonDefaultAttackModifiers_.Find (unitType);
+    if (iterator != nonDefaultAttackModifiers_.End ())
+    {
+        return iterator->second_;
+    }
+    else
+    {
+        return 1.0f;
+    }
+}
+
 void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 {
     output.SetUInt ("recruitmentCost", recruitmentCost_);
@@ -159,14 +176,31 @@ void UnitType::SaveToXML (Urho3D::XMLElement &output) const
 
     output.SetAttribute ("prefabPath", prefabPath_);
     output.SetAttribute ("iconPath", iconPath_);
+
+    for (const auto &modifier : nonDefaultAttackModifiers_)
+    {
+        Urho3D::XMLElement modifierElement = output.CreateChild ("attackModifier");
+        modifierElement.SetUInt ("vs", modifier.first_);
+        modifierElement.SetFloat ("value", modifier.second_);
+    }
 }
 
 UnitType UnitType::LoadFromXML (unsigned int id, const Urho3D::XMLElement &input)
 {
+    Urho3D::HashMap <unsigned int, float> nonDefaultAttackModifiers;
+    Urho3D::XMLElement attackModifier = input.GetChild ("attackModifier");
+
+    while (attackModifier.NotNull ())
+    {
+        nonDefaultAttackModifiers [attackModifier.GetUInt ("vs")] = attackModifier.GetFloat ("value");
+        attackModifier = attackModifier.GetNext ("attackModifier");
+    }
+
     return UnitType (id, input.GetUInt ("recruitmentCost"), input.GetFloat ("recruitmentTime"),
-                     input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"), input.GetUInt ("attackForce"),
-                     input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"), input.GetFloat ("moveSpeed"),
-                     input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"), input.GetAttribute ("iconPath"));
+            input.GetFloat ("attackRange"), input.GetFloat ("attackSpeed"), input.GetUInt ("attackForce"),
+            input.GetFloat ("visionRange"), input.GetFloat ("navigationRadius"), input.GetFloat ("moveSpeed"),
+            input.GetUInt ("maxHp"), input.GetAttribute ("prefabPath"), input.GetAttribute ("iconPath"),
+            nonDefaultAttackModifiers);
 }
 
 void UnitType::Check ()
@@ -219,6 +253,15 @@ void UnitType::Check ()
     if (prefabPath_.Empty ())
     {
         throw UniversalException <UnitType> ("UnitType: prefab path must not be more empty!");
+    }
+
+    for (const auto &modifier : nonDefaultAttackModifiers_)
+    {
+        if (modifier.second_ < 0.0f)
+        {
+            throw UniversalException <UnitType> ("UnitType: attack modifier can not be negative, but it is vs " +
+                Urho3D::String (modifier.first_) + "!");
+        }
     }
 }
 }

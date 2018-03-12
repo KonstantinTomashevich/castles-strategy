@@ -399,8 +399,9 @@ void ProcessUnitCommandAttackUnit (UnitsManager *unitsManager, Unit *unit, const
 
     if (unit->GetAttackCooldown () <= 0.0f)
     {
-        another->SetHp (another->GetHp () > unitType.GetAttackForce () ?
-                        another->GetHp () - unitType.GetAttackForce () : 0);
+        float attackModifier = unitType.GetAttackModiferVersus (another->GetUnitType ());
+        another->SetHp (static_cast <unsigned int> (another->GetHp () > unitType.GetAttackForce () * attackModifier ?
+                        another->GetHp () - unitType.GetAttackForce () * attackModifier : 0));
         unit->SetAttackCooldown (unitType.GetAttackSpeed ());
     }
 }

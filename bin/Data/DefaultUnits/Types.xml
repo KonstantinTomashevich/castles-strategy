@@ -15,8 +15,6 @@
             maxHp="2000"
             prefabPath="DefaultUnits/Tower/Prefab.xml"
             iconPath="DefaultUnits/Tower/Icon.png"
-
-            BonusVS=""
     />
 
     <unitType
@@ -34,9 +32,10 @@
             maxHp="150"
             prefabPath="DefaultUnits/Swordsman/Prefab.xml"
             iconPath="DefaultUnits/Swordsman/Icon.png"
-
-            BonusVS="2;3"
-    />
+    >
+        <attackModifier vs="2" value="1.35" />
+        <attackModifier vs="3" value="1.35" />
+    </unitType>
 
     <unitType
             name="Archer"
@@ -53,9 +52,10 @@
             maxHp="100"
             prefabPath="DefaultUnits/Archer/Prefab.xml"
             iconPath="DefaultUnits/Archer/Icon.png"
-
-            BonusVS="3;4"
-    />
+    >
+        <attackModifier vs="3" value="1.35" />
+        <attackModifier vs="4" value="1.35" />
+    </unitType>
 
     <unitType
             name="Spearman"
@@ -72,9 +72,10 @@
             maxHp="150"
             prefabPath="DefaultUnits/Spearman/Prefab.xml"
             iconPath="DefaultUnits/Spearman/Icon.png"
-
-            BonusVS="4;5"
-    />
+    >
+        <attackModifier vs="4" value="1.35" />
+        <attackModifier vs="5" value="1.35" />
+    </unitType>
 
     <unitType
             name="Raider"
@@ -91,9 +92,10 @@
             maxHp="200"
             prefabPath="DefaultUnits/Raider/Prefab.xml"
             iconPath="DefaultUnits/Raider/Icon.png"
-
-            BonusVS="1;5"
-    />
+    >
+        <attackModifier vs="1" value="1.35" />
+        <attackModifier vs="5" value="1.35" />
+    </unitType>
 
     <unitType
             name="Knight"
@@ -110,7 +112,8 @@
             maxHp="400"
             prefabPath="DefaultUnits/Knight/Prefab.xml"
             iconPath="DefaultUnits/Knight/Icon.png"
-
-            BonusVS="1;2"
-    />
+    >
+        <attackModifier vs="1" value="1.35" />
+        <attackModifier vs="2" value="1.35" />
+    </unitType>
 </unitTypes>

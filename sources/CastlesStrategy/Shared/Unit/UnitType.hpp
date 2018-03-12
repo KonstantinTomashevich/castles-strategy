@@ -34,8 +34,9 @@ class UnitType
 {
 public:
     UnitType (unsigned int id, unsigned int recruitmentCost, float recruitmentTime, float attackRange,
-                  float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
-                  unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath);
+                float attackSpeed, unsigned int attackForce, float visionRange, float navigationRadius, float moveSpeed,
+                unsigned int maxHp, const Urho3D::String &prefabPath, const Urho3D::String &iconPath,
+                const Urho3D::HashMap <unsigned int, float> &nonDefaultAttackModifiers);
     UnitType (const UnitType &another);
     virtual ~UnitType ();
 
@@ -54,6 +55,8 @@ public:
 
     const Urho3D::String &GetPrefabPath () const;
     const Urho3D::String &GetIconPath () const;
+
+    float GetAttackModiferVersus (unsigned int unitType) const;
     UnitAIProcessor GetAiProcessor () const;
     void SetAiProcessor (UnitAIProcessor aiProcessor);
 
@@ -78,6 +81,8 @@ private:
 
     Urho3D::String prefabPath_;
     Urho3D::String iconPath_;
+
+    Urho3D::HashMap <unsigned int, float> nonDefaultAttackModifiers_;
     UnitAIProcessor aiProcessor_;
 };
 }
