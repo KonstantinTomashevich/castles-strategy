@@ -10,7 +10,8 @@
 	<parameter name="MatSpecColor" value="0.5 0.5 0.5 16" />
 	<parameter name="Roughness" value="0.5" />
 	<parameter name="Metallic" value="0" />
-	<parameter name="UnderFogOfWar" value="true" />
+	<parameter name="FogOfWarEnabled" value="1" />
+	<parameter name="Unit" value="1" />
 	<cull value="ccw" />
 	<shadowcull value="ccw" />
 	<fill value="solid" />

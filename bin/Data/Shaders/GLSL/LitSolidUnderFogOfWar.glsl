@@ -49,6 +49,8 @@ uniform vec3 cMapMinPoint;
 uniform vec3 cMapMaxPoint;
 uniform vec4 cDefaultColor;
 uniform int cFogOfWarEnabled;
+uniform int cUnit;
+uniform float cMinModifier;
 #endif
 
 void VS()
@@ -146,7 +148,14 @@ void PS()
                 maskCoord.y = localCoord.z / delta.z;
 
                 vec3 maskRGB = texture2D (sEnvMap, maskCoord).rgb;
-                diffColor *= vec4 (maskRGB, 1.0);
+                if (cUnit > 0 && length (maskRGB) < cMinModifier)
+                {
+                    discard;
+                }
+                else
+                {
+                    diffColor *= vec4 (maskRGB, 1.0);
+                }
             }
         }
     #else

@@ -152,7 +152,7 @@ void FogOfWarManager::UpdateMaterialsShaderParameters ()
 
     for (Urho3D::Material *material : materials)
     {
-        if (material->GetShaderParameter ("UnderFogOfWar").GetBool ())
+        if (material->GetShaderParameter ("FogOfWarEnabled").GetInt () > 0)
         {
             material->SetShaderParameter ("DefaultColor", underFogColor_);
             material->SetShaderParameter ("MapMinPoint", Urho3D::Vector3::ZERO);
@@ -160,7 +160,11 @@ void FogOfWarManager::UpdateMaterialsShaderParameters ()
                     fogOfWarMaskImage_->GetWidth () / mapUnitSize_.x_, 0.0f,
                     fogOfWarMaskImage_->GetHeight () / mapUnitSize_.y_));
 
+            //* Fucking magic of Urho3D shader parameters. Without resetting they can magically become zeros.
             material->SetShaderParameter ("FogOfWarEnabled", 1);
+            material->SetShaderParameter ("Unit", material->GetShaderParameter ("Unit").GetInt ());
+            //*
+            material->SetShaderParameter ("MinModifier", underFogColor_.ToVector3 ().Length () * 1.01f);
             material->SetTexture (Urho3D::TU_ENVIRONMENT, fogOfWarMaskTexture_);
         }
     }
