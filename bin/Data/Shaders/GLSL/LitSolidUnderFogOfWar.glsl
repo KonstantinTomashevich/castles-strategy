@@ -143,7 +143,7 @@ void PS()
 
                 vec2 maskCoord;
                 maskCoord.x = localCoord.x / delta.x;
-                maskCoord.y = 1.0 - localCoord.z / delta.z;
+                maskCoord.y = localCoord.z / delta.z;
 
                 vec3 maskRGB = texture2D (sEnvMap, maskCoord).rgb;
                 diffColor *= vec4 (maskRGB, 1.0);

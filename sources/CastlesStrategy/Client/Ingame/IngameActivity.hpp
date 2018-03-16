@@ -3,10 +3,13 @@
 #include <Urho3D/Scene/Scene.h>
 
 #include <CastlesStrategy/Shared/PlayerType.hpp>
+#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
+
 #include <CastlesStrategy/Client/Ingame/IngameUIManager.hpp>
 #include <CastlesStrategy/Client/Ingame/NetworkManager.hpp>
 #include <CastlesStrategy/Client/Ingame/DataManager.hpp>
 #include <CastlesStrategy/Client/Ingame/CameraManager.hpp>
+#include <CastlesStrategy/Client/Ingame/FogOfWarManager.hpp>
 
 namespace CastlesStrategy
 {
@@ -25,6 +28,9 @@ public:
     PlayerType GetPlayerType () const;
     void SetPlayerType (PlayerType playerType);
 
+    GameStatus GetGameStatus () const;
+    void SetGameStatus (GameStatus gameStatus);
+
     const Urho3D::String &GetServerAddress () const;
     unsigned int GetPort () const;
     Urho3D::Scene *GetScene () const;
@@ -33,6 +39,7 @@ public:
     NetworkManager *GetNetworkManager () const;
     DataManager *GetDataManager () const;
     CameraManager *GetCameraManager () const;
+    FogOfWarManager *GetFogOfWarManager () const;
 
 private:
     void InitScene () const;
@@ -44,6 +51,8 @@ private:
     void HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     PlayerType playerType_;
+    GameStatus gameStatus_;
+
     Urho3D::String playerName_;
     Urho3D::String serverAddress_;
     unsigned int port_;
@@ -53,6 +62,7 @@ private:
     NetworkManager *networkManager_;
     DataManager *dataManager_;
     CameraManager *cameraManager_;
+    FogOfWarManager *fogOfWarManager_;
 };
 }
 

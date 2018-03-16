@@ -30,7 +30,8 @@ IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &
           ingameUIManager_ (nullptr),
           networkManager_ (nullptr),
           dataManager_ (nullptr),
-          cameraManager_ (nullptr)
+          cameraManager_ (nullptr),
+          fogOfWarManager_ (nullptr)
 {
 
 }
@@ -42,6 +43,7 @@ IngameActivity::~IngameActivity ()
     delete networkManager_;
     delete dataManager_;
     delete cameraManager_;
+    delete fogOfWarManager_;
 }
 
 void IngameActivity::Start ()
@@ -56,6 +58,7 @@ void IngameActivity::Start ()
     ConnectToServer ();
 
     cameraManager_ = new CameraManager (this);
+    fogOfWarManager_ = new FogOfWarManager (this);
     InitScene ();
 }
 
@@ -63,6 +66,7 @@ void IngameActivity::Update (float timeStep)
 {
     cameraManager_->Update (timeStep);
     dataManager_->Update (timeStep);
+    fogOfWarManager_->Update (timeStep);
 }
 
 void IngameActivity::Stop ()
@@ -78,6 +82,16 @@ PlayerType IngameActivity::GetPlayerType () const
 void IngameActivity::SetPlayerType (PlayerType playerType)
 {
     playerType_ = playerType;
+}
+
+GameStatus IngameActivity::GetGameStatus () const
+{
+    return gameStatus_;
+}
+
+void IngameActivity::SetGameStatus (GameStatus gameStatus)
+{
+    gameStatus_ = gameStatus;
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
@@ -113,6 +127,11 @@ DataManager *IngameActivity::GetDataManager () const
 CameraManager *IngameActivity::GetCameraManager () const
 {
     return cameraManager_;
+}
+
+FogOfWarManager *IngameActivity::GetFogOfWarManager () const
+{
+    return fogOfWarManager_;
 }
 
 void IngameActivity::InitScene () const

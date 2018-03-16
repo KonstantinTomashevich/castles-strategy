@@ -64,7 +64,8 @@ void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D:
 
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
-    // TODO: Implement.
+    // TODO: Temporary, reimplement later.
+    ingameActivity->SetGameStatus (static_cast <GameStatus> (messageData.ReadUInt ()));
 }
 
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
@@ -86,6 +87,8 @@ void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
     ingameActivity->GetIngameUIManager ()->SetupUnitsIcons ();
     ingameActivity->GetCameraManager ()->SetupCamera (
             mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
+
+    ingameActivity->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
 }
 
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
