@@ -1,0 +1,3 @@
+<technique vs="TextUnderFogOfWar" ps="TextUnderFogOfWar" psdefines="ALPHAMAP">
+    <pass name="alpha" depthwrite="false" blend="alpha" />
+</technique>

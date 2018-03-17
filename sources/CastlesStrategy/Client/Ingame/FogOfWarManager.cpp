@@ -1,6 +1,8 @@
 #include "FogOfWarManager.hpp"
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Material.h>
+#include <Urho3D/UI/Text3D.h>
+
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Resource/Image.h>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
@@ -54,6 +56,7 @@ void FogOfWarManager::Update (float timeStep)
         {
             UpdateFogOfWarMap ();
             UpdateMaterialsShaderParameters ();
+            ResetText3DMaterials ();
             untilNextUpdate_ = updateDelay_;
         }
         else
@@ -167,6 +170,18 @@ void FogOfWarManager::UpdateMaterialsShaderParameters ()
             material->SetShaderParameter ("MinModifier", underFogColor_.ToVector3 ().Length () * 1.01f);
             material->SetTexture (Urho3D::TU_ENVIRONMENT, fogOfWarMaskTexture_);
         }
+    }
+}
+
+void FogOfWarManager::ResetText3DMaterials ()
+{
+    Urho3D::PODVector <Urho3D::Text3D *> texts;
+    owner_->GetScene ()->GetComponents <Urho3D::Text3D> (texts, true);
+
+    for (Urho3D::Text3D *text : texts)
+    {
+        // More Urho3D shader magic. Without it Unit and FogOfWarEnabled parameters become zeros in shader.
+        text->SetMaterial (text->GetMaterial ());
     }
 }
 

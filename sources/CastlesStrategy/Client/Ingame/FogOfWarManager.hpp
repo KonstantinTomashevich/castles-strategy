@@ -36,6 +36,8 @@ private:
     void ReleaseImageAndTexture ();
     // TODO: It's not a best way, later think about better solutions.
     void UpdateMaterialsShaderParameters ();
+    // TODO: It's not a best way, later think about better solutions.
+    void ResetText3DMaterials ();
     /// Bresenham's procedure.
     void MakeEllipseVisible (int centerX, int centerY, int width, int height);
     void MakeLineVisible (int minX, int maxX, int y);

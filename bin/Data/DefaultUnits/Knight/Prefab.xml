@@ -30,6 +30,7 @@
 		<attribute name="Variables" />
 		<component type="Text3D" id="16777272">
 			<attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+			<attribute name="Material" value="Material;DefaultUnits/Materials/DefaultText.xml" />
 			<attribute name="Font Size" value="60" />
 			<attribute name="Text" value="[100 HP]" />
 			<attribute name="Text Alignment" value="Center" />
