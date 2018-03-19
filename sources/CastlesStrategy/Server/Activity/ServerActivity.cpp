@@ -21,6 +21,9 @@
 namespace CastlesStrategy
 {
 ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
+    autoDisconnectTime_ (DEFAULT_AUTO_DISCONNECT_TIME),
+    serverPort_ (DEFAULT_SERVER_PORT),
+
     currentGameStatus_ (GS_WAITING),
     unidentifiedConnections_ (),
     identifiedConnections_ (),
@@ -60,7 +63,7 @@ ServerActivity::~ServerActivity ()
 void ServerActivity::Start ()
 {
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
-    network->StartServer (SERVER_PORT);
+    network->StartServer (serverPort_);
 }
 
 void ServerActivity::Update (float timeStep)
@@ -130,7 +133,7 @@ void ServerActivity::HandleClientConnected (Urho3D::StringHash eventHash, Urho3D
 {
     Urho3D::Connection *connection =
             dynamic_cast <Urho3D::Connection *> (eventData[Urho3D::ClientConnected::P_CONNECTION].GetPtr ());
-    unidentifiedConnections_.Push (Urho3D::MakePair (connection, AUTO_DISCONNECT_TIME));
+    unidentifiedConnections_.Push (Urho3D::MakePair (connection, autoDisconnectTime_));
 }
 
 void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)

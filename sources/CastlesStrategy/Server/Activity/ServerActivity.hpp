@@ -54,6 +54,9 @@ private:
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
 
+    float autoDisconnectTime_;
+    unsigned int serverPort_;
+
     GameStatus currentGameStatus_;
     Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > unidentifiedConnections_;
     Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> identifiedConnections_;

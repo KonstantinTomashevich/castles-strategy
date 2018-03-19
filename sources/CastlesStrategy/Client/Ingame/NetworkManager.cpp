@@ -64,7 +64,6 @@ void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D:
 
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
-    // TODO: Temporary, reimplement later.
     ingameActivity->SetGameStatus (static_cast <GameStatus> (messageData.ReadUInt ()));
 }
 

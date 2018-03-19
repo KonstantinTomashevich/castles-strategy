@@ -3,9 +3,8 @@
 
 namespace CastlesStrategy
 {
-// TODO: Maybe allow to specify this vars in server activity (except P_IDENTITY_NAME of course).
-const float AUTO_DISCONNECT_TIME = 1.0f;
-const unsigned int SERVER_PORT = 10001;
+const float DEFAULT_AUTO_DISCONNECT_TIME = 1.0f;
+const unsigned int DEFAULT_SERVER_PORT = 10001;
 
 namespace IdentityFields
 {
