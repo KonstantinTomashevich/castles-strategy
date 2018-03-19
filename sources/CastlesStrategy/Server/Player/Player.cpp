@@ -7,7 +7,6 @@ namespace CastlesStrategy
 Player::Player (const ManagersHub *managersHub) :
     managersHub_ (managersHub),
     coins_ (0),
-    belongingMaterialIndex_ (0),
 
     orders_ (),
     unitsPull_ (dynamic_cast <const UnitsManager *> (managersHub->GetManager (MI_UNITS_MANAGER))->GetUnitsTypesCount ())
@@ -56,16 +55,6 @@ void Player::SetCoins (unsigned int coins)
     eventData [PlayerCoinsSync::PLAYER] = this;
     eventData [PlayerCoinsSync::NEW_VALUE] = coins;
     managersHub_->GetScene ()->SendEvent (E_PLAYER_COINS_SYNC, eventData);
-}
-
-unsigned int Player::GetBelongingMaterialIndex () const
-{
-    return belongingMaterialIndex_;
-}
-
-void Player::SetBelongingMaterialIndex (unsigned int belongingMaterialIndex)
-{
-    belongingMaterialIndex_ = belongingMaterialIndex;
 }
 
 const Urho3D::List <RecruitmentOrder> &Player::GetOrders () const
@@ -143,8 +132,6 @@ unsigned int Player::GetUnitsPullCount (unsigned int unitType) const
 Player &Player::operator = (const Player &another)
 {
     coins_ = another.coins_;
-    belongingMaterialIndex_ = another.belongingMaterialIndex_;
-
     orders_ = another.orders_;
     unitsPull_ = another.unitsPull_;
 }

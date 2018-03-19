@@ -350,12 +350,10 @@ void ServerActivity::SetupPlayers (unsigned int startCoins)
 {
     PlayersManager *playersManager = dynamic_cast <PlayersManager *> (managersHub_->GetManager (MI_PLAYERS_MANAGER));
     Player firstPlayer (managersHub_);
-    firstPlayer.SetBelongingMaterialIndex (0);
     playersManager->SetFirstPlayer (firstPlayer);
     playersManager->GetFirstPlayer ().SetCoins (startCoins);
 
     Player secondPlayer (managersHub_);
-    secondPlayer.SetBelongingMaterialIndex (1);
     playersManager->SetSecondPlayer (secondPlayer);
     playersManager->GetSecondPlayer ().SetCoins (startCoins);
 }

@@ -40,9 +40,6 @@ public:
     unsigned int GetCoins () const;
     void SetCoins (unsigned int coins);
 
-    unsigned int GetBelongingMaterialIndex () const;
-    void SetBelongingMaterialIndex (unsigned int belongingMaterialIndex);
-
     const Urho3D::List <RecruitmentOrder> &GetOrders () const;
     void AddOrder (unsigned int unitType);
     void RemoveOrder (unsigned int unitType);
@@ -56,8 +53,6 @@ private:
 
     const ManagersHub *managersHub_;
     unsigned int coins_;
-    // TODO: Is belonging material index really needed? I think, it is not.
-    unsigned int belongingMaterialIndex_;
 
     Urho3D::List <RecruitmentOrder> orders_;
     Urho3D::PODVector <unsigned int> unitsPull_;
