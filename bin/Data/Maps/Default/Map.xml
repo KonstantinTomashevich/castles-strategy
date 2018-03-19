@@ -2,24 +2,24 @@
 <map size="50 100" useDefaultUnitsTypes="true" defaultCameraPosition="25 20 50"
      defaultCameraRotation="30 0 0" startCoins="5000">
     <route>
-        <waypoint coord="20 10" />
+        <waypoint coord="20 13" />
         <waypoint coord="10 30" />
         <waypoint coord="25 50" />
         <waypoint coord="40 70" />
-        <waypoint coord="30 90" />
+        <waypoint coord="30 87" />
     </route>
 
     <route>
-        <waypoint coord="30 10" />
+        <waypoint coord="30 13" />
         <waypoint coord="40 30" />
         <waypoint coord="25 50" />
         <waypoint coord="10 70" />
-        <waypoint coord="20 90" />
+        <waypoint coord="20 87" />
     </route>
 
-    <spawn position="20 8" belongsToFirst="true" route="0" />
-    <spawn position="30 92" belongsToFirst="false" route="0" />
+    <spawn position="20 10" belongsToFirst="true" route="0" />
+    <spawn position="30 90" belongsToFirst="false" route="0" />
 
-    <spawn position="30 8" belongsToFirst="true" route="1" />
-    <spawn position="20 92" belongsToFirst="false" route="1" />
+    <spawn position="30 10" belongsToFirst="true" route="1" />
+    <spawn position="20 90" belongsToFirst="false" route="1" />
 </map>

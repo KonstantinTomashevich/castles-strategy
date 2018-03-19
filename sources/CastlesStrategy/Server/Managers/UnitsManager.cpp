@@ -226,6 +226,15 @@ void UnitsManager::LoadSpawnsFromXML (const Urho3D::XMLElement &input)
 const Unit *UnitsManager::SpawnUnit (const Unit *spawn, unsigned unitType)
 {
     Urho3D::Vector3 spawnWorldPosition = spawn->GetNode ()->GetWorldPosition ();
+    float deltaX = unitsTypes_ [spawnsUnitType_].GetAttackRange ();
+    float deltaZ = deltaX;
+
+    deltaX = Urho3D::Random (unitsTypes_ [spawnsUnitType_].GetNavigationRadius (), deltaX);
+    deltaZ = Urho3D::Random (unitsTypes_ [spawnsUnitType_].GetNavigationRadius (), deltaZ);
+
+    spawnWorldPosition.x_ += (Urho3D::Random (2) * 2 - 1) * deltaX;
+    spawnWorldPosition.z_ += (Urho3D::Random (2) * 2 - 1) * deltaZ;
+
     Unit *unit = CreateUnit ({spawnWorldPosition.x_, spawnWorldPosition.z_}, unitType,
                              spawn->IsBelongsToFirst (), spawn->GetRouteIndex ());
 
@@ -311,8 +320,10 @@ Unit *UnitsManager::CreateUnit (Urho3D::Vector2 position, unsigned unitType, boo
         unitsNode = GetManagersHub ()->GetScene ()->CreateChild ("units", Urho3D::REPLICATED);
     }
 
+    Urho3D::NavigationMesh *navigationMesh = GetManagersHub ()->GetScene ()->GetComponent <Urho3D::NavigationMesh> ();
     Urho3D::Node *unitNode = unitsNode->CreateChild (Urho3D::String::EMPTY, Urho3D::REPLICATED);
-    unitNode->SetWorldPosition ({position.x_, 0.0f, position.y_});
+    unitNode->SetWorldPosition (
+            navigationMesh->FindNearestPoint ({position.x_, 0.0f, position.y_}, Urho3D::Vector3::UP * INT_MAX));
 
     Unit *unit = unitNode->CreateComponent <Unit> (Urho3D::REPLICATED);
     unit->SetUnitType (unitType);
