@@ -92,6 +92,10 @@ GameStatus IngameActivity::GetGameStatus () const
 void IngameActivity::SetGameStatus (GameStatus gameStatus)
 {
     gameStatus_ = gameStatus;
+    if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
+    {
+        ingameUIManager_->InformGameEnded (gameStatus == GS_FIRST_WON);
+    }
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
@@ -173,6 +177,14 @@ void IngameActivity::HandleServerConnected (Urho3D::StringHash eventType, Urho3D
 
 void IngameActivity::HandleServerDisconnected (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    // TODO: Implement.
+    if (gameStatus_ != GS_FIRST_WON && gameStatus_ != GS_SECOND_WON)
+    {
+        ingameUIManager_->ShowMessage ("Disconnected!", "Lost connection to server!", "Go to main menu.",
+                [] (IngameActivity *activity) -> void
+                {
+                    activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+                    activity->SendEvent (START_MAIN_MENU);
+                });
+    }
 }
 }

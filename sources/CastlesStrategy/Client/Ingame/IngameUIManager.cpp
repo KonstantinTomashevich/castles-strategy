@@ -131,6 +131,14 @@ void IngameUIManager::UpdateCoins (unsigned int coins)
     }
 }
 
+void IngameUIManager::InformGameEnded (bool firstWon)
+{
+    menu_->SetVisible (true);
+    dynamic_cast <Urho3D::Text *> (
+            menu_->GetChild ("Menu", false))->SetText (Urho3D::String (firstWon ? "Blue" : "Red") + " won!");
+    menu_->GetChild ("CloseMenuButton", false)->SetVisible (false);
+}
+
 void IngameUIManager::LoadElements ()
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();

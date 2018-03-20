@@ -31,6 +31,7 @@ public:
     void ClearUI ();
     void CheckUIForUnitsType (unsigned int unitType);
     void UpdateCoins (unsigned int coins);
+    void InformGameEnded (bool firstWon);
 
 private:
     struct MessageData
