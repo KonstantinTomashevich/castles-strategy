@@ -9,6 +9,11 @@
 
 namespace CastlesStrategy
 {
+URHO3D_EVENT (E_GAME_ENDED, GameEnded)
+{
+    URHO3D_PARAM (FIRST_WON, FirstWon);
+}
+
 class UnitsManager : public Manager
 {
 public:
@@ -26,8 +31,6 @@ public:
     const Unit *GetNearestEnemy (Unit *unit) const;
 
     virtual void HandleUpdate (float timeStep);
-    GameStatus CheckGameStatus () const;
-
     unsigned int GetUnitsTypesCount () const;
     const UnitType &GetUnitType (unsigned int index) const;
     unsigned int GetSpawnsUnitType () const;

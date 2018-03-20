@@ -47,6 +47,7 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (Urho3D::E_COMPONENTADDED, URHO3D_HANDLER (ServerActivity, HandleComponentAdded));
     SubscribeToEvent (E_PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
     SubscribeToEvent (E_PLAYER_COINS_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerCoinsSync));
+    SubscribeToEvent (E_GAME_ENDED, URHO3D_HANDLER (ServerActivity, HandleGameEnded));
 }
 
 ServerActivity::~ServerActivity ()
@@ -68,16 +69,9 @@ void ServerActivity::Start ()
 
 void ServerActivity::Update (float timeStep)
 {
-    if (managersHub_ != nullptr)
+    if (managersHub_ != nullptr && currentGameStatus_ == GS_PLAYING)
     {
         managersHub_->HandleUpdate (timeStep);
-
-        GameStatus newStatus = dynamic_cast <UnitsManager *> (managersHub_->GetManager (MI_UNITS_MANAGER))->CheckGameStatus ();
-        if (newStatus != currentGameStatus_)
-        {
-            currentGameStatus_ = newStatus;
-            ReportGameStatus (currentGameStatus_);
-        }
     }
 
     // TODO: It's temporary. Autostarts game when 2 or more players are connected.
@@ -90,6 +84,9 @@ void ServerActivity::Update (float timeStep)
         unsigned int startCoins;
         LoadResources (startCoins);
         SetupPlayers (startCoins);
+
+        currentGameStatus_ = GS_PLAYING;
+        ReportGameStatus (GS_PLAYING);
     }
 }
 
@@ -222,6 +219,12 @@ void ServerActivity::HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D
 
     (player == &dynamic_cast <PlayersManager *> (managersHub_->GetManager (MI_PLAYERS_MANAGER))->GetFirstPlayer () ?
             firstPlayer_ : secondPlayer_)->SendMessage (STCNMT_COINS_SYNC, true, false, messageData);
+}
+
+void ServerActivity::HandleGameEnded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    currentGameStatus_ = eventData [GameEnded::FIRST_WON].GetBool () ? GS_FIRST_WON : GS_SECOND_WON;
+    ReportGameStatus (currentGameStatus_);
 }
 
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)

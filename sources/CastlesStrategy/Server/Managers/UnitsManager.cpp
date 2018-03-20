@@ -132,19 +132,6 @@ void UnitsManager::HandleUpdate (float timeStep)
     ClearDeadUnits ();
 }
 
-GameStatus UnitsManager::CheckGameStatus () const
-{
-    for (const Unit *unit : units_)
-    {
-        if (unit->GetUnitType () == spawnsUnitType_ && unit->GetHp () == 0)
-        {
-            return unit->IsBelongsToFirst () ? GS_SECOND_WON : GS_FIRST_WON;
-        }
-    }
-
-    return GS_PLAYING;
-}
-
 unsigned int UnitsManager::GetUnitsTypesCount () const
 {
     return unitsTypes_.size ();
@@ -354,6 +341,13 @@ void UnitsManager::ProcessUnitCommand (Unit *unit, const UnitCommand &command, c
 
 void UnitsManager::MakeUnitDead (Unit *unit)
 {
+    if (unit->GetUnitType () == spawnsUnitType_)
+    {
+        Urho3D::VariantMap eventData;
+        eventData [GameEnded::FIRST_WON] = !unit->IsBelongsToFirst ();
+        GetManagersHub ()->GetScene ()->SendEvent (E_GAME_ENDED, eventData);
+    }
+
     // TODO: Temporary (reimplement).
     unit->GetNode ()->Remove ();
 }
