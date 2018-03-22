@@ -96,6 +96,9 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
     {
         ingameUIManager_->InformGameEnded (gameStatus == GS_FIRST_WON);
         fogOfWarManager_->SetFogOfWarEnabled (false);
+
+        Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+        network->GetServerConnection ()->SetScene (nullptr);
     }
 }
 
