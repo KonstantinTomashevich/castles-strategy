@@ -31,6 +31,9 @@ public:
     const Urho3D::Color &GetVisibleColor () const;
     void SetVisibleColor (const Urho3D::Color &visibleColor);
 
+    bool IsFogOfWarEnabled () const;
+    void SetFogOfWarEnabled (bool fogOfWarEnabled);
+
 private:
     void UpdateFogOfWarMap ();
     void ReleaseImageAndTexture ();
@@ -52,5 +55,6 @@ private:
     Urho3D::Color underFogColor_;
     Urho3D::Color visibleColor_;
     Urho3D::Vector2 mapUnitSize_;
+    bool fogOfWarEnabled_;
 };
 }

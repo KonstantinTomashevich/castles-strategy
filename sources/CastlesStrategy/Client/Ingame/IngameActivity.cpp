@@ -95,6 +95,7 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
     if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
     {
         ingameUIManager_->InformGameEnded (gameStatus == GS_FIRST_WON);
+        fogOfWarManager_->SetFogOfWarEnabled (false);
     }
 }
 

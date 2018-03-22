@@ -9,7 +9,8 @@
 
 namespace CastlesStrategy
 {
-FogOfWarManager::FogOfWarManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
+FogOfWarManager::FogOfWarManager (IngameActivity *owner) :
+        Urho3D::Object (owner->GetContext ()),
         owner_ (owner),
         updateDelay_ (DEFAULT_FOG_OF_WAR_UPDATE_DELAY),
         untilNextUpdate_ (0.0f),
@@ -19,7 +20,8 @@ FogOfWarManager::FogOfWarManager (IngameActivity *owner) : Urho3D::Object (owner
 
         underFogColor_ (DEFAULT_UNDER_FOG_OF_WAR_MASK_COLOR),
         visibleColor_ (DEFAULT_VISIBLE_MASK_COLOR),
-        mapUnitSize_ ()
+        mapUnitSize_ (),
+        fogOfWarEnabled_ (true)
 {
 
 }
@@ -27,7 +29,6 @@ FogOfWarManager::FogOfWarManager (IngameActivity *owner) : Urho3D::Object (owner
 FogOfWarManager::~FogOfWarManager ()
 {
     ReleaseImageAndTexture ();
-
 }
 
 void FogOfWarManager::SetupFogOfWarMask (const Urho3D::IntVector2 &maskSize, const Urho3D::Vector2 &mapSize)
@@ -40,7 +41,8 @@ void FogOfWarManager::SetupFogOfWarMask (const Urho3D::IntVector2 &maskSize, con
     fogOfWarMaskImage_->Clear (underFogColor_);
 
     fogOfWarMaskTexture_ = new Urho3D::Texture2D (context_);
-    fogOfWarMaskTexture_->SetSize (maskSize.x_, maskSize.y_, Urho3D::Graphics::GetRGBAFormat (), Urho3D::TEXTURE_DYNAMIC);
+    fogOfWarMaskTexture_->SetSize (maskSize.x_, maskSize.y_, Urho3D::Graphics::GetRGBAFormat (),
+            Urho3D::TEXTURE_DYNAMIC);
     fogOfWarMaskTexture_->SetData (fogOfWarMaskImage_);
 
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
@@ -101,31 +103,54 @@ void FogOfWarManager::SetVisibleColor (const Urho3D::Color &visibleColor)
     visibleColor_ = visibleColor;
 }
 
+bool FogOfWarManager::IsFogOfWarEnabled () const
+{
+    return fogOfWarEnabled_;
+}
+
+void FogOfWarManager::SetFogOfWarEnabled (bool fogOfWarEnabled)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::PODVector <Urho3D::Material *> materials;
+    resourceCache->GetResources <Urho3D::Material> (materials);
+
+    for (Urho3D::Material *material : materials)
+    {
+        if (!material->GetShaderParameter ("FogOfWarEnabled").IsEmpty ())
+        {
+            material->SetShaderParameter ("FogOfWarEnabled", fogOfWarEnabled ? 1 : 0);
+        }
+    }
+}
+
 void FogOfWarManager::UpdateFogOfWarMap ()
 {
-    DataManager *dataManager = owner_->GetDataManager ();
-    Urho3D::Node *unitsNode = owner_->GetScene ()->GetChild ("units");
-    if (unitsNode == nullptr)
+    if (fogOfWarEnabled_)
     {
-        return;
-    }
-
-    Urho3D::PODVector <Urho3D::Node *> unitsNodes;
-    unitsNode->GetChildrenWithComponent <Unit> (unitsNodes);
-    fogOfWarMaskImage_->Clear (underFogColor_);
-
-    for (const auto &unitNode : unitsNodes)
-    {
-        Unit *unit = unitNode->GetComponent <Unit> ();
-        if (owner_->GetPlayerType () == PT_OBSERVER ||
-                (unit->IsBelongsToFirst () && owner_->GetPlayerType () == PT_FIRST) ||
-                (!unit->IsBelongsToFirst () && owner_->GetPlayerType () == PT_SECOND))
+        DataManager *dataManager = owner_->GetDataManager ();
+        Urho3D::Node *unitsNode = owner_->GetScene ()->GetChild ("units");
+        if (unitsNode == nullptr)
         {
-            const UnitType &unitType = dataManager->GetUnitTypeByIndex (unit->GetUnitType ());
-            MakeEllipseVisible (Urho3D::RoundToInt (unit->GetNode ()->GetPosition ().x_ * mapUnitSize_.x_),
-                    Urho3D::RoundToInt (unit->GetNode ()->GetPosition ().z_ * mapUnitSize_.y_),
-                    Urho3D::RoundToInt (unitType.GetVisionRange () * mapUnitSize_.x_),
-                    Urho3D::RoundToInt (unitType.GetVisionRange () * mapUnitSize_.y_));
+            return;
+        }
+
+        Urho3D::PODVector <Urho3D::Node *> unitsNodes;
+        unitsNode->GetChildrenWithComponent <Unit> (unitsNodes);
+        fogOfWarMaskImage_->Clear (underFogColor_);
+
+        for (const auto &unitNode : unitsNodes)
+        {
+            Unit *unit = unitNode->GetComponent <Unit> ();
+            if (owner_->GetPlayerType () == PT_OBSERVER ||
+                    (unit->IsBelongsToFirst () && owner_->GetPlayerType () == PT_FIRST) ||
+                    (!unit->IsBelongsToFirst () && owner_->GetPlayerType () == PT_SECOND))
+            {
+                const UnitType &unitType = dataManager->GetUnitTypeByIndex (unit->GetUnitType ());
+                MakeEllipseVisible (Urho3D::RoundToInt (unit->GetNode ()->GetPosition ().x_ * mapUnitSize_.x_),
+                        Urho3D::RoundToInt (unit->GetNode ()->GetPosition ().z_ * mapUnitSize_.y_),
+                        Urho3D::RoundToInt (unitType.GetVisionRange () * mapUnitSize_.x_),
+                        Urho3D::RoundToInt (unitType.GetVisionRange () * mapUnitSize_.y_));
+            }
         }
     }
 
@@ -155,7 +180,7 @@ void FogOfWarManager::UpdateMaterialsShaderParameters ()
 
     for (Urho3D::Material *material : materials)
     {
-        if (material->GetShaderParameter ("FogOfWarEnabled").GetInt () > 0)
+        if (!material->GetShaderParameter ("FogOfWarEnabled").IsEmpty ())
         {
             material->SetShaderParameter ("DefaultColor", underFogColor_);
             material->SetShaderParameter ("MapMinPoint", Urho3D::Vector3::ZERO);
@@ -164,7 +189,8 @@ void FogOfWarManager::UpdateMaterialsShaderParameters ()
                     fogOfWarMaskImage_->GetHeight () / mapUnitSize_.y_));
 
             //* Fucking magic of Urho3D shader parameters. Without resetting they can magically become zeros.
-            material->SetShaderParameter ("FogOfWarEnabled", 1);
+            material->SetShaderParameter ("FogOfWarEnabled",
+                    material->GetShaderParameter ("FogOfWarEnabled").GetInt ());
             material->SetShaderParameter ("Unit", material->GetShaderParameter ("Unit").GetInt ());
             //*
             material->SetShaderParameter ("MinModifier", underFogColor_.ToVector3 ().Length () * 1.01f);
