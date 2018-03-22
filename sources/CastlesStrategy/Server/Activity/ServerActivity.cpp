@@ -131,7 +131,15 @@ void ServerActivity::HandleClientConnected (Urho3D::StringHash eventHash, Urho3D
 {
     Urho3D::Connection *connection =
             dynamic_cast <Urho3D::Connection *> (eventData[Urho3D::ClientConnected::P_CONNECTION].GetPtr ());
-    unidentifiedConnections_.Push (Urho3D::MakePair (connection, autoDisconnectTime_));
+
+    if (currentGameStatus_ == GS_WAITING)
+    {
+        unidentifiedConnections_.Push (Urho3D::MakePair (connection, autoDisconnectTime_));
+    }
+    else
+    {
+        connection->Disconnect ();
+    }
 }
 
 void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
@@ -141,7 +149,7 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
     Urho3D::String name = eventData [IdentityFields::NAME].GetString ();
 
     RemoveUnidentifiedConnection (connection);
-    if (identifiedConnections_.Contains (name))
+    if (identifiedConnections_.Contains (name) || currentGameStatus_ != GS_WAITING)
     {
         connection->Disconnect ();
         return;
