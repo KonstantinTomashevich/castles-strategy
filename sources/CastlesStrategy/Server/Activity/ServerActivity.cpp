@@ -69,6 +69,7 @@ void ServerActivity::Start ()
 
 void ServerActivity::Update (float timeStep)
 {
+    ProcessUnidentifiedConnections (timeStep);
     if (managersHub_ != nullptr && currentGameStatus_ == GS_PLAYING)
     {
         managersHub_->HandleUpdate (timeStep);
@@ -261,6 +262,23 @@ void ServerActivity::ReportGameStatus (GameStatus gameStatus) const
     for (auto &connectionData : identifiedConnections_)
     {
         connectionData.first_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
+    }
+}
+
+void ServerActivity::ProcessUnidentifiedConnections (float timeStep)
+{
+    for (auto iterator = unidentifiedConnections_.Begin (); iterator != unidentifiedConnections_.End ();)
+    {
+        iterator->second_ -= timeStep;
+        if (iterator->second_ <= 0.0f)
+        {
+            iterator->first_->Disconnect ();
+            iterator = unidentifiedConnections_.Erase (iterator);
+        }
+        else
+        {
+            iterator++;
+        }
     }
 }
 

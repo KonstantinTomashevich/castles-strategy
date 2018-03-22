@@ -47,6 +47,7 @@ private:
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
     bool RemoveIdentifiedConnection (Urho3D::Connection *connection);
     void ReportGameStatus (GameStatus gameStatus) const;
+    void ProcessUnidentifiedConnections (float timeStep);
 
     void LoadResources (unsigned int &startCoins);
     void LoadScene (const Urho3D::String &mapFolder);
