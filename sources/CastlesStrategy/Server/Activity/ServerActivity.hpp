@@ -27,7 +27,7 @@ public:
     const Urho3D::String &GetMapName () const;
     void SetMapName (const Urho3D::String &mapName);
 
-    const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &GetIdentifiedConnections () const;
+    const Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> &GetIdentifiedConnections () const;
     ManagersHub *GetManagersHub () const;
 
     Urho3D::Connection *GetFirstPlayer () const;
@@ -61,7 +61,7 @@ private:
 
     GameStatus currentGameStatus_;
     Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > unidentifiedConnections_;
-    Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> identifiedConnections_;
+    Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> identifiedConnections_;
 
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;

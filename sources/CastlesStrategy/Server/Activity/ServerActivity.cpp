@@ -79,8 +79,8 @@ void ServerActivity::Update (float timeStep)
     else if (identifiedConnections_.Size () >= 2 && currentGameStatus_ == GS_WAITING)
     {
         managersHub_ = new ManagersHub (scene_);
-        firstPlayer_ = identifiedConnections_.Front ().first_;
-        secondPlayer_ = identifiedConnections_.Back ().first_;
+        firstPlayer_ = identifiedConnections_.Front ().second_;
+        secondPlayer_ = identifiedConnections_.Back ().second_;
 
         unsigned int startCoins;
         LoadResources (startCoins);
@@ -107,7 +107,7 @@ void ServerActivity::SetMapName (const Urho3D::String &mapName)
     mapName_ = mapName;
 }
 
-const Urho3D::HashMap <Urho3D::Connection *, Urho3D::String> &ServerActivity::GetIdentifiedConnections () const
+const Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> &ServerActivity::GetIdentifiedConnections () const
 {
     return identifiedConnections_;
 }
@@ -141,8 +141,13 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
     Urho3D::String name = eventData [IdentityFields::NAME].GetString ();
 
     RemoveUnidentifiedConnection (connection);
-    identifiedConnections_ [connection] = name;
+    if (identifiedConnections_.Contains (name))
+    {
+        connection->Disconnect ();
+        return;
+    }
 
+    identifiedConnections_ [name] = connection;
     Urho3D::VectorBuffer data;
     data.WriteInt (currentGameStatus_);
     connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
@@ -195,7 +200,7 @@ void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D:
 
             for (auto &connectionData : identifiedConnections_)
             {
-                connectionData.first_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
+                connectionData.second_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
             }
         }
     }
@@ -245,7 +250,7 @@ bool ServerActivity::RemoveIdentifiedConnection (Urho3D::Connection *connection)
 {
     for (auto iterator = identifiedConnections_.Begin (); iterator != identifiedConnections_.End (); iterator++)
     {
-        if (iterator->first_ == connection)
+        if (iterator->second_ == connection)
         {
             identifiedConnections_.Erase (iterator);
             return true;
@@ -261,7 +266,7 @@ void ServerActivity::ReportGameStatus (GameStatus gameStatus) const
 
     for (auto &connectionData : identifiedConnections_)
     {
-        connectionData.first_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
+        connectionData.second_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
     }
 }
 
@@ -332,11 +337,11 @@ void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath) co
     for (auto identifiedConnection : identifiedConnections_)
     {
         PlayerType playerType;
-        if (identifiedConnection.first_ == firstPlayer_)
+        if (identifiedConnection.second_ == firstPlayer_)
         {
             playerType = PT_FIRST;
         }
-        else if (identifiedConnection.first_ == secondPlayer_)
+        else if (identifiedConnection.second_ == secondPlayer_)
         {
             playerType = PT_SECOND;
         }
@@ -348,7 +353,7 @@ void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath) co
         Urho3D::VectorBuffer messageBuffer;
         messageBuffer.WriteUByte (playerType);
         messageBuffer.WriteString (mapPath);
-        identifiedConnection.first_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
+        identifiedConnection.second_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
     }
 }
 
