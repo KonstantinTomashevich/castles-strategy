@@ -75,7 +75,7 @@ void ServerActivity::Update (float timeStep)
     }
 
     // TODO: It's temporary. Autostarts game when 2 or more players are connected.
-    else if (identifiedConnections_.Size () >= 2)
+    else if (identifiedConnections_.Size () >= 2 && currentGameStatus_ == GS_WAITING)
     {
         managersHub_ = new ManagersHub (scene_);
         firstPlayer_ = identifiedConnections_.Front ().first_;
