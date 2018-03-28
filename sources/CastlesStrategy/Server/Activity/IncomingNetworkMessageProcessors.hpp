@@ -10,5 +10,6 @@ namespace IncomingNetworkMessageProcessors
 {
 void AddOrder (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 void SpawnUnit (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
+void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 }
 }

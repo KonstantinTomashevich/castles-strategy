@@ -9,6 +9,8 @@ enum ClientToServerNetworkMessageType
     CTSNMT_ADD_ORDER = 200,
     // SpawnID : UInt, UnitType : UInt.
     CTSNMT_SPAWN_UNIT,
+    // Message : String.
+    CTSNMT_CHAT_MESSAGE,
     CTSNMT_TYPES_COUNT
 };
 }
