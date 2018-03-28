@@ -32,6 +32,7 @@ public:
     void CheckUIForUnitsType (unsigned int unitType);
     void UpdateCoins (unsigned int coins);
     void InformGameEnded (bool firstWon);
+    void AddNewChatMessage (const Urho3D::String &message);
 
 private:
     struct MessageData
@@ -50,6 +51,7 @@ private:
     void SubscribeToTopBarEvents ();
     void SubscribeToMenuEvents ();
     void SubscribeToMessageWindowEvents ();
+    void SubscribeToChatWindowEvents ();
 
     void HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
@@ -59,6 +61,8 @@ private:
     void HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleMessageWindowOkClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+
+    void HandleChatWindowSendClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     IngameActivity *owner_;
@@ -67,6 +71,7 @@ private:
     Urho3D::Window *topBar_;
     Urho3D::Window *menu_;
     Urho3D::Window *messageWindow_;
+    Urho3D::Window *chatWindow_;
     Urho3D::List <MessageData> requestedMessages_;
 };
 }

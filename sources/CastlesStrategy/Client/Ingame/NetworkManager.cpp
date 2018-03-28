@@ -15,6 +15,7 @@ void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessChatMessageMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
@@ -26,6 +27,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
     incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
+    incomingMessagesProcessors_ [STCNMT_CHAT_MESSAGE - STCNMT_START] = ProcessChatMessageMessage;
 }
 
 NetworkManager::~NetworkManager ()
@@ -50,6 +52,15 @@ void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitTy
 
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->GetServerConnection ()->SendMessage (CTSNMT_SPAWN_UNIT, true, true, messageData);
+}
+
+void NetworkManager::SendChatMessage (const Urho3D::String &message)
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteString (message);
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_CHAT_MESSAGE, true, false, messageData);
 }
 
 void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
@@ -105,5 +116,10 @@ void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::Vector
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
     ingameActivity->GetDataManager ()->SetPredictedCoins (messageData.ReadUInt ());
+}
+
+void ProcessChatMessageMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    ingameActivity->GetIngameUIManager ()->AddNewChatMessage (messageData.ReadString ());
 }
 }

@@ -2,7 +2,11 @@
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Text.h>
+
 #include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/UI/ScrollView.h>
+#include <Urho3D/UI/ScrollBar.h>
+#include <Urho3D/UI/LineEdit.h>
 
 #include <Urho3D/Resource/XMLFile.h>
 #include <Urho3D/Resource/XMLElement.h>
@@ -24,6 +28,7 @@ IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner
     topBar_ (nullptr),
     menu_ (nullptr),
     messageWindow_ (nullptr),
+    chatWindow_ (nullptr),
     requestedMessages_ ()
 {
 
@@ -82,9 +87,7 @@ void IngameUIManager::ShowMessage (const Urho3D::String &title, const Urho3D::St
 void IngameUIManager::ClearUI ()
 {
     UnsubscribeFromAllEvents ();
-    topBar_->Remove ();
-    menu_->Remove ();
-    messageWindow_->Remove ();
+    GetSubsystem <Urho3D::UI> ()->Clear ();
 
     topBar_ = nullptr;
     menu_ = nullptr;
@@ -139,6 +142,35 @@ void IngameUIManager::InformGameEnded (bool firstWon)
     menu_->GetChild ("CloseMenuButton", false)->SetVisible (false);
 }
 
+void IngameUIManager::AddNewChatMessage (const Urho3D::String &message)
+{
+    Urho3D::ScrollView *messagesView = dynamic_cast <Urho3D::ScrollView *> (chatWindow_->GetChild ("MessagesView", false));
+    Urho3D::Text *messageText = messagesView->GetContentElement ()->CreateChild <Urho3D::Text> ("Message");
+
+    messageText->SetStyleAuto ();
+    messageText->SetText (message);
+    messageText->AddTag ("UIResizer");
+
+    messageText->SetVar ("VWidth", 0.95f);
+    messageText->SetVar ("VHeight", 0.1f);
+    messageText->SetVar ("VX", 0.0f);
+    messageText->SetVar ("VY", 0.0f);
+
+    messageText->SetVar ("WDep", "PW");
+    messageText->SetVar ("HDep", "SH");
+    messageText->SetVar ("XDep", "SH");
+    messageText->SetVar ("YDep", "SH");
+
+    messageText->SetVar ("VTextSize", 0.015f);
+    messageText->SetVar ("TSDep", "SH");
+    messageText->SetWordwrap (true);
+
+    SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
+    int contentHeight = messagesView->GetContentElement ()->GetHeight ();
+    int scrollBarHeight = messagesView->GetVerticalScrollBar ()->GetHeight ();
+    messagesView->SetViewPosition (0, scrollBarHeight > contentHeight ? 0 : contentHeight - scrollBarHeight);
+}
+
 void IngameUIManager::LoadElements ()
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
@@ -158,6 +190,11 @@ void IngameUIManager::LoadElements ()
     messageWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/MessageWindow.xml")->GetRoot (), style));
     messageWindow_->SetVisible (false);
+
+    chatWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/ChatWindow.xml")->GetRoot (), style));
+    dynamic_cast <Urho3D::ScrollView *> (chatWindow_->GetChild ("MessagesView", false))->
+            SetContentElement (chatWindow_->GetChild ("MessagesView", false)->GetChild ("MessagesContent", false));
 }
 
 void IngameUIManager::ShowNextMessage ()
@@ -202,6 +239,7 @@ void IngameUIManager::SubscribeToEvents ()
     SubscribeToTopBarEvents ();
     SubscribeToMenuEvents ();
     SubscribeToMessageWindowEvents ();
+    SubscribeToChatWindowEvents ();
     SubscribeToEvent (Urho3D::E_UIMOUSEDOUBLECLICK, URHO3D_HANDLER (IngameUIManager, HandleDoubleClickOnMap));
 }
 
@@ -226,6 +264,13 @@ void IngameUIManager::SubscribeToMessageWindowEvents ()
 {
     Urho3D::Button *okButton = dynamic_cast <Urho3D::Button *> (messageWindow_->GetChild ("OkButton", false));
     SubscribeToEvent (okButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleMessageWindowOkClicked));
+}
+
+void IngameUIManager::SubscribeToChatWindowEvents ()
+{
+    Urho3D::Button *sendButton = dynamic_cast <Urho3D::Button *> (
+            chatWindow_->GetChild ("MessageInput", false)->GetChild ("SendButton", false));
+    SubscribeToEvent (sendButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleChatWindowSendClicked));
 }
 
 void IngameUIManager::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
@@ -276,6 +321,15 @@ void IngameUIManager::HandleMessageWindowOkClicked (Urho3D::StringHash eventType
     {
         ShowNextMessage ();
     }
+}
+
+void IngameUIManager::HandleChatWindowSendClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    Urho3D::LineEdit *messageEdit = dynamic_cast <Urho3D::LineEdit *> (
+            chatWindow_->GetChild ("MessageInput", false)->GetChild ("Edit", false));
+
+    owner_->GetNetworkManager ()->SendChatMessage (messageEdit->GetText ());
+    messageEdit->SetText ("");
 }
 
 void IngameUIManager::HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

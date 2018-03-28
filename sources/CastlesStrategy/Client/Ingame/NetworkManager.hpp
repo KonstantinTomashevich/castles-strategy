@@ -15,6 +15,7 @@ public:
 
     void SendAddOrderMessage (unsigned int unitType) const;
     void SendSpawnMessage (unsigned int spawnID, unsigned int unitType);
+    void SendChatMessage (const Urho3D::String &message);
 
 private:
     void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data);
