@@ -6,6 +6,7 @@
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/UI/ScrollView.h>
 
 UIResizer::UIResizer (Urho3D::Context *context) : LogicComponent (context),
     continuousUpdate_ (false),
@@ -143,6 +144,20 @@ void UIResizer::ProcessElementChildren (Urho3D::UIElement *element,
         ProcessElement (child, dependenciesValues);
         ProcessElementChildren (child, dependenciesValues);
         ProcessElementLayout (child, dependenciesValues);
+    }
+
+    if (dynamic_cast <Urho3D::ScrollView *> (element) != nullptr)
+    {
+        Urho3D::UIElement *content = dynamic_cast <Urho3D::ScrollView *> (element)->GetContentElement ();
+        if (content != nullptr && content->HasTag ("UIResizer"))
+        {
+            dependenciesValues ["PW"] = element->GetWidth ();
+            dependenciesValues ["PH"] = element->GetHeight ();
+
+            ProcessElement (content, dependenciesValues);
+            ProcessElementChildren (content, dependenciesValues);
+            ProcessElementLayout (content, dependenciesValues);
+        }
     }
 
     dependenciesValues ["PW"] = previousPW;
