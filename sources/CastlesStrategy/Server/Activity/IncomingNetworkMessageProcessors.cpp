@@ -58,7 +58,7 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
     bool found = false;
     for (const auto &item : activity->GetIdentifiedConnections ())
     {
-        if (item.second_ == sender)
+        if (item.second_.connection_ == sender)
         {
             resultingMessage += " [" + item.first_ + "] ";
             found = true;
@@ -78,7 +78,7 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
 
     for (const auto &item : activity->GetIdentifiedConnections ())
     {
-        item.second_->SendMessage (STCNMT_CHAT_MESSAGE, true, false, newMessageData);
+        item.second_.connection_->SendMessage (STCNMT_CHAT_MESSAGE, true, false, newMessageData);
     }
 }
 }

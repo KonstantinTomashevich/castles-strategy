@@ -7,8 +7,10 @@ enum ServerToClientNetworkMessageType
     STCNMT_START = 100,
     // GameStatus : Int.
     STCNMT_GAME_STATUS = 100,
-    // PlayerType : UByte, MapPath : String.
+    // MapPath : String.
     STCNMT_INITIAL_INFO,
+    // PlayerType : byte.
+    STCNMT_PLAYER_TYPE,
     // ID : UInt (node id).
     STCNMT_UNIT_SPAWNED,
     // UnitType : UInt, NewValue : UInt.

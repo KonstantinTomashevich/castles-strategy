@@ -12,6 +12,8 @@ namespace CastlesStrategy
 {
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerTypeMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
@@ -24,6 +26,8 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_INITIAL_INFO - STCNMT_START] = ProcessInitialInfoMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_TYPE - STCNMT_START] = ProcessPlayerTypeMessage;
+
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
     incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
@@ -80,9 +84,6 @@ void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuf
 
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
-    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
-    ingameActivity->SetPlayerType (playerType);
-
     Urho3D::ResourceCache *resourceCache = ingameActivity->GetContext ()->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::String mapPath = messageData.ReadString ();
     ingameActivity->GetScene ()->CreateChild ("PlayerSide", Urho3D::LOCAL)->LoadXML (
@@ -99,6 +100,12 @@ void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
             mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
 
     ingameActivity->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
+}
+
+void ProcessPlayerTypeMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
+    ingameActivity->SetPlayerType (playerType);
 }
 
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)

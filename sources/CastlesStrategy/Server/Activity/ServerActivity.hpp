@@ -3,15 +3,26 @@
 #include <Urho3D/Network/Connection.h>
 #include <Urho3D/Scene/Scene.h>
 
-#include <ActivitiesApplication/Activity.hpp>
-#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
 #include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
+#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
+#include <CastlesStrategy/Shared/PlayerType.hpp>
+#include <ActivitiesApplication/Activity.hpp>
 
 namespace CastlesStrategy
 {
 class ServerActivity;
 typedef void (*ServerIncomingNetworkMessageProcessor) (ServerActivity *activity,
         Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
+
+struct PlayerData
+{
+    Urho3D::Connection *connection_;
+    PlayerType playerType;
+    bool readyForStart_;
+};
+
+typedef Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > UnidentifiedConnectionsVector;
+typedef Urho3D::HashMap <Urho3D::String, PlayerData> IdentifiedConnectionsMap;
 
 class ServerActivity : public ActivitiesApplication::Activity
 {
@@ -27,7 +38,7 @@ public:
     const Urho3D::String &GetMapName () const;
     void SetMapName (const Urho3D::String &mapName);
 
-    const Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> &GetIdentifiedConnections () const;
+    const IdentifiedConnectionsMap &GetIdentifiedConnections () const;
     ManagersHub *GetManagersHub () const;
 
     Urho3D::Connection *GetFirstPlayer () const;
@@ -55,13 +66,16 @@ private:
     void SendInitialInfoToPlayers (const Urho3D::String &mapPath) const;
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
+    
+    void SendPlayerTypeToPlayer (const Urho3D::String &playerName);
+    void SendPlayerTypeToPlayer (IdentifiedConnectionsMap::KeyValue &playerInfo);
 
     float autoDisconnectTime_;
     unsigned int serverPort_;
 
     GameStatus currentGameStatus_;
-    Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > unidentifiedConnections_;
-    Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> identifiedConnections_;
+    UnidentifiedConnectionsVector unidentifiedConnections_;
+    IdentifiedConnectionsMap identifiedConnections_;
 
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;
