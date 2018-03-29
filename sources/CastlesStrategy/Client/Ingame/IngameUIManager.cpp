@@ -15,7 +15,7 @@
 #include <Urho3D/Graphics/Texture2D.h>
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UIResizer.hpp>
 #include <Utils/UniversalException.hpp>
 

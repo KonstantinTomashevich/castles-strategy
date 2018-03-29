@@ -2,6 +2,7 @@
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Network/Network.h>
 
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/AngelScript/Script.h>
@@ -11,7 +12,7 @@
 #include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Server/Activity/ServerActivity.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UniversalException.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)

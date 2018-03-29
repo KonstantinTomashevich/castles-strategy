@@ -13,7 +13,7 @@
 
 #include <Utils/UIResizer.hpp>
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Urho3D/Graphics/StaticModel.h>
 
 namespace CastlesStrategy
@@ -82,6 +82,7 @@ PlayerType IngameActivity::GetPlayerType () const
 void IngameActivity::SetPlayerType (PlayerType playerType)
 {
     playerType_ = playerType;
+    fogOfWarManager_->SetFogOfWarEnabled (playerType == PT_FIRST || playerType == PT_SECOND);
 }
 
 GameStatus IngameActivity::GetGameStatus () const

@@ -9,7 +9,7 @@
 #include <Urho3D/UI/UIEvents.h>
 
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 
 namespace CastlesStrategy
 {

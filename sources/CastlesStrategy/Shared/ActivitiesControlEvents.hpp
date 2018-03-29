@@ -24,4 +24,14 @@ URHO3D_EVENT (START_SERVER, StartServer)
 {
 
 }
+
+URHO3D_EVENT (REQUEST_GAME_START, RequestGameStart)
+{
+
+}
+
+URHO3D_EVENT (REQUEST_KICK_PLAYER, RequestKickPlayer)
+{
+
+}
 }
