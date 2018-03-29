@@ -341,7 +341,7 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     SendInitialInfoToPlayers (mapFolder);
 }
 
-void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath) const
+void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath)
 {
     for (auto &identifiedConnection : identifiedConnections_)
     {
