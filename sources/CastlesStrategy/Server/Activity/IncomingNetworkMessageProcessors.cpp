@@ -66,10 +66,9 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
         }
     }
 
-    // TODO: What about exception?
     if (!found)
     {
-        return;
+        URHO3D_LOGERROR ("ServerActivity: unidentified player attempted to send a chat message!");
     }
 
     resultingMessage += messageData.ReadString ();

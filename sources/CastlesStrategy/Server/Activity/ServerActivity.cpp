@@ -391,7 +391,8 @@ void ServerActivity::SendPlayerTypeToPlayer (const Urho3D::String &playerName)
     }
     else
     {
-        // TODO: Maybe throw exception there?
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: attempt to send player type of unidentified player!");
     }
 }
 
@@ -410,8 +411,8 @@ void ServerActivity::SendPlayerTypeToPlayer (IdentifiedConnectionsMap::KeyValue 
         }
         else
         {
-            // TODO: Maybe throw exception there?
-            playerType = PT_OBSERVER;
+            throw UniversalException <ServerActivity> (
+                    "ServerActivity: more than 2 connections requested to be players!");
         }
 
         playerInfo.second_.playerType = playerType;
