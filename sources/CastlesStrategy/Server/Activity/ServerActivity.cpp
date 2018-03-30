@@ -16,6 +16,7 @@
 #include <CastlesStrategy/Shared/Network/ClientToServerNetworkMessageType.hpp>
 #include <CastlesStrategy/Shared/Network/ServerToClientNetworkMessageType.hpp>
 #include <CastlesStrategy/Shared/PlayerType.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy

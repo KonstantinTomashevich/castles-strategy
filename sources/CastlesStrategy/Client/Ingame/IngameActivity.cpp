@@ -170,8 +170,8 @@ void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::
     ingameUIManager_->ShowMessage ("Connection failed!", "Couldn't connect to specified server!", "Go to main menu.",
                             [] (IngameActivity *activity) -> void
                             {
-                                activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-                                activity->SendEvent (START_MAIN_MENU);
+                                activity->SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+                                activity->SendEvent (E_START_MAIN_MENU);
                             });
 }
 
@@ -187,8 +187,8 @@ void IngameActivity::HandleServerDisconnected (Urho3D::StringHash eventType, Urh
         ingameUIManager_->ShowMessage ("Disconnected!", "Lost connection to server!", "Go to main menu.",
                 [] (IngameActivity *activity) -> void
                 {
-                    activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-                    activity->SendEvent (START_MAIN_MENU);
+                    activity->SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+                    activity->SendEvent (E_START_MAIN_MENU);
                 });
     }
 }

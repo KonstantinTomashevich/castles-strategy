@@ -299,8 +299,8 @@ void IngameUIManager::HandleMenuCloseClicked (Urho3D::StringHash eventType, Urho
 
 void IngameUIManager::HandleMenuExitToMainClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-    SendEvent (START_MAIN_MENU);
+    SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+    SendEvent (E_START_MAIN_MENU);
 }
 
 void IngameUIManager::HandleMenuExitFromGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
