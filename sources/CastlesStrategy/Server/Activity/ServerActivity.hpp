@@ -59,6 +59,9 @@ private:
     void HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandleGameEnded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
 
+    void HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+    void HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
     bool RemoveIdentifiedConnection (Urho3D::Connection *connection);
     void ReportGameStatus (GameStatus gameStatus) const;

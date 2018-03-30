@@ -4,10 +4,10 @@
 class AnyUniversalException
 {
 public:
-    explicit AnyUniversalException (const Urho3D::String &exception) : exception_ (exception) {}
-    AnyUniversalException (const AnyUniversalException &another) : exception_ (another.exception_) {}
+    explicit AnyUniversalException (const Urho3D::String &exception) noexcept : exception_ (exception) {}
+    AnyUniversalException (const AnyUniversalException &another) noexcept : exception_ (another.exception_) {}
     virtual ~AnyUniversalException () {}
-    const Urho3D::String &GetException () const { return exception_; }
+    const Urho3D::String &GetException () const noexcept { return exception_; }
 
 private:
     Urho3D::String exception_;
@@ -16,7 +16,7 @@ private:
 template <class T> class UniversalException : public AnyUniversalException
 {
 public:
-    explicit UniversalException (const Urho3D::String &exception) : AnyUniversalException (exception) {}
-    UniversalException (const UniversalException <T> &another) : AnyUniversalException (another) {}
+    explicit UniversalException (const Urho3D::String &exception) noexcept : AnyUniversalException (exception) {}
+    UniversalException (const UniversalException <T> &another) noexcept : AnyUniversalException (another) {}
     virtual ~UniversalException () {}
 };

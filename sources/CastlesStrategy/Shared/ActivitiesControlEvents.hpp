@@ -32,6 +32,6 @@ URHO3D_EVENT (E_REQUEST_GAME_START, RequestGameStart)
 
 URHO3D_EVENT (E_REQUEST_KICK_PLAYER, RequestKickPlayer)
 {
-
+    URHO3D_PARAM (PLAYER_NAME, PlayerName);
 }
 }

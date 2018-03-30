@@ -61,6 +61,9 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (E_PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
     SubscribeToEvent (E_PLAYER_COINS_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerCoinsSync));
     SubscribeToEvent (E_GAME_ENDED, URHO3D_HANDLER (ServerActivity, HandleGameEnded));
+
+    SubscribeToEvent (E_REQUEST_GAME_START, URHO3D_HANDLER (ServerActivity, HandleRequestGameStart));
+    SubscribeToEvent (E_REQUEST_KICK_PLAYER, URHO3D_HANDLER (ServerActivity, HandleRequestKickPlayer));
 }
 
 ServerActivity::~ServerActivity ()
@@ -86,21 +89,6 @@ void ServerActivity::Update (float timeStep)
     if (managersHub_ != nullptr && currentGameStatus_ == GS_PLAYING)
     {
         managersHub_->HandleUpdate (timeStep);
-    }
-
-    // TODO: It's temporary. Autostarts game when 2 or more players are connected.
-    else if (identifiedConnections_.Size () >= 2 && currentGameStatus_ == GS_WAITING)
-    {
-        managersHub_ = new ManagersHub (scene_);
-        firstPlayer_ = identifiedConnections_.Front ().second_.connection_;
-        secondPlayer_ = identifiedConnections_.Back ().second_.connection_;
-
-        unsigned int startCoins;
-        LoadResources (startCoins);
-        SetupPlayers (startCoins);
-
-        currentGameStatus_ = GS_PLAYING;
-        ReportGameStatus (GS_PLAYING);
     }
 }
 
@@ -303,6 +291,71 @@ void ServerActivity::HandleGameEnded (Urho3D::StringHash eventHash, Urho3D::Vari
     ReportGameStatus (currentGameStatus_);
 }
 
+void ServerActivity::HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    if (countOfPlayers_ != 2 || currentGameStatus_ != GS_WAITING)
+    {
+        return;
+    }
+
+    IdentifiedConnectionsMap::KeyValue *firstData = nullptr;
+    IdentifiedConnectionsMap::KeyValue *secondData = nullptr;
+
+    for (auto &connection : identifiedConnections_)
+    {
+        if (!connection.second_.readyForStart_)
+        {
+            return;
+        }
+
+        if (connection.second_.playerType == PT_REQUESTED_TO_BE_PLAYER)
+        {
+            if (firstData == nullptr)
+            {
+                firstData = &connection;
+            }
+            else if (secondData == nullptr)
+            {
+                secondData = &connection;
+            }
+            else
+            {
+                throw UniversalException <ServerActivity> (
+                        "ServerActivity: more than 2 connections requested to be players!");
+            }
+        }
+    }
+
+    if (firstData == nullptr || secondData == nullptr)
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: count of players is two, but less players found!");
+    }
+
+    managersHub_ = new ManagersHub (scene_);
+    firstPlayer_ = firstData->second_.connection_;
+    secondPlayer_ = secondData->second_.connection_;
+
+    unsigned int startCoins;
+    LoadResources (startCoins);
+    SetupPlayers (startCoins);
+
+    currentGameStatus_ = GS_PLAYING;
+    ReportGameStatus (GS_PLAYING);
+}
+
+void ServerActivity::HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    IdentifiedConnectionsMap::Iterator iterator =
+            identifiedConnections_.Find (eventData [RequestKickPlayer::PLAYER_NAME].GetString ());
+
+    if (iterator != identifiedConnections_.End () &&
+            (iterator->second_.playerType == PT_OBSERVER || currentGameStatus_ == GS_WAITING))
+    {
+        iterator->second_.connection_->Disconnect ();
+    }
+}
+
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)
 {
     for (auto iterator = unidentifiedConnections_.Begin (); iterator != unidentifiedConnections_.End (); iterator++)
@@ -322,6 +375,11 @@ bool ServerActivity::RemoveIdentifiedConnection (Urho3D::Connection *connection)
     {
         if (iterator->second_.connection_ == connection)
         {
+            if (iterator->second_.playerType == PT_REQUESTED_TO_BE_PLAYER)
+            {
+                countOfPlayers_--;
+            }
+
             identifiedConnections_.Erase (iterator);
             return true;
         }
