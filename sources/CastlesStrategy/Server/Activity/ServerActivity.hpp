@@ -35,6 +35,10 @@ public:
     virtual void Update (float timeStep);
     virtual void Stop ();
 
+    void ProcessRequestToBeAPlayer (Urho3D::Connection *sender);
+    void ProcessRequestToBeAnObserver (Urho3D::Connection *sender);
+    void SetIsPlayerReady (Urho3D::Connection *sender, bool isReady);
+
     const Urho3D::String &GetMapName () const;
     void SetMapName (const Urho3D::String &mapName);
 
@@ -82,6 +86,7 @@ private:
     Urho3D::String mapName_;
     Urho3D::PODVector <ServerIncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
 
+    unsigned int countOfPlayers_;
     Urho3D::Connection *firstPlayer_;
     Urho3D::Connection *secondPlayer_;
 };

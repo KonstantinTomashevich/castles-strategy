@@ -33,12 +33,23 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     mapName_ (),
     incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT - CTSNMT_START),
 
+    countOfPlayers_ (0),
     firstPlayer_ (nullptr),
     secondPlayer_ (nullptr)
 {
     incomingNetworkMessageProcessors_ [CTSNMT_ADD_ORDER - CTSNMT_START] = IncomingNetworkMessageProcessors::AddOrder;
     incomingNetworkMessageProcessors_ [CTSNMT_SPAWN_UNIT - CTSNMT_START] = IncomingNetworkMessageProcessors::SpawnUnit;
-    incomingNetworkMessageProcessors_ [CTSNMT_CHAT_MESSAGE - CTSNMT_START] = IncomingNetworkMessageProcessors::ChatMessage;
+    incomingNetworkMessageProcessors_ [CTSNMT_CHAT_MESSAGE - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::ChatMessage;
+
+    incomingNetworkMessageProcessors_ [CTSNMT_REQUEST_TO_BE_A_PLAYER - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::RequestToBeAPlayer;
+
+    incomingNetworkMessageProcessors_ [CTSNMT_REQUEST_TO_BE_AN_OBSERVER - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::RequestToBeAnObserver;
+
+    incomingNetworkMessageProcessors_ [CTSNMT_SET_IS_READY_FOR_START - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::SetIsReadyForStart;
 
     SubscribeToEvent (Urho3D::E_CLIENTCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientConnected));
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
@@ -96,6 +107,55 @@ void ServerActivity::Stop ()
 {
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->StopServer ();
+}
+
+void ServerActivity::ProcessRequestToBeAPlayer (Urho3D::Connection *sender)
+{
+    if (countOfPlayers_ < 2)
+    {
+        for (auto &connectionData : identifiedConnections_)
+        {
+            if (connectionData.second_.connection_ == sender)
+            {
+                connectionData.second_.playerType = PT_REQUESTED_TO_BE_PLAYER;
+                countOfPlayers_++;
+                return;
+            }
+        }
+    }
+}
+
+void ServerActivity::ProcessRequestToBeAnObserver (Urho3D::Connection *sender)
+{
+    if (countOfPlayers_ > 0)
+    {
+        for (auto &connectionData : identifiedConnections_)
+        {
+            if (connectionData.second_.connection_ == sender)
+            {
+                if (connectionData.second_.playerType == PT_OBSERVER)
+                {
+                    return;
+                }
+
+                connectionData.second_.playerType = PT_OBSERVER;
+                countOfPlayers_--;
+                return;
+            }
+        }
+    }
+}
+
+void ServerActivity::SetIsPlayerReady (Urho3D::Connection *sender, bool isReady)
+{
+    for (auto &connectionData : identifiedConnections_)
+    {
+        if (connectionData.second_.connection_ == sender)
+        {
+            connectionData.second_.readyForStart_ = isReady;
+            return;
+        }
+    }
 }
 
 const Urho3D::String &ServerActivity::GetMapName () const

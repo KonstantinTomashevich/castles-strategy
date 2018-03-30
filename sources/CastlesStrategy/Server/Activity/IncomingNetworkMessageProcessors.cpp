@@ -69,6 +69,7 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
     if (!found)
     {
         URHO3D_LOGERROR ("ServerActivity: unidentified player attempted to send a chat message!");
+        return;
     }
 
     resultingMessage += messageData.ReadString ();
@@ -79,6 +80,21 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
     {
         item.second_.connection_->SendMessage (STCNMT_CHAT_MESSAGE, true, false, newMessageData);
     }
+}
+
+void RequestToBeAPlayer (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+{
+    activity->ProcessRequestToBeAPlayer (sender);
+}
+
+void RequestToBeAnObserver (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+{
+    activity->ProcessRequestToBeAnObserver (sender);
+}
+
+void SetIsReadyForStart (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+{
+    activity->SetIsPlayerReady (sender, messageData.ReadBool ());
 }
 }
 }
