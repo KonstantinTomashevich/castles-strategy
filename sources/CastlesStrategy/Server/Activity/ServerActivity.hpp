@@ -62,7 +62,7 @@ private:
     void HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
 
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
-    bool RemoveIdentifiedConnection (Urho3D::Connection *connection);
+    Urho3D::String RemoveIdentifiedConnection (Urho3D::Connection *connection);
     void ReportGameStatus () const;
     void ProcessUnidentifiedConnections (float timeStep);
 

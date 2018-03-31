@@ -23,6 +23,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_PLAYER_TYPE_CHANGED,
     // PlayerName : String, ReadyForStart : Bool.
     STCNMT_PLAYER_READY_CHANGED,
+    // PlayerName : String.
+    STCNMT_PLAYER_LEFT,
     STCNMT_TYPES_COUNT
 };
 }
