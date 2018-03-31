@@ -82,14 +82,9 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
     }
 }
 
-void RequestToBeAPlayer (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+void RequestToChangeType (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
 {
-    activity->ProcessRequestToBeAPlayer (sender);
-}
-
-void RequestToBeAnObserver (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
-{
-    activity->ProcessRequestToBeAnObserver (sender);
+    activity->ProcessRequestToChangeType (sender, static_cast <PlayerType> (messageData.ReadUByte ()));
 }
 
 void SetIsReadyForStart (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)

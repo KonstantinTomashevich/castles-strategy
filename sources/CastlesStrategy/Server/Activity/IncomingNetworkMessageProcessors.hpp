@@ -12,8 +12,7 @@ void AddOrder (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho
 void SpawnUnit (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 
-void RequestToBeAPlayer (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
-void RequestToBeAnObserver (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
+void RequestToChangeType (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 void SetIsReadyForStart (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 }
 }

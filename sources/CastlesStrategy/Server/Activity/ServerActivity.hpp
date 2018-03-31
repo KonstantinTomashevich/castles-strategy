@@ -35,8 +35,7 @@ public:
     virtual void Update (float timeStep);
     virtual void Stop ();
 
-    void ProcessRequestToBeAPlayer (Urho3D::Connection *sender);
-    void ProcessRequestToBeAnObserver (Urho3D::Connection *sender);
+    void ProcessRequestToChangeType (Urho3D::Connection *sender, PlayerType newType);
     void SetIsPlayerReady (Urho3D::Connection *sender, bool isReady);
 
     const Urho3D::String &GetMapName () const;
@@ -64,7 +63,7 @@ private:
 
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
     bool RemoveIdentifiedConnection (Urho3D::Connection *connection);
-    void ReportGameStatus (GameStatus gameStatus) const;
+    void ReportGameStatus () const;
     void ProcessUnidentifiedConnections (float timeStep);
 
     void LoadResources (unsigned int &startCoins);
@@ -74,8 +73,8 @@ private:
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
     
-    void SendPlayerTypeToPlayer (const Urho3D::String &playerName);
-    void SendPlayerTypeToPlayer (IdentifiedConnectionsMap::KeyValue &playerInfo);
+    void SendPlayerTypeToAllPlayers (const Urho3D::String &playerName);
+    void SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyValue &playerInfo);
 
     float autoDisconnectTime_;
     unsigned int serverPort_;
