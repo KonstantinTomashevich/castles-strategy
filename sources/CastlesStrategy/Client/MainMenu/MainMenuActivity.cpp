@@ -88,6 +88,7 @@ void MainMenuActivity::HandleConnectToServerClick (Urho3D::StringHash eventType,
     startClientData [StartClient::PLAYER_NAME] = playerName;
     startClientData [StartClient::ADDRESS] = address;
     startClientData [StartClient::PORT] = port;
+    startClientData [StartClient::IS_ADMIN] = false;
     SendEvent (E_START_CLIENT, startClientData);
 }
 
@@ -106,6 +107,7 @@ void MainMenuActivity::HandleStartServerClick (Urho3D::StringHash eventType, Urh
     startClientData [StartClient::PLAYER_NAME] = playerName;
     startClientData [StartClient::ADDRESS] = "localhost";
     startClientData [StartClient::PORT] = DEFAULT_SERVER_PORT;
+    startClientData [StartClient::IS_ADMIN] = true;
     SendEvent (E_START_CLIENT, startClientData);
 }
 }

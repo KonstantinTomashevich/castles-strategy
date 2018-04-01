@@ -19,10 +19,12 @@
 namespace CastlesStrategy
 {
 IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &playerName, const Urho3D::String &serverAddress,
-                                unsigned int port)
+            unsigned int port, bool isAdmin)
         : ActivitiesApplication::Activity (context),
           playerType_ (PT_OBSERVER),
           playerName_ (playerName),
+          isAdmin_ (isAdmin),
+          
           serverAddress_ (serverAddress),
           port_ (port),
           scene_ (new Urho3D::Scene (context)),
@@ -103,6 +105,11 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
     }
 }
 
+bool IngameActivity::IsAdmin () const
+{
+    return isAdmin_;
+}
+
 const Urho3D::String &IngameActivity::GetPlayerName () const
 {
     return playerName_;
@@ -156,9 +163,12 @@ void IngameActivity::InitScene () const
 
 void IngameActivity::SubscribeToEvents ()
 {
-    SubscribeToEvent (Urho3D::E_CONNECTFAILED, URHO3D_HANDLER (IngameActivity, HandleConnectFailed));
-    SubscribeToEvent (Urho3D::E_SERVERCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerConnected));
-    SubscribeToEvent (Urho3D::E_SERVERDISCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerDisconnected));
+    SubscribeToEvent (Urho3D::E_CONNECTFAILED, URHO3D_HANDLER (IngameActivity, HandleConnectFailed), <#initializer#>, 0,
+            false);
+    SubscribeToEvent (Urho3D::E_SERVERCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerConnected),
+            <#initializer#>, 0, false);
+    SubscribeToEvent (Urho3D::E_SERVERDISCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerDisconnected),
+            <#initializer#>, 0, false);
 }
 
 void IngameActivity::ConnectToServer () const

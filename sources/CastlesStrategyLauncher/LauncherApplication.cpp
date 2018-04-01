@@ -119,9 +119,11 @@ void LauncherApplication::HandleStartMainMenu (Urho3D::StringHash eventType, Urh
 void LauncherApplication::HandleStartClient (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     CastlesStrategy::IngameActivity *client = new CastlesStrategy::IngameActivity (context_,
-        eventData [CastlesStrategy::StartClient::PLAYER_NAME].GetString (),
-        eventData [CastlesStrategy::StartClient::ADDRESS].GetString (),
-        eventData [CastlesStrategy::StartClient::PORT].GetUInt ());
+            eventData [CastlesStrategy::StartClient::PLAYER_NAME].GetString (),
+            eventData [CastlesStrategy::StartClient::ADDRESS].GetString (),
+            eventData [CastlesStrategy::StartClient::PORT].GetUInt (),
+            eventData [CastlesStrategy::StartClient::IS_ADMIN].GetBool ()
+    );
     SetupActivityNextFrame (client);
 }
 
