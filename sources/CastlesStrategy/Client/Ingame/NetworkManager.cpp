@@ -12,7 +12,11 @@ namespace CastlesStrategy
 {
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
-void ProcessPlayerTypeMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+
+void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
@@ -26,7 +30,11 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_INITIAL_INFO - STCNMT_START] = ProcessInitialInfoMessage;
-    incomingMessagesProcessors_ [STCNMT_PLAYER_TYPE - STCNMT_START] = ProcessPlayerTypeMessage;
+
+    incomingMessagesProcessors_ [STCNMT_NEW_PLAYER - STCNMT_START] = ProcessNewPlayerMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_TYPE_CHANGED - STCNMT_START] = ProcessPlayerTypeChangedMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_READY_CHANGED - STCNMT_START] = ProcessPlayerReadyChangedMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_LEFT - STCNMT_START] = ProcessPlayerLeftMessage;
 
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
@@ -102,10 +110,42 @@ void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
     ingameActivity->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
 }
 
-void ProcessPlayerTypeMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
+    Urho3D::String name = messageData.ReadString ();
     PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
-    ingameActivity->SetPlayerType (playerType);
+    bool readyForStart = messageData.ReadBool ();
+
+    ingameActivity->GetDataManager ()->AddPlayer (name, playerType, readyForStart);
+    if (name == ingameActivity->GetPlayerName ())
+    {
+        ingameActivity->SetPlayerType (playerType);
+    }
+}
+
+void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
+
+    ingameActivity->GetDataManager ()->SetPlayerType (name, playerType);
+    if (name == ingameActivity->GetPlayerName ())
+    {
+        ingameActivity->SetPlayerType (playerType);
+    }
+}
+
+void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    bool readyForStart = messageData.ReadBool ();
+    ingameActivity->GetDataManager ()->SetIsPlayerReadyForStart (name, readyForStart);
+}
+
+void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    ingameActivity->GetDataManager ()->RemovePlayer (name);
 }
 
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)

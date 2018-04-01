@@ -31,6 +31,7 @@ public:
     GameStatus GetGameStatus () const;
     void SetGameStatus (GameStatus gameStatus);
 
+    const Urho3D::String &GetPlayerName () const;
     const Urho3D::String &GetServerAddress () const;
     unsigned int GetPort () const;
     Urho3D::Scene *GetScene () const;

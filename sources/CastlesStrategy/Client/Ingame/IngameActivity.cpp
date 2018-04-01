@@ -103,6 +103,11 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
     }
 }
 
+const Urho3D::String &IngameActivity::GetPlayerName () const
+{
+    return playerName_;
+}
+
 const Urho3D::String &IngameActivity::GetServerAddress () const
 {
     return serverAddress_;
