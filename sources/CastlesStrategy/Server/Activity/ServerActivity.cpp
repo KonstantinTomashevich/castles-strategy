@@ -217,16 +217,11 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
         return;
     }
 
-    identifiedConnections_ [name] = {connection, PT_OBSERVER, false};
-    Urho3D::VectorBuffer data;
-    data.WriteInt (currentGameStatus_);
-    connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
-    connection->SetScene (scene_);
-
     Urho3D::VectorBuffer newPlayerMessageData;
     newPlayerMessageData.WriteString (name);
     newPlayerMessageData.WriteUByte (PT_OBSERVER);
     newPlayerMessageData.WriteBool (false);
+    connection->SendMessage (STCNMT_NEW_PLAYER, true, true, newPlayerMessageData);
 
     for (auto &anotherConnectionData : identifiedConnections_)
     {
@@ -239,6 +234,12 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
 
         connection->SendMessage (STCNMT_NEW_PLAYER, true, true, messageData);
     }
+
+    identifiedConnections_ [name] = {connection, PT_OBSERVER, false};
+    Urho3D::VectorBuffer data;
+    data.WriteInt (currentGameStatus_);
+    connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
+    connection->SetScene (scene_);
 }
 
 void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
