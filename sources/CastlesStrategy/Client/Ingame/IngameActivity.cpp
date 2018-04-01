@@ -163,12 +163,9 @@ void IngameActivity::InitScene () const
 
 void IngameActivity::SubscribeToEvents ()
 {
-    SubscribeToEvent (Urho3D::E_CONNECTFAILED, URHO3D_HANDLER (IngameActivity, HandleConnectFailed), <#initializer#>, 0,
-            false);
-    SubscribeToEvent (Urho3D::E_SERVERCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerConnected),
-            <#initializer#>, 0, false);
-    SubscribeToEvent (Urho3D::E_SERVERDISCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerDisconnected),
-            <#initializer#>, 0, false);
+    SubscribeToEvent (Urho3D::E_CONNECTFAILED, URHO3D_HANDLER (IngameActivity, HandleConnectFailed));
+    SubscribeToEvent (Urho3D::E_SERVERCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerConnected));
+    SubscribeToEvent (Urho3D::E_SERVERDISCONNECTED, URHO3D_HANDLER (IngameActivity, HandleServerDisconnected));
 }
 
 void IngameActivity::ConnectToServer () const

@@ -56,7 +56,7 @@ void NetworkManager::SendAddOrderMessage (unsigned int unitType) const
     network->GetServerConnection ()->SendMessage (CTSNMT_ADD_ORDER, true, true, messageData);
 }
 
-void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitType)
+void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitType) const
 {
     Urho3D::VectorBuffer messageData;
     messageData.WriteUInt (spawnID);
@@ -66,13 +66,34 @@ void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitTy
     network->GetServerConnection ()->SendMessage (CTSNMT_SPAWN_UNIT, true, true, messageData);
 }
 
-void NetworkManager::SendChatMessage (const Urho3D::String &message)
+void NetworkManager::SendChatMessage (const Urho3D::String &message) const
 {
     Urho3D::VectorBuffer messageData;
     messageData.WriteString (message);
 
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->GetServerConnection ()->SendMessage (CTSNMT_CHAT_MESSAGE, true, false, messageData);
+}
+
+void NetworkManager::SendTogglePlayerTypeMessage ()
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUByte (
+            owner_->GetDataManager ()->GetPlayers () [owner_->GetPlayerName ()]->playerType_ == PT_OBSERVER ?
+            PT_REQUESTED_TO_BE_PLAYER : PT_OBSERVER
+    );
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_REQUEST_TO_CHANGE_TYPE, true, true, messageData);
+}
+
+void NetworkManager::SendToggleReadyMessage ()
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteBool (!owner_->GetDataManager ()->GetPlayers () [owner_->GetPlayerName ()]->readyForStart_);
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_SET_IS_READY_FOR_START, true, true, messageData);
 }
 
 void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
