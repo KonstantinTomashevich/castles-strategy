@@ -29,6 +29,7 @@ IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner
     menu_ (nullptr),
     messageWindow_ (nullptr),
     chatWindow_ (nullptr),
+    connectedPlayersWindow_ (nullptr),
     requestedMessages_ ()
 {
 
@@ -92,6 +93,8 @@ void IngameUIManager::ClearUI ()
     topBar_ = nullptr;
     menu_ = nullptr;
     messageWindow_ = nullptr;
+    chatWindow_ = nullptr;
+    connectedPlayersWindow_ = nullptr;
 }
 
 void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
@@ -171,6 +174,65 @@ void IngameUIManager::AddNewChatMessage (const Urho3D::String &message)
     messagesView->SetViewPosition (0, scrollBarHeight > contentHeight ? 0 : contentHeight - scrollBarHeight);
 }
 
+void IngameUIManager::UpdatePlayersList ()
+{
+    Urho3D::ScrollView *playersView =
+            dynamic_cast <Urho3D::ScrollView *> (connectedPlayersWindow_->GetChild ("PlayersView", false));
+    Urho3D::PODVector <Urho3D::UIElement *> listElements;
+    playersView->GetContentElement ()->GetChildren (listElements);
+
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    const Urho3D::HashMap <Urho3D::String, PlayerData> &players = owner_->GetDataManager ()->GetPlayers ();
+
+    while (players.Size () < listElements.Size ())
+    {
+        Urho3D::UIElement *listElement = playersView->GetContentElement ()->LoadChildXML (
+                resourceCache->GetResource <Urho3D::XMLFile> ("UI/PlayersListElement.xml")->GetRoot ()
+        );
+
+        SubscribeToEvent (listElement->GetChild ("ToggleRoleButton", false), Urho3D::E_CLICKEND,
+                URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersToggleRoleClicked));
+
+        SubscribeToEvent (listElement->GetChild ("ToggleReadyButton", false), Urho3D::E_CLICKEND,
+                URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersToggleReadyClicked));
+
+        SubscribeToEvent (listElement->GetChild ("KickButton", false), Urho3D::E_CLICKEND,
+                URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersKickClicked));
+    }
+
+    while (players.Size () > listElements.Size ())
+    {
+        listElements.Back ()->Remove ();
+        listElements.Pop ();
+    }
+
+    unsigned int index = 0;
+    for (const auto &player : players)
+    {
+        Urho3D::UIElement *listElement = listElements [index];
+        dynamic_cast <Urho3D::Text *> (listElement->GetChild ("NicknameText", false))->SetText (player.first_);
+
+        listElement->GetChild ("ToggleRoleButton", false)->SetEnabled (player.first_ == owner_->GetPlayerName ());
+        listElement->GetChild ("ToggleRoleButton", false)->SetVar (BUTTON_PLAYER_NAME_VAR, player.first_);
+
+        dynamic_cast <Urho3D::Text *> (listElement->GetChild ("ToggleRoleButton", false)->GetChild ("Text", false))->
+                SetText (Urho3D::String ((player.second_.playerType_ == PT_OBSERVER ? "Observer" : "Player")) +
+                        (player.first_ == owner_->GetPlayerName () ? " (Toggle)" : "")
+                );
+
+        listElement->GetChild ("ToggleReadyButton", false)->SetEnabled (player.first_ == owner_->GetPlayerName ());
+        listElement->GetChild ("ToggleReadyButton", false)->SetVar (BUTTON_PLAYER_NAME_VAR, player.first_);
+
+        dynamic_cast <Urho3D::Text *> (listElement->GetChild ("ToggleReadyButton", false)->GetChild ("Text", false))->
+                SetText (Urho3D::String ((player.second_.readyForStart_ ? "Ready" : "Not ready")) +
+                        (player.first_ == owner_->GetPlayerName () ? " (Toggle)" : "")
+                );
+
+        listElement->GetChild ("KickButton", false)->SetVisible (owner_->IsAdmin ());
+        index++;
+    }
+}
+
 void IngameUIManager::LoadElements ()
 {
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
@@ -195,6 +257,11 @@ void IngameUIManager::LoadElements ()
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/ChatWindow.xml")->GetRoot (), style));
     dynamic_cast <Urho3D::ScrollView *> (chatWindow_->GetChild ("MessagesView", false))->
             SetContentElement (chatWindow_->GetChild ("MessagesView", false)->GetChild ("MessagesContent", false));
+
+    connectedPlayersWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/ConnectedPlayersWindow.xml")->GetRoot (), style));
+    dynamic_cast <Urho3D::ScrollView *> (connectedPlayersWindow_->GetChild ("PlayersView", false))->
+            SetContentElement (chatWindow_->GetChild ("PlayersView", false)->GetChild ("PlayersList", false));
 }
 
 void IngameUIManager::ShowNextMessage ()
@@ -341,6 +408,35 @@ void IngameUIManager::HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho
                 eventData [Urho3D::UIMouseDoubleClick::P_Y].GetInt (),
                 true
         ));
+    }
+}
+
+void IngameUIManager::HandleConnectedPlayersToggleRoleClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    Urho3D::Button *pressedButton = dynamic_cast <Urho3D::Button *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    if (pressedButton->GetVar (BUTTON_PLAYER_NAME_VAR).GetString () == owner_->GetPlayerName ())
+    {
+        owner_->GetNetworkManager ()->SendTogglePlayerTypeMessage ();
+    }
+}
+
+void IngameUIManager::HandleConnectedPlayersToggleReadyClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    Urho3D::Button *pressedButton = dynamic_cast <Urho3D::Button *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    if (pressedButton->GetVar (BUTTON_PLAYER_NAME_VAR).GetString () == owner_->GetPlayerName ())
+    {
+        owner_->GetNetworkManager ()->SendToggleReadyMessage ();
+    }
+}
+
+void IngameUIManager::HandleConnectedPlayersKickClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    Urho3D::Button *pressedButton = dynamic_cast <Urho3D::Button *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    if (owner_->IsAdmin ())
+    {
+        Urho3D::VariantMap kickEventData;
+        kickEventData [RequestKickPlayer::PLAYER_NAME] = pressedButton->GetVar (BUTTON_PLAYER_NAME_VAR).GetString ();
+        SendEvent (E_REQUEST_KICK_PLAYER, kickEventData);
     }
 }
 }

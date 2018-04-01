@@ -10,7 +10,9 @@ namespace CastlesStrategy
 // TODO: Should we move GUI to AngelScript or Lua?
 class IngameActivity;
 typedef void (*UICallback) (IngameActivity *activity);
+
 const Urho3D::StringHash BUTTON_UNIT_TYPE_VAR ("ButtonUnitType");
+const Urho3D::StringHash BUTTON_PLAYER_NAME_VAR ("ButtonPlayerName");
 
 class IngameUIManager : public Urho3D::Object
 {
@@ -31,8 +33,10 @@ public:
     void ClearUI ();
     void CheckUIForUnitsType (unsigned int unitType);
     void UpdateCoins (unsigned int coins);
+
     void InformGameEnded (bool firstWon);
     void AddNewChatMessage (const Urho3D::String &message);
+    void UpdatePlayersList ();
 
 private:
     struct MessageData
@@ -65,6 +69,10 @@ private:
     void HandleChatWindowSendClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
+    void HandleConnectedPlayersToggleRoleClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleConnectedPlayersToggleReadyClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleConnectedPlayersKickClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+
     IngameActivity *owner_;
     bool inputEnabled_;
 
@@ -72,6 +80,7 @@ private:
     Urho3D::Window *menu_;
     Urho3D::Window *messageWindow_;
     Urho3D::Window *chatWindow_;
+    Urho3D::Window *connectedPlayersWindow_;
     Urho3D::List <MessageData> requestedMessages_;
 };
 }
