@@ -275,7 +275,7 @@ void DataManager::SetIsPlayerReadyForStart (const Urho3D::String &name, bool rea
     }
 }
 
-const Urho3D::HashMap <Urho3D::String, PlayerData> &DataManager::GetPlayers ()
+const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &DataManager::GetPlayers ()
 {
     return players_;
 }

@@ -169,7 +169,7 @@ void ServerActivity::SetMapName (const Urho3D::String &mapName)
     mapName_ = mapName;
 }
 
-const IdentifiedConnectionsMap &ServerActivity::GetIdentifiedConnections () const
+const ServerActivity::IdentifiedConnectionsMap &ServerActivity::GetIdentifiedConnections () const
 {
     return identifiedConnections_;
 }

@@ -14,20 +14,20 @@ class ServerActivity;
 typedef void (*ServerIncomingNetworkMessageProcessor) (ServerActivity *activity,
         Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender);
 
-struct PlayerData
-{
-    Urho3D::Connection *connection_;
-    PlayerType playerType;
-    bool readyForStart_;
-};
-
-typedef Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > UnidentifiedConnectionsVector;
-typedef Urho3D::HashMap <Urho3D::String, PlayerData> IdentifiedConnectionsMap;
-
 class ServerActivity : public ActivitiesApplication::Activity
 {
 URHO3D_OBJECT (ServerActivity, Activity)
 public:
+    struct PlayerData
+    {
+        Urho3D::Connection *connection_;
+        PlayerType playerType;
+        bool readyForStart_;
+    };
+
+    typedef Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > UnidentifiedConnectionsVector;
+    typedef Urho3D::HashMap <Urho3D::String, ServerActivity::PlayerData> IdentifiedConnectionsMap;
+
     ServerActivity (Urho3D::Context *context);
     virtual ~ServerActivity ();
 

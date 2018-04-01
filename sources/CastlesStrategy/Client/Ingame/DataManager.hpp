@@ -13,16 +13,16 @@ struct RecruitmentOrder
     float timeLeft_;
 };
 
-struct PlayerData
-{
-    PlayerType playerType_;
-    bool readyForStart_;
-};
-
 class DataManager : public Urho3D::Object
 {
 URHO3D_OBJECT (DataManager, Object)
 public:
+    struct PlayerData
+    {
+        PlayerType playerType_;
+        bool readyForStart_;
+    };
+
     explicit DataManager (IngameActivity *owner);
     virtual ~DataManager ();
 
@@ -54,7 +54,7 @@ public:
     void RemovePlayer (const Urho3D::String &name);
     void SetPlayerType (const Urho3D::String &name, PlayerType playerType);
     void SetIsPlayerReadyForStart (const Urho3D::String &name, bool readyForStart);
-    const Urho3D::HashMap <Urho3D::String, PlayerData> &GetPlayers ();
+    const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &GetPlayers ();
 
 private:
     void AttemptToAddPrefabs ();

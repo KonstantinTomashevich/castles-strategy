@@ -182,7 +182,7 @@ void IngameUIManager::UpdatePlayersList ()
     playersView->GetContentElement ()->GetChildren (listElements);
 
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
-    const Urho3D::HashMap <Urho3D::String, PlayerData> &players = owner_->GetDataManager ()->GetPlayers ();
+    const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &players = owner_->GetDataManager ()->GetPlayers ();
 
     while (players.Size () < listElements.Size ())
     {
