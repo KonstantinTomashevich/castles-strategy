@@ -1,4 +1,5 @@
 #include "IngameUIManager.hpp"
+#include <Urho3D/IO/Log.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Text.h>
@@ -184,7 +185,7 @@ void IngameUIManager::UpdatePlayersList ()
     Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
     const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &players = owner_->GetDataManager ()->GetPlayers ();
 
-    while (players.Size () < listElements.Size ())
+    while (listElements.Size () < players.Size ())
     {
         Urho3D::UIElement *listElement = playersView->GetContentElement ()->LoadChildXML (
                 resourceCache->GetResource <Urho3D::XMLFile> ("UI/PlayersListElement.xml")->GetRoot ()
@@ -198,9 +199,11 @@ void IngameUIManager::UpdatePlayersList ()
 
         SubscribeToEvent (listElement->GetChild ("KickButton", false), Urho3D::E_CLICKEND,
                 URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersKickClicked));
+
+        listElements.Push (listElement);
     }
 
-    while (players.Size () > listElements.Size ())
+    while (listElements.Size () > players.Size ())
     {
         listElements.Back ()->Remove ();
         listElements.Pop ();
@@ -229,8 +232,10 @@ void IngameUIManager::UpdatePlayersList ()
                 );
 
         listElement->GetChild ("KickButton", false)->SetVisible (owner_->IsAdmin ());
+        listElement->GetChild ("KickButton", false)->SetVar (BUTTON_PLAYER_NAME_VAR, player.first_);
         index++;
     }
+    SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
 }
 
 void IngameUIManager::LoadElements ()
@@ -261,7 +266,7 @@ void IngameUIManager::LoadElements ()
     connectedPlayersWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/ConnectedPlayersWindow.xml")->GetRoot (), style));
     dynamic_cast <Urho3D::ScrollView *> (connectedPlayersWindow_->GetChild ("PlayersView", false))->
-            SetContentElement (chatWindow_->GetChild ("PlayersView", false)->GetChild ("PlayersList", false));
+            SetContentElement (connectedPlayersWindow_->GetChild ("PlayersView", false)->GetChild ("PlayersList", false));
 }
 
 void IngameUIManager::ShowNextMessage ()
