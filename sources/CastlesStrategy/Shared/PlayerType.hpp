@@ -3,7 +3,8 @@ namespace CastlesStrategy
 {
 enum PlayerType
 {
-    PT_FIRST = 0,
+    PT_REQUESTED_TO_BE_PLAYER,
+    PT_FIRST,
     PT_SECOND,
     PT_OBSERVER
 };

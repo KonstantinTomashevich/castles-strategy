@@ -3,9 +3,10 @@
 #include <Urho3D/Network/Connection.h>
 #include <Urho3D/Scene/Scene.h>
 
-#include <ActivitiesApplication/Activity.hpp>
-#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
 #include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
+#include <CastlesStrategy/Shared/Network/GameStatus.hpp>
+#include <CastlesStrategy/Shared/PlayerType.hpp>
+#include <ActivitiesApplication/Activity.hpp>
 
 namespace CastlesStrategy
 {
@@ -17,6 +18,16 @@ class ServerActivity : public ActivitiesApplication::Activity
 {
 URHO3D_OBJECT (ServerActivity, Activity)
 public:
+    struct PlayerData
+    {
+        Urho3D::Connection *connection_;
+        PlayerType playerType;
+        bool readyForStart_;
+    };
+
+    typedef Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > UnidentifiedConnectionsVector;
+    typedef Urho3D::HashMap <Urho3D::String, ServerActivity::PlayerData> IdentifiedConnectionsMap;
+
     ServerActivity (Urho3D::Context *context);
     virtual ~ServerActivity ();
 
@@ -24,10 +35,13 @@ public:
     virtual void Update (float timeStep);
     virtual void Stop ();
 
+    void ProcessRequestToChangeType (Urho3D::Connection *sender, PlayerType newType);
+    void SetIsPlayerReady (Urho3D::Connection *sender, bool isReady);
+
     const Urho3D::String &GetMapName () const;
     void SetMapName (const Urho3D::String &mapName);
 
-    const Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> &GetIdentifiedConnections () const;
+    const IdentifiedConnectionsMap &GetIdentifiedConnections () const;
     ManagersHub *GetManagersHub () const;
 
     Urho3D::Connection *GetFirstPlayer () const;
@@ -44,30 +58,37 @@ private:
     void HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandleGameEnded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
 
+    void HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+    void HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
-    bool RemoveIdentifiedConnection (Urho3D::Connection *connection);
-    void ReportGameStatus (GameStatus gameStatus) const;
+    Urho3D::String RemoveIdentifiedConnection (Urho3D::Connection *connection);
+    void ReportGameStatus () const;
     void ProcessUnidentifiedConnections (float timeStep);
 
     void LoadResources (unsigned int &startCoins);
     void LoadScene (const Urho3D::String &mapFolder);
     void LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes);
-    void SendInitialInfoToPlayers (const Urho3D::String &mapPath) const;
+    void SendInitialInfoToPlayers (const Urho3D::String &mapPath);
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
+    
+    void SendPlayerTypeToAllPlayers (const Urho3D::String &playerName);
+    void SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyValue &playerInfo);
 
     float autoDisconnectTime_;
     unsigned int serverPort_;
 
     GameStatus currentGameStatus_;
-    Urho3D::PODVector <Urho3D::Pair <Urho3D::Connection *, float> > unidentifiedConnections_;
-    Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> identifiedConnections_;
+    UnidentifiedConnectionsVector unidentifiedConnections_;
+    IdentifiedConnectionsMap identifiedConnections_;
 
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;
     Urho3D::String mapName_;
     Urho3D::PODVector <ServerIncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
 
+    unsigned int countOfPlayers_;
     Urho3D::Connection *firstPlayer_;
     Urho3D::Connection *secondPlayer_;
 };

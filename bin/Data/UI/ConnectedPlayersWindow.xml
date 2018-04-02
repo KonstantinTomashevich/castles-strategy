@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="ConnectedPlayersWindow" />
+	<attribute name="Size" value="777 377" />
+	<attribute name="Min Anchor" value="0 1" />
+	<attribute name="Max Anchor" value="0 1" />
+	<attribute name="Pivot" value="0 1" />
+	<attribute name="Layout Spacing" value="10" />
+	<attribute name="Layout Border" value="20 20 20 20" />
+	<attribute name="Variables">
+		<variant hash="307414576" type="Float" value="0" name="VWidth" />
+		<variant hash="3464421821" type="Float" value="0" name="VHeight" />
+		<variant hash="7740802" type="Float" value="0" name="VX" />
+		<variant hash="7740803" type="Float" value="0" name="VY" />
+		<variant hash="3528339576" type="String" value="SH" name="WDep" />
+		<variant hash="409466183" type="String" value="SH" name="HDep" />
+		<variant hash="13959479" type="String" value="SH" name="XDep" />
+		<variant hash="794546678" type="String" value="SH" name="YDep" />
+		<variant hash="4157924068" type="String" value="V" name="LayoutType" />
+		<variant hash="3876020524" type="Bool" value="true" name="UpdatePS" />
+		<variant hash="3876217321" type="Bool" value="true" name="UpdateSS" />
+	</attribute>
+	<attribute name="Tags">
+		<string value="UIResizer" />
+	</attribute>
+	<element type="Text">
+		<attribute name="Name" value="Title" />
+		<attribute name="Position" value="21 21" />
+		<attribute name="Pivot" value="0 0" />
+		<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Variables">
+			<variant hash="307414576" type="Float" value="0" name="VWidth" />
+			<variant hash="3464421821" type="Float" value="0" name="VHeight" />
+			<variant hash="7740802" type="Float" value="0" name="VX" />
+			<variant hash="7740803" type="Float" value="0" name="VY" />
+			<variant hash="3528339576" type="String" value="SH" name="WDep" />
+			<variant hash="409466183" type="String" value="SH" name="HDep" />
+			<variant hash="13959479" type="String" value="SH" name="XDep" />
+			<variant hash="794546678" type="String" value="SH" name="YDep" />
+			<variant hash="4151908868" type="Float" value="0.0155" name="VTextSize" />
+			<variant hash="3746429424" type="String" value="SH" name="TSDep" />
+		</attribute>
+		<attribute name="Tags">
+			<string value="UIResizer" />
+		</attribute>
+		<attribute name="Font Size" value="16.2905" />
+		<attribute name="Text" value="Connected Players" />
+	</element>
+	<element type="ScrollView">
+		<attribute name="Name" value="PlayersView" />
+		<attribute name="Position" value="21 53" />
+		<attribute name="Size" value="735 262" />
+		<attribute name="Pivot" value="0 0" />
+		<attribute name="Variables">
+			<variant hash="307414576" type="Float" value="0.7" name="VWidth" />
+			<variant hash="3464421821" type="Float" value="0.25" name="VHeight" />
+			<variant hash="7740802" type="Float" value="0" name="VX" />
+			<variant hash="7740803" type="Float" value="0" name="VY" />
+			<variant hash="3528339576" type="String" value="SH" name="WDep" />
+			<variant hash="409466183" type="String" value="SH" name="HDep" />
+			<variant hash="13959479" type="String" value="SH" name="XDep" />
+			<variant hash="794546678" type="String" value="SH" name="YDep" />
+		</attribute>
+		<attribute name="Tags">
+			<string value="UIResizer" />
+		</attribute>
+		<attribute name="Auto Show/Hide Scrollbars" value="false" />
+		<element type="ScrollBar" internal="true" style="none">
+			<attribute name="Size" value="719 16" />
+			<attribute name="Min Anchor" value="0 1" />
+			<attribute name="Max Anchor" value="0 1" />
+			<attribute name="Pivot" value="0 1" />
+			<attribute name="Color" value="0 0 0 0" />
+			<attribute name="Top Left Color" value="0 0 0 0" />
+			<attribute name="Top Right Color" value="0 0 0 0" />
+			<attribute name="Bottom Left Color" value="0 0 0 0" />
+			<attribute name="Bottom Right Color" value="0 0 0 0" />
+			<element type="Button" internal="true" style="none">
+				<attribute name="Pivot" value="0 0" />
+			</element>
+			<element type="Slider" internal="true" style="none">
+				<attribute name="Position" value="16 0" />
+				<attribute name="Size" value="687 16" />
+				<attribute name="Pivot" value="0 0" />
+				<element type="BorderImage" internal="true" style="none">
+					<attribute name="Pivot" value="0 0" />
+				</element>
+			</element>
+			<element type="Button" internal="true" style="none">
+				<attribute name="Position" value="703 0" />
+				<attribute name="Pivot" value="0 0" />
+			</element>
+		</element>
+		<element type="ScrollBar" internal="true" style="none">
+			<attribute name="Size" value="16 246" />
+			<attribute name="Min Anchor" value="1 0" />
+			<attribute name="Max Anchor" value="1 0" />
+			<attribute name="Pivot" value="1 0" />
+			<attribute name="Color" value="0 0 0 0" />
+			<attribute name="Top Left Color" value="0 0 0 0" />
+			<attribute name="Top Right Color" value="0 0 0 0" />
+			<attribute name="Bottom Left Color" value="0 0 0 0" />
+			<attribute name="Bottom Right Color" value="0 0 0 0" />
+			<element type="Button" internal="true" style="none">
+				<attribute name="Pivot" value="0 0" />
+			</element>
+			<element type="Slider" internal="true" style="none">
+				<attribute name="Position" value="0 16" />
+				<attribute name="Size" value="16 214" />
+				<attribute name="Pivot" value="0 0" />
+				<element type="BorderImage" internal="true" style="none">
+					<attribute name="Pivot" value="0 0" />
+				</element>
+			</element>
+			<element type="Button" internal="true" style="none">
+				<attribute name="Position" value="0 230" />
+				<attribute name="Pivot" value="0 0" />
+			</element>
+		</element>
+		<element type="BorderImage" internal="true" style="none">
+			<attribute name="Pivot" value="0 0" />
+		</element>
+		<element>
+			<attribute name="Name" value="PlayersList" />
+			<attribute name="Size" value="735 0" />
+			<attribute name="Pivot" value="0 0" />
+			<attribute name="Variables">
+				<variant hash="307414576" type="Float" value="1" name="VWidth" />
+				<variant hash="3464421821" type="Float" value="0" name="VHeight" />
+				<variant hash="7740802" type="Float" value="0" name="VX" />
+				<variant hash="7740803" type="Float" value="0" name="VY" />
+				<variant hash="3528339576" type="String" value="PW" name="WDep" />
+				<variant hash="409466183" type="String" value="SH" name="HDep" />
+				<variant hash="13959479" type="String" value="SH" name="XDep" />
+				<variant hash="794546678" type="String" value="SH" name="YDep" />
+				<variant hash="4157924068" type="String" value="V" name="LayoutType" />
+				<variant hash="3876020524" type="Bool" value="true" name="UpdatePS" />
+				<variant hash="3876217321" type="Bool" value="false" name="UpdateSS" />
+			</attribute>
+			<attribute name="Tags">
+				<string value="UIResizer" />
+			</attribute>
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="ControlButtons" />
+		<attribute name="Position" value="21 325" />
+		<attribute name="Size" value="735 31" />
+		<attribute name="Pivot" value="0 0" />
+		<attribute name="Variables">
+			<variant hash="307414576" type="Float" value="0.7" name="VWidth" />
+			<variant hash="3464421821" type="Float" value="0" name="VHeight" />
+			<variant hash="7740802" type="Float" value="0" name="VX" />
+			<variant hash="7740803" type="Float" value="0" name="VY" />
+			<variant hash="3528339576" type="String" value="SH" name="WDep" />
+			<variant hash="409466183" type="String" value="SH" name="HDep" />
+			<variant hash="13959479" type="String" value="SH" name="XDep" />
+			<variant hash="794546678" type="String" value="SH" name="YDep" />
+			<variant hash="4157924068" type="String" value="H" name="LayoutType" />
+			<variant hash="3876020524" type="Bool" value="false" name="UpdatePS" />
+			<variant hash="3876217321" type="Bool" value="true" name="UpdateSS" />
+		</attribute>
+		<attribute name="Tags">
+			<string value="UIResizer" />
+		</attribute>
+		<element type="Button">
+			<attribute name="Name" value="ExitButton" />
+			<attribute name="Size" value="367 31" />
+			<attribute name="Pivot" value="0 0" />
+			<attribute name="Variables">
+				<variant hash="307414576" type="Float" value="0.35" name="VWidth" />
+				<variant hash="3464421821" type="Float" value="0.03" name="VHeight" />
+				<variant hash="7740802" type="Float" value="0" name="VX" />
+				<variant hash="7740803" type="Float" value="0" name="VY" />
+				<variant hash="3528339576" type="String" value="SH" name="WDep" />
+				<variant hash="409466183" type="String" value="SH" name="HDep" />
+				<variant hash="13959479" type="String" value="SH" name="XDep" />
+				<variant hash="794546678" type="String" value="SH" name="YDep" />
+			</attribute>
+			<attribute name="Tags">
+				<string value="UIResizer" />
+			</attribute>
+			<element type="Text">
+				<attribute name="Name" value="Text" />
+				<attribute name="Min Anchor" value="0.5 0.5" />
+				<attribute name="Max Anchor" value="0.5 0.5" />
+				<attribute name="Pivot" value="0.5 0.5" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Variables">
+					<variant hash="307414576" type="Float" value="0.1" name="VWidth" />
+					<variant hash="3464421821" type="Float" value="0.04" name="VHeight" />
+					<variant hash="7740802" type="Float" value="0" name="VX" />
+					<variant hash="7740803" type="Float" value="0" name="VY" />
+					<variant hash="3528339576" type="String" value="SH" name="WDep" />
+					<variant hash="409466183" type="String" value="SH" name="HDep" />
+					<variant hash="13959479" type="String" value="SH" name="XDep" />
+					<variant hash="794546678" type="String" value="SH" name="YDep" />
+					<variant hash="4151908868" type="Float" value="0.015" name="VTextSize" />
+					<variant hash="3746429424" type="String" value="SH" name="TSDep" />
+				</attribute>
+				<attribute name="Tags">
+					<string value="UIResizer" />
+				</attribute>
+				<attribute name="Font Size" value="15.765" />
+				<attribute name="Text" value="Exit to main menu" />
+				<attribute name="Text Alignment" value="Center" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="StartGameButton" />
+			<attribute name="Position" value="367 0" />
+			<attribute name="Size" value="367 31" />
+			<attribute name="Pivot" value="0 0" />
+			<attribute name="Variables">
+				<variant hash="307414576" type="Float" value="0.35" name="VWidth" />
+				<variant hash="3464421821" type="Float" value="0.03" name="VHeight" />
+				<variant hash="7740802" type="Float" value="0" name="VX" />
+				<variant hash="7740803" type="Float" value="0" name="VY" />
+				<variant hash="3528339576" type="String" value="SH" name="WDep" />
+				<variant hash="409466183" type="String" value="SH" name="HDep" />
+				<variant hash="13959479" type="String" value="SH" name="XDep" />
+				<variant hash="794546678" type="String" value="SH" name="YDep" />
+			</attribute>
+			<attribute name="Tags">
+				<string value="UIResizer" />
+			</attribute>
+			<element type="Text">
+				<attribute name="Name" value="Text" />
+				<attribute name="Min Anchor" value="0.5 0.5" />
+				<attribute name="Max Anchor" value="0.5 0.5" />
+				<attribute name="Pivot" value="0.5 0.5" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Variables">
+					<variant hash="307414576" type="Float" value="0.1" name="VWidth" />
+					<variant hash="3464421821" type="Float" value="0.04" name="VHeight" />
+					<variant hash="7740802" type="Float" value="0" name="VX" />
+					<variant hash="7740803" type="Float" value="0" name="VY" />
+					<variant hash="3528339576" type="String" value="SH" name="WDep" />
+					<variant hash="409466183" type="String" value="SH" name="HDep" />
+					<variant hash="13959479" type="String" value="SH" name="XDep" />
+					<variant hash="794546678" type="String" value="SH" name="YDep" />
+					<variant hash="4151908868" type="Float" value="0.015" name="VTextSize" />
+					<variant hash="3746429424" type="String" value="SH" name="TSDep" />
+				</attribute>
+				<attribute name="Tags">
+					<string value="UIResizer" />
+				</attribute>
+				<attribute name="Font Size" value="15.765" />
+				<attribute name="Text" value="Start game!" />
+				<attribute name="Text Alignment" value="Center" />
+			</element>
+		</element>
+	</element>
+</element>

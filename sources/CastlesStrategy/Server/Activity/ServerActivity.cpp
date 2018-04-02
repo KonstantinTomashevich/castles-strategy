@@ -16,6 +16,7 @@
 #include <CastlesStrategy/Shared/Network/ClientToServerNetworkMessageType.hpp>
 #include <CastlesStrategy/Shared/Network/ServerToClientNetworkMessageType.hpp>
 #include <CastlesStrategy/Shared/PlayerType.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
@@ -33,12 +34,20 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     mapName_ (),
     incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT - CTSNMT_START),
 
+    countOfPlayers_ (0),
     firstPlayer_ (nullptr),
     secondPlayer_ (nullptr)
 {
     incomingNetworkMessageProcessors_ [CTSNMT_ADD_ORDER - CTSNMT_START] = IncomingNetworkMessageProcessors::AddOrder;
     incomingNetworkMessageProcessors_ [CTSNMT_SPAWN_UNIT - CTSNMT_START] = IncomingNetworkMessageProcessors::SpawnUnit;
-    incomingNetworkMessageProcessors_ [CTSNMT_CHAT_MESSAGE - CTSNMT_START] = IncomingNetworkMessageProcessors::ChatMessage;
+    incomingNetworkMessageProcessors_ [CTSNMT_CHAT_MESSAGE - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::ChatMessage;
+
+    incomingNetworkMessageProcessors_ [CTSNMT_REQUEST_TO_CHANGE_TYPE - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::RequestToChangeType;
+
+    incomingNetworkMessageProcessors_ [CTSNMT_SET_IS_READY_FOR_START - CTSNMT_START] =
+            IncomingNetworkMessageProcessors::SetIsReadyForStart;
 
     SubscribeToEvent (Urho3D::E_CLIENTCONNECTED, URHO3D_HANDLER (ServerActivity, HandleClientConnected));
     SubscribeToEvent (Urho3D::E_CLIENTIDENTITY, URHO3D_HANDLER (ServerActivity, HandleClientIdentity));
@@ -49,6 +58,9 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     SubscribeToEvent (E_PLAYER_UNITS_PULL_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerUnitsPullSync));
     SubscribeToEvent (E_PLAYER_COINS_SYNC, URHO3D_HANDLER (ServerActivity, HandlePlayerCoinsSync));
     SubscribeToEvent (E_GAME_ENDED, URHO3D_HANDLER (ServerActivity, HandleGameEnded));
+
+    SubscribeToEvent (E_REQUEST_GAME_START, URHO3D_HANDLER (ServerActivity, HandleRequestGameStart));
+    SubscribeToEvent (E_REQUEST_KICK_PLAYER, URHO3D_HANDLER (ServerActivity, HandleRequestKickPlayer));
 }
 
 ServerActivity::~ServerActivity ()
@@ -75,27 +87,76 @@ void ServerActivity::Update (float timeStep)
     {
         managersHub_->HandleUpdate (timeStep);
     }
-
-    // TODO: It's temporary. Autostarts game when 2 or more players are connected.
-    else if (identifiedConnections_.Size () >= 2 && currentGameStatus_ == GS_WAITING)
-    {
-        managersHub_ = new ManagersHub (scene_);
-        firstPlayer_ = identifiedConnections_.Front ().second_;
-        secondPlayer_ = identifiedConnections_.Back ().second_;
-
-        unsigned int startCoins;
-        LoadResources (startCoins);
-        SetupPlayers (startCoins);
-
-        currentGameStatus_ = GS_PLAYING;
-        ReportGameStatus (GS_PLAYING);
-    }
 }
 
 void ServerActivity::Stop ()
 {
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->StopServer ();
+}
+
+void ServerActivity::ProcessRequestToChangeType (Urho3D::Connection *sender, PlayerType newType)
+{
+    if (newType != PT_REQUESTED_TO_BE_PLAYER && newType != PT_OBSERVER)
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: ProcessRequestToChangeType can be called only with observer or requested to be a player types!");
+    }
+
+    if (currentGameStatus_ != GS_WAITING)
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: ProcessRequestToChangeType can be called only while waiting for game start!");
+    }
+
+    if ((newType == PT_OBSERVER && countOfPlayers_ > 0) ||
+            (newType == PT_REQUESTED_TO_BE_PLAYER && countOfPlayers_ < 2))
+    {
+        for (auto &connectionData : identifiedConnections_)
+        {
+            if (connectionData.second_.connection_ == sender)
+            {
+                if (connectionData.second_.playerType == newType)
+                {
+                    return;
+                }
+
+                connectionData.second_.playerType = newType;
+                countOfPlayers_ += (newType == PT_OBSERVER ? -1 : 1);
+
+                SendPlayerTypeToAllPlayers (connectionData);
+                return;
+            }
+        }
+    }
+}
+
+void ServerActivity::SetIsPlayerReady (Urho3D::Connection *sender, bool isReady)
+{
+    if (currentGameStatus_ != GS_WAITING)
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: SetIsPlayerReady can be called only while waiting for game start!");
+    }
+
+    for (auto &connectionData : identifiedConnections_)
+    {
+        if (connectionData.second_.connection_ == sender)
+        {
+            connectionData.second_.readyForStart_ = isReady;
+
+            Urho3D::VectorBuffer messageData;
+            messageData.WriteString (connectionData.first_);
+            messageData.WriteBool (isReady);
+
+            for (auto &anotherConnectionData : identifiedConnections_)
+            {
+                anotherConnectionData.second_.connection_->SendMessage (
+                        STCNMT_PLAYER_READY_CHANGED, true, true, messageData);
+            }
+            return;
+        }
+    }
 }
 
 const Urho3D::String &ServerActivity::GetMapName () const
@@ -108,7 +169,7 @@ void ServerActivity::SetMapName (const Urho3D::String &mapName)
     mapName_ = mapName;
 }
 
-const Urho3D::HashMap <Urho3D::String, Urho3D::Connection *> &ServerActivity::GetIdentifiedConnections () const
+const ServerActivity::IdentifiedConnectionsMap &ServerActivity::GetIdentifiedConnections () const
 {
     return identifiedConnections_;
 }
@@ -156,7 +217,25 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
         return;
     }
 
-    identifiedConnections_ [name] = connection;
+    Urho3D::VectorBuffer newPlayerMessageData;
+    newPlayerMessageData.WriteString (name);
+    newPlayerMessageData.WriteUByte (PT_OBSERVER);
+    newPlayerMessageData.WriteBool (false);
+    connection->SendMessage (STCNMT_NEW_PLAYER, true, true, newPlayerMessageData);
+
+    for (auto &anotherConnectionData : identifiedConnections_)
+    {
+        anotherConnectionData.second_.connection_->SendMessage (STCNMT_NEW_PLAYER, true, true, newPlayerMessageData);
+
+        Urho3D::VectorBuffer messageData;
+        messageData.WriteString (anotherConnectionData.first_);
+        messageData.WriteUByte (anotherConnectionData.second_.playerType);
+        messageData.WriteBool (anotherConnectionData.second_.readyForStart_);
+
+        connection->SendMessage (STCNMT_NEW_PLAYER, true, true, messageData);
+    }
+
+    identifiedConnections_ [name] = {connection, PT_OBSERVER, false};
     Urho3D::VectorBuffer data;
     data.WriteInt (currentGameStatus_);
     connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
@@ -170,15 +249,24 @@ void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urh
 
     if (!RemoveUnidentifiedConnection (connection))
     {
-        RemoveIdentifiedConnection (connection);
+        Urho3D::VectorBuffer messageData;
+        messageData.WriteString (RemoveIdentifiedConnection (connection));
+
+        for (auto &identifiedConnectionData : identifiedConnections_)
+        {
+            identifiedConnectionData.second_.connection_->SendMessage (STCNMT_PLAYER_LEFT, true, false, messageData);
+        }
+
         if (connection == firstPlayer_)
         {
-            ReportGameStatus (GS_SECOND_WON);
+            currentGameStatus_ = GS_SECOND_WON;
+            ReportGameStatus ();
         }
 
         else if (connection == secondPlayer_)
         {
-            ReportGameStatus (GS_FIRST_WON);
+            currentGameStatus_ = GS_FIRST_WON;
+            ReportGameStatus ();
         }
     }
 }
@@ -209,7 +297,7 @@ void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D:
 
             for (auto &connectionData : identifiedConnections_)
             {
-                connectionData.second_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
+                connectionData.second_.connection_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
             }
         }
     }
@@ -239,7 +327,71 @@ void ServerActivity::HandlePlayerCoinsSync (Urho3D::StringHash eventHash, Urho3D
 void ServerActivity::HandleGameEnded (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
 {
     currentGameStatus_ = eventData [GameEnded::FIRST_WON].GetBool () ? GS_FIRST_WON : GS_SECOND_WON;
-    ReportGameStatus (currentGameStatus_);
+    ReportGameStatus ();
+}
+
+void ServerActivity::HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    if (countOfPlayers_ != 2 || currentGameStatus_ != GS_WAITING)
+    {
+        return;
+    }
+
+    IdentifiedConnectionsMap::KeyValue *firstData = nullptr;
+    IdentifiedConnectionsMap::KeyValue *secondData = nullptr;
+
+    for (auto &connection : identifiedConnections_)
+    {
+        if (!connection.second_.readyForStart_)
+        {
+            return;
+        }
+
+        if (connection.second_.playerType == PT_REQUESTED_TO_BE_PLAYER)
+        {
+            if (firstData == nullptr)
+            {
+                firstData = &connection;
+            }
+            else if (secondData == nullptr)
+            {
+                secondData = &connection;
+            }
+            else
+            {
+                throw UniversalException <ServerActivity> (
+                        "ServerActivity: more than 2 connections requested to be players!");
+            }
+        }
+    }
+
+    if (firstData == nullptr || secondData == nullptr)
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: count of players is two, but less players found!");
+    }
+
+    managersHub_ = new ManagersHub (scene_);
+    firstPlayer_ = firstData->second_.connection_;
+    secondPlayer_ = secondData->second_.connection_;
+
+    currentGameStatus_ = GS_PLAYING;
+    unsigned int startCoins;
+    LoadResources (startCoins);
+    SetupPlayers (startCoins);
+    ReportGameStatus ();
+}
+
+void ServerActivity::HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    IdentifiedConnectionsMap::Iterator iterator =
+            identifiedConnections_.Find (eventData [RequestKickPlayer::PLAYER_NAME].GetString ());
+
+    if (iterator != identifiedConnections_.End () &&
+            (iterator->second_.playerType == PT_OBSERVER || currentGameStatus_ == GS_WAITING))
+    {
+        iterator->second_.connection_->Disconnect ();
+    }
 }
 
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)
@@ -255,27 +407,33 @@ bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connectio
     return false;
 }
 
-bool ServerActivity::RemoveIdentifiedConnection (Urho3D::Connection *connection)
+Urho3D::String ServerActivity::RemoveIdentifiedConnection (Urho3D::Connection *connection)
 {
     for (auto iterator = identifiedConnections_.Begin (); iterator != identifiedConnections_.End (); iterator++)
     {
-        if (iterator->second_ == connection)
+        if (iterator->second_.connection_ == connection)
         {
+            if (iterator->second_.playerType == PT_REQUESTED_TO_BE_PLAYER)
+            {
+                countOfPlayers_--;
+            }
+
+            Urho3D::String name = iterator->first_;
             identifiedConnections_.Erase (iterator);
-            return true;
+            return name;
         }
     }
-    return false;
+    return Urho3D::String::EMPTY;
 }
 
-void ServerActivity::ReportGameStatus (GameStatus gameStatus) const
+void ServerActivity::ReportGameStatus () const
 {
     Urho3D::VectorBuffer data;
-    data.WriteInt (gameStatus);
+    data.WriteInt (currentGameStatus_);
 
     for (auto &connectionData : identifiedConnections_)
     {
-        connectionData.second_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
+        connectionData.second_.connection_->SendMessage (STCNMT_GAME_STATUS, true, false, data);
     }
 }
 
@@ -341,28 +499,14 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     SendInitialInfoToPlayers (mapFolder);
 }
 
-void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath) const
+void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath)
 {
-    for (auto identifiedConnection : identifiedConnections_)
+    for (auto &identifiedConnection : identifiedConnections_)
     {
-        PlayerType playerType;
-        if (identifiedConnection.second_ == firstPlayer_)
-        {
-            playerType = PT_FIRST;
-        }
-        else if (identifiedConnection.second_ == secondPlayer_)
-        {
-            playerType = PT_SECOND;
-        }
-        else
-        {
-            playerType = PT_OBSERVER;
-        }
-
         Urho3D::VectorBuffer messageBuffer;
-        messageBuffer.WriteUByte (playerType);
         messageBuffer.WriteString (mapPath);
-        identifiedConnection.second_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
+        identifiedConnection.second_.connection_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
+        SendPlayerTypeToAllPlayers (identifiedConnection);
     }
 }
 
@@ -394,6 +538,52 @@ void ServerActivity::SetupPlayers (unsigned int startCoins)
     Player secondPlayer (managersHub_);
     playersManager->SetSecondPlayer (secondPlayer);
     playersManager->GetSecondPlayer ().SetCoins (startCoins);
+}
+
+void ServerActivity::SendPlayerTypeToAllPlayers (const Urho3D::String &playerName)
+{
+    auto iterator = identifiedConnections_.Find (playerName);
+    if (iterator != identifiedConnections_.End ())
+    {
+        SendPlayerTypeToAllPlayers (*iterator);
+    }
+    else
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: attempt to send player type of unidentified player!");
+    }
+}
+
+void ServerActivity::SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyValue &playerInfo)
+{
+    PlayerType playerType = playerInfo.second_.playerType;
+    if (playerType == PT_REQUESTED_TO_BE_PLAYER && currentGameStatus_ != GS_WAITING)
+    {
+        if (firstPlayer_ == playerInfo.second_.connection_)
+        {
+            playerType = PT_FIRST;
+        }
+        else if (secondPlayer_ == playerInfo.second_.connection_)
+        {
+            playerType = PT_SECOND;
+        }
+        else
+        {
+            throw UniversalException <ServerActivity> (
+                    "ServerActivity: more than 2 connections requested to be players!");
+        }
+
+        playerInfo.second_.playerType = playerType;
+    }
+
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteString (playerInfo.first_);
+    messageData.WriteUByte (playerType);
+
+    for (auto &connection : identifiedConnections_)
+    {
+        connection.second_.connection_->SendMessage (STCNMT_PLAYER_TYPE_CHANGED, true, true, messageData);
+    }
 }
 }
 

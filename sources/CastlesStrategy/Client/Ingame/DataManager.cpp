@@ -18,7 +18,8 @@ DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetCon
         selectedSpawnNode_ (nullptr),
 
         predictedOrders_ (),
-        predictedOrderedUnitsCounts_ ()
+        predictedOrderedUnitsCounts_ (),
+        players_ ()
 {
 
 }
@@ -212,6 +213,71 @@ unsigned int DataManager::GetPredictedOrdedUnitsCount (unsigned int unitType) co
     }
 
     return predictedOrderedUnitsCounts_ [unitType];
+}
+
+void DataManager::AddPlayer (const Urho3D::String &name, PlayerType playerType, bool readyForStart)
+{
+    auto iterator = players_.Find (name);
+    if (iterator == players_.End ())
+    {
+        players_ [name] = {playerType, readyForStart};
+        owner_->GetIngameUIManager ()->UpdatePlayersList ();
+    }
+    else
+    {
+        throw UniversalException <DataManager> ("DataManager: attempt to add " +
+                name + ", but player with this name is already exists!");
+    }
+}
+
+void DataManager::RemovePlayer (const Urho3D::String &name)
+{
+    auto iterator = players_.Find (name);
+    if (iterator != players_.End ())
+    {
+        players_.Erase (iterator);
+        owner_->GetIngameUIManager ()->UpdatePlayersList ();
+    }
+    else
+    {
+        throw UniversalException <DataManager> ("DataManager: attempt to remove " +
+                name + ", but couldn't find player with this name!");
+    }
+}
+
+void DataManager::SetPlayerType (const Urho3D::String &name, PlayerType playerType)
+{
+    auto iterator = players_.Find (name);
+    if (iterator != players_.End ())
+    {
+        iterator->second_.playerType_ = playerType;
+        owner_->GetIngameUIManager ()->UpdatePlayersList ();
+    }
+    else
+    {
+        throw UniversalException <DataManager> ("DataManager: attempt to set player type of " +
+            name + ", but couldn't find player with this name!");
+    }
+}
+
+void DataManager::SetIsPlayerReadyForStart (const Urho3D::String &name, bool readyForStart)
+{
+    auto iterator = players_.Find (name);
+    if (iterator != players_.End ())
+    {
+        iterator->second_.readyForStart_ = readyForStart;
+        owner_->GetIngameUIManager ()->UpdatePlayersList ();
+    }
+    else
+    {
+        throw UniversalException <DataManager> ("DataManager: attempt to set ready for start of " +
+                name + ", but couldn't find player with this name!");
+    }
+}
+
+const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &DataManager::GetPlayers ()
+{
+    return players_;
 }
 
 void DataManager::AttemptToAddPrefabs ()

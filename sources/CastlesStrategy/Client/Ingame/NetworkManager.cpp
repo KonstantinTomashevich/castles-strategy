@@ -1,4 +1,5 @@
 #include "NetworkManager.hpp"
+#include <Urho3D/IO/Log.h>
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -12,6 +13,12 @@ namespace CastlesStrategy
 {
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+
+void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
@@ -24,6 +31,12 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
     incomingMessagesProcessors_ [STCNMT_INITIAL_INFO - STCNMT_START] = ProcessInitialInfoMessage;
+
+    incomingMessagesProcessors_ [STCNMT_NEW_PLAYER - STCNMT_START] = ProcessNewPlayerMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_TYPE_CHANGED - STCNMT_START] = ProcessPlayerTypeChangedMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_READY_CHANGED - STCNMT_START] = ProcessPlayerReadyChangedMessage;
+    incomingMessagesProcessors_ [STCNMT_PLAYER_LEFT - STCNMT_START] = ProcessPlayerLeftMessage;
+
     incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
     incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
@@ -44,7 +57,7 @@ void NetworkManager::SendAddOrderMessage (unsigned int unitType) const
     network->GetServerConnection ()->SendMessage (CTSNMT_ADD_ORDER, true, true, messageData);
 }
 
-void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitType)
+void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitType) const
 {
     Urho3D::VectorBuffer messageData;
     messageData.WriteUInt (spawnID);
@@ -54,13 +67,34 @@ void NetworkManager::SendSpawnMessage (unsigned int spawnID, unsigned int unitTy
     network->GetServerConnection ()->SendMessage (CTSNMT_SPAWN_UNIT, true, true, messageData);
 }
 
-void NetworkManager::SendChatMessage (const Urho3D::String &message)
+void NetworkManager::SendChatMessage (const Urho3D::String &message) const
 {
     Urho3D::VectorBuffer messageData;
     messageData.WriteString (message);
 
     Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
     network->GetServerConnection ()->SendMessage (CTSNMT_CHAT_MESSAGE, true, false, messageData);
+}
+
+void NetworkManager::SendTogglePlayerTypeMessage ()
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteUByte (
+            owner_->GetDataManager ()->GetPlayers () [owner_->GetPlayerName ()]->playerType_ == PT_OBSERVER ?
+            PT_REQUESTED_TO_BE_PLAYER : PT_OBSERVER
+    );
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_REQUEST_TO_CHANGE_TYPE, true, true, messageData);
+}
+
+void NetworkManager::SendToggleReadyMessage ()
+{
+    Urho3D::VectorBuffer messageData;
+    messageData.WriteBool (!owner_->GetDataManager ()->GetPlayers () [owner_->GetPlayerName ()]->readyForStart_);
+
+    Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
+    network->GetServerConnection ()->SendMessage (CTSNMT_SET_IS_READY_FOR_START, true, true, messageData);
 }
 
 void NetworkManager::HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data)
@@ -80,9 +114,6 @@ void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuf
 
 void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
-    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
-    ingameActivity->SetPlayerType (playerType);
-
     Urho3D::ResourceCache *resourceCache = ingameActivity->GetContext ()->GetSubsystem <Urho3D::ResourceCache> ();
     Urho3D::String mapPath = messageData.ReadString ();
     ingameActivity->GetScene ()->CreateChild ("PlayerSide", Urho3D::LOCAL)->LoadXML (
@@ -99,6 +130,44 @@ void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
             mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
 
     ingameActivity->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
+}
+
+void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
+    bool readyForStart = messageData.ReadBool ();
+
+    ingameActivity->GetDataManager ()->AddPlayer (name, playerType, readyForStart);
+    if (name == ingameActivity->GetPlayerName ())
+    {
+        ingameActivity->SetPlayerType (playerType);
+    }
+}
+
+void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    PlayerType playerType = static_cast <PlayerType> (messageData.ReadUByte ());
+
+    ingameActivity->GetDataManager ()->SetPlayerType (name, playerType);
+    if (name == ingameActivity->GetPlayerName ())
+    {
+        ingameActivity->SetPlayerType (playerType);
+    }
+}
+
+void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    bool readyForStart = messageData.ReadBool ();
+    ingameActivity->GetDataManager ()->SetIsPlayerReadyForStart (name, readyForStart);
+}
+
+void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String name = messageData.ReadString ();
+    ingameActivity->GetDataManager ()->RemovePlayer (name);
 }
 
 void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)

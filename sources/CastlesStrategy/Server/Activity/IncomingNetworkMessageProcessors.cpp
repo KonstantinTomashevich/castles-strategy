@@ -58,7 +58,7 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
     bool found = false;
     for (const auto &item : activity->GetIdentifiedConnections ())
     {
-        if (item.second_ == sender)
+        if (item.second_.connection_ == sender)
         {
             resultingMessage += " [" + item.first_ + "] ";
             found = true;
@@ -66,9 +66,9 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
         }
     }
 
-    // TODO: What about exception?
     if (!found)
     {
+        URHO3D_LOGERROR ("ServerActivity: unidentified player attempted to send a chat message!");
         return;
     }
 
@@ -78,8 +78,18 @@ void ChatMessage (ServerActivity *activity, Urho3D::VectorBuffer &messageData, U
 
     for (const auto &item : activity->GetIdentifiedConnections ())
     {
-        item.second_->SendMessage (STCNMT_CHAT_MESSAGE, true, false, newMessageData);
+        item.second_.connection_->SendMessage (STCNMT_CHAT_MESSAGE, true, false, newMessageData);
     }
+}
+
+void RequestToChangeType (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+{
+    activity->ProcessRequestToChangeType (sender, static_cast <PlayerType> (messageData.ReadUByte ()));
+}
+
+void SetIsReadyForStart (ServerActivity *activity, Urho3D::VectorBuffer &messageData, Urho3D::Connection *sender)
+{
+    activity->SetIsPlayerReady (sender, messageData.ReadBool ());
 }
 }
 }

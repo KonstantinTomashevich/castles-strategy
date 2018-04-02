@@ -2,6 +2,7 @@
 #include <vector>
 #include <Urho3D/Core/Context.h>
 #include <CastlesStrategy/Shared/Unit/UnitType.hpp>
+#include <CastlesStrategy/Shared/PlayerType.hpp>
 
 namespace CastlesStrategy
 {
@@ -16,6 +17,12 @@ class DataManager : public Urho3D::Object
 {
 URHO3D_OBJECT (DataManager, Object)
 public:
+    struct PlayerData
+    {
+        PlayerType playerType_;
+        bool readyForStart_;
+    };
+
     explicit DataManager (IngameActivity *owner);
     virtual ~DataManager ();
 
@@ -43,6 +50,12 @@ public:
     void SetSelectedSpawnNode (Urho3D::Node *selectedSpawnNode);
     unsigned int GetPredictedOrdedUnitsCount (unsigned int unitType) const;
 
+    void AddPlayer (const Urho3D::String &name, PlayerType playerType, bool readyForStart);
+    void RemovePlayer (const Urho3D::String &name);
+    void SetPlayerType (const Urho3D::String &name, PlayerType playerType);
+    void SetIsPlayerReadyForStart (const Urho3D::String &name, bool readyForStart);
+    const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &GetPlayers ();
+
 private:
     void AttemptToAddPrefabs ();
     void PredictOrders (float timeStep);
@@ -58,5 +71,6 @@ private:
 
     Urho3D::Vector <RecruitmentOrder> predictedOrders_;
     Urho3D::Vector <unsigned int> predictedOrderedUnitsCounts_;
+    Urho3D::HashMap <Urho3D::String, PlayerData> players_;
 };
 }

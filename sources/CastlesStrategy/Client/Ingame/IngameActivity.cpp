@@ -13,16 +13,18 @@
 
 #include <Utils/UIResizer.hpp>
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Urho3D/Graphics/StaticModel.h>
 
 namespace CastlesStrategy
 {
 IngameActivity::IngameActivity (Urho3D::Context *context, const Urho3D::String &playerName, const Urho3D::String &serverAddress,
-                                unsigned int port)
+            unsigned int port, bool isAdmin)
         : ActivitiesApplication::Activity (context),
           playerType_ (PT_OBSERVER),
           playerName_ (playerName),
+          isAdmin_ (isAdmin),
+          
           serverAddress_ (serverAddress),
           port_ (port),
           scene_ (new Urho3D::Scene (context)),
@@ -82,6 +84,7 @@ PlayerType IngameActivity::GetPlayerType () const
 void IngameActivity::SetPlayerType (PlayerType playerType)
 {
     playerType_ = playerType;
+    fogOfWarManager_->SetFogOfWarEnabled (playerType == PT_FIRST || playerType == PT_SECOND);
 }
 
 GameStatus IngameActivity::GetGameStatus () const
@@ -92,7 +95,12 @@ GameStatus IngameActivity::GetGameStatus () const
 void IngameActivity::SetGameStatus (GameStatus gameStatus)
 {
     gameStatus_ = gameStatus;
-    if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
+    if (gameStatus == GS_PLAYING)
+    {
+        ingameUIManager_->SwitchToPlayingState ();
+    }
+
+    else if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
     {
         ingameUIManager_->InformGameEnded (gameStatus == GS_FIRST_WON);
         fogOfWarManager_->SetFogOfWarEnabled (false);
@@ -100,6 +108,16 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
         Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
         network->GetServerConnection ()->SetScene (nullptr);
     }
+}
+
+bool IngameActivity::IsAdmin () const
+{
+    return isAdmin_;
+}
+
+const Urho3D::String &IngameActivity::GetPlayerName () const
+{
+    return playerName_;
 }
 
 const Urho3D::String &IngameActivity::GetServerAddress () const
@@ -169,8 +187,8 @@ void IngameActivity::HandleConnectFailed (Urho3D::StringHash eventType, Urho3D::
     ingameUIManager_->ShowMessage ("Connection failed!", "Couldn't connect to specified server!", "Go to main menu.",
                             [] (IngameActivity *activity) -> void
                             {
-                                activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-                                activity->SendEvent (START_MAIN_MENU);
+                                activity->SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+                                activity->SendEvent (E_START_MAIN_MENU);
                             });
 }
 
@@ -186,8 +204,8 @@ void IngameActivity::HandleServerDisconnected (Urho3D::StringHash eventType, Urh
         ingameUIManager_->ShowMessage ("Disconnected!", "Lost connection to server!", "Go to main menu.",
                 [] (IngameActivity *activity) -> void
                 {
-                    activity->SendEvent (SHUTDOWN_ALL_ACTIVITIES);
-                    activity->SendEvent (START_MAIN_MENU);
+                    activity->SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+                    activity->SendEvent (E_START_MAIN_MENU);
                 });
     }
 }

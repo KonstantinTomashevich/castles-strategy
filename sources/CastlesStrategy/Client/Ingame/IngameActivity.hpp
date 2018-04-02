@@ -18,7 +18,7 @@ class IngameActivity : public ActivitiesApplication::Activity
 URHO3D_OBJECT (IngameActivity, Activity)
 public:
     IngameActivity (Urho3D::Context *context, const Urho3D::String &playerName, const Urho3D::String &serverAddress,
-                        unsigned int port);
+                unsigned int port, bool isAdmin);
     virtual ~IngameActivity ();
 
     virtual void Start ();
@@ -30,6 +30,9 @@ public:
 
     GameStatus GetGameStatus () const;
     void SetGameStatus (GameStatus gameStatus);
+
+    bool IsAdmin () const;
+    const Urho3D::String &GetPlayerName () const;
 
     const Urho3D::String &GetServerAddress () const;
     unsigned int GetPort () const;
@@ -52,6 +55,7 @@ private:
 
     PlayerType playerType_;
     GameStatus gameStatus_;
+    bool isAdmin_;
 
     Urho3D::String playerName_;
     Urho3D::String serverAddress_;

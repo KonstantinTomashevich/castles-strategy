@@ -2,6 +2,7 @@
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Network/Network.h>
 
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/AngelScript/Script.h>
@@ -11,7 +12,7 @@
 #include <CastlesStrategy/Client/MainMenu/MainMenuActivity.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Server/Activity/ServerActivity.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UniversalException.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)
@@ -66,7 +67,7 @@ void LauncherApplication::Start ()
 
     UIResizer::RegisterObject (context_);
     SubscribeToEvents ();
-    SendEvent (CastlesStrategy::START_MAIN_MENU);
+    SendEvent (CastlesStrategy::E_START_MAIN_MENU);
 
 #ifndef NDEBUG
     Urho3D::ResourceCache *resourceCache = GetSubsystem <Urho3D::ResourceCache>();
@@ -88,10 +89,10 @@ void LauncherApplication::Stop ()
 void LauncherApplication::SubscribeToEvents ()
 {
     SubscribeToEvent (Urho3D::E_KEYUP, URHO3D_HANDLER (LauncherApplication, HandleKeyPress));
-    SubscribeToEvent (CastlesStrategy::SHUTDOWN_ALL_ACTIVITIES, URHO3D_HANDLER (LauncherApplication, HandleShutdownAllActivities));
-    SubscribeToEvent (CastlesStrategy::START_MAIN_MENU, URHO3D_HANDLER (LauncherApplication, HandleStartMainMenu));
-    SubscribeToEvent (CastlesStrategy::START_CLIENT, URHO3D_HANDLER (LauncherApplication, HandleStartClient));
-    SubscribeToEvent (CastlesStrategy::START_SERVER, URHO3D_HANDLER (LauncherApplication, HandleStartServer));
+    SubscribeToEvent (CastlesStrategy::E_SHUTDOWN_ALL_ACTIVITIES, URHO3D_HANDLER (LauncherApplication, HandleShutdownAllActivities));
+    SubscribeToEvent (CastlesStrategy::E_START_MAIN_MENU, URHO3D_HANDLER (LauncherApplication, HandleStartMainMenu));
+    SubscribeToEvent (CastlesStrategy::E_START_CLIENT, URHO3D_HANDLER (LauncherApplication, HandleStartClient));
+    SubscribeToEvent (CastlesStrategy::E_START_SERVER, URHO3D_HANDLER (LauncherApplication, HandleStartServer));
 }
 
 void LauncherApplication::HandleKeyPress (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
@@ -118,9 +119,11 @@ void LauncherApplication::HandleStartMainMenu (Urho3D::StringHash eventType, Urh
 void LauncherApplication::HandleStartClient (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
     CastlesStrategy::IngameActivity *client = new CastlesStrategy::IngameActivity (context_,
-        eventData [CastlesStrategy::StartClient::PLAYER_NAME].GetString (),
-        eventData [CastlesStrategy::StartClient::ADDRESS].GetString (),
-        eventData [CastlesStrategy::StartClient::PORT].GetUInt ());
+            eventData [CastlesStrategy::StartClient::PLAYER_NAME].GetString (),
+            eventData [CastlesStrategy::StartClient::ADDRESS].GetString (),
+            eventData [CastlesStrategy::StartClient::PORT].GetUInt (),
+            eventData [CastlesStrategy::StartClient::IS_ADMIN].GetBool ()
+    );
     SetupActivityNextFrame (client);
 }
 

@@ -9,7 +9,7 @@
 #include <Urho3D/UI/UIEvents.h>
 
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
-#include <CastlesStrategy/Shared/ChangeActivityEvents.hpp>
+#include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 
 namespace CastlesStrategy
 {
@@ -69,7 +69,7 @@ void MainMenuActivity::SubscribeToEvents ()
 
 void MainMenuActivity::HandleConnectToServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+    SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::String playerName = dynamic_cast <Urho3D::LineEdit *> (
             ui->GetRoot ()->GetChild ("StartGameWindow", false)->GetChild ("NameInput", false)->
@@ -88,24 +88,26 @@ void MainMenuActivity::HandleConnectToServerClick (Urho3D::StringHash eventType,
     startClientData [StartClient::PLAYER_NAME] = playerName;
     startClientData [StartClient::ADDRESS] = address;
     startClientData [StartClient::PORT] = port;
-    SendEvent (START_CLIENT, startClientData);
+    startClientData [StartClient::IS_ADMIN] = false;
+    SendEvent (E_START_CLIENT, startClientData);
 }
 
 void MainMenuActivity::HandleStartServerClick (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
 {
-    SendEvent (SHUTDOWN_ALL_ACTIVITIES);
+    SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
     Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
     Urho3D::String playerName = dynamic_cast <Urho3D::LineEdit *> (
             ui->GetRoot ()->GetChild ("StartGameWindow", false)->GetChild ("NameInput", false)->
                     GetChild ("Edit", false))->GetText ();
 
     Urho3D::VariantMap startServerEventData;
-    SendEvent (START_SERVER);
+    SendEvent (E_START_SERVER);
 
     Urho3D::VariantMap startClientData;
     startClientData [StartClient::PLAYER_NAME] = playerName;
     startClientData [StartClient::ADDRESS] = "localhost";
     startClientData [StartClient::PORT] = DEFAULT_SERVER_PORT;
-    SendEvent (START_CLIENT, startClientData);
+    startClientData [StartClient::IS_ADMIN] = true;
+    SendEvent (E_START_CLIENT, startClientData);
 }
 }

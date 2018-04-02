@@ -14,8 +14,11 @@ public:
     virtual ~NetworkManager ();
 
     void SendAddOrderMessage (unsigned int unitType) const;
-    void SendSpawnMessage (unsigned int spawnID, unsigned int unitType);
-    void SendChatMessage (const Urho3D::String &message);
+    void SendSpawnMessage (unsigned int spawnID, unsigned int unitType) const;
+    void SendChatMessage (const Urho3D::String &message) const;
+
+    void SendTogglePlayerTypeMessage ();
+    void SendToggleReadyMessage ();
 
 private:
     void HandleNetworkMessage (Urho3D::StringHash eventType, Urho3D::VariantMap &data);
