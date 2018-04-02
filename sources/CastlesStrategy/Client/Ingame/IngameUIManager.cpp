@@ -188,7 +188,8 @@ void IngameUIManager::UpdatePlayersList ()
     while (listElements.Size () < players.Size ())
     {
         Urho3D::UIElement *listElement = playersView->GetContentElement ()->LoadChildXML (
-                resourceCache->GetResource <Urho3D::XMLFile> ("UI/PlayersListElement.xml")->GetRoot ()
+                resourceCache->GetResource <Urho3D::XMLFile> ("UI/PlayersListElement.xml")->GetRoot (),
+                playersView->GetDefaultStyle (true)
         );
 
         SubscribeToEvent (listElement->GetChild ("ToggleRoleButton", false), Urho3D::E_CLICKEND,
