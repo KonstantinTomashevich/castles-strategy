@@ -95,7 +95,12 @@ GameStatus IngameActivity::GetGameStatus () const
 void IngameActivity::SetGameStatus (GameStatus gameStatus)
 {
     gameStatus_ = gameStatus;
-    if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
+    if (gameStatus == GS_PLAYING)
+    {
+        ingameUIManager_->SwitchToPlayingState ();
+    }
+
+    else if (gameStatus == GS_FIRST_WON || gameStatus == GS_SECOND_WON)
     {
         ingameUIManager_->InformGameEnded (gameStatus == GS_FIRST_WON);
         fogOfWarManager_->SetFogOfWarEnabled (false);

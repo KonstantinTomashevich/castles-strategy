@@ -210,8 +210,17 @@ void IngameUIManager::UpdatePlayersList ()
     }
 
     unsigned int index = 0;
+    bool readyForStart = true;
+    unsigned int playersCount = 0;
+
     for (const auto &player : players)
     {
+        readyForStart = readyForStart && player.second_.readyForStart_;
+        if (player.second_.playerType_ == PT_REQUESTED_TO_BE_PLAYER)
+        {
+            playersCount++;
+        }
+
         Urho3D::UIElement *listElement = listElements [index];
         dynamic_cast <Urho3D::Text *> (listElement->GetChild ("NicknameText", false))->SetText (player.first_);
 
@@ -235,7 +244,16 @@ void IngameUIManager::UpdatePlayersList ()
         listElement->GetChild ("KickButton", false)->SetVar (BUTTON_PLAYER_NAME_VAR, player.first_);
         index++;
     }
+
+    connectedPlayersWindow_->GetChild ("ControlButtons", false)->GetChild ("StartGameButton", false)->
+            SetVisible (owner_->IsAdmin () && readyForStart && playersCount == 2);
     SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
+}
+
+void IngameUIManager::SwitchToPlayingState ()
+{
+    connectedPlayersWindow_->SetVisible (false);
+    topBar_->SetVisible (true);
 }
 
 void IngameUIManager::LoadElements ()
@@ -248,7 +266,7 @@ void IngameUIManager::LoadElements ()
 
     topBar_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/TopBarWindow.xml")->GetRoot (), style));
-    topBar_->SetVisible (true);
+    topBar_->SetVisible (false);
 
     menu_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/IngameMenuWindow.xml")->GetRoot (), style));
@@ -267,6 +285,7 @@ void IngameUIManager::LoadElements ()
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/ConnectedPlayersWindow.xml")->GetRoot (), style));
     dynamic_cast <Urho3D::ScrollView *> (connectedPlayersWindow_->GetChild ("PlayersView", false))->
             SetContentElement (connectedPlayersWindow_->GetChild ("PlayersView", false)->GetChild ("PlayersList", false));
+    connectedPlayersWindow_->GetChild ("ControlButtons", false)->GetChild ("StartGameButton", false)->SetVisible (false);
 }
 
 void IngameUIManager::ShowNextMessage ()
@@ -311,7 +330,9 @@ void IngameUIManager::SubscribeToEvents ()
     SubscribeToTopBarEvents ();
     SubscribeToMenuEvents ();
     SubscribeToMessageWindowEvents ();
+
     SubscribeToChatWindowEvents ();
+    SubscribeToConnectedPlayersWindowEvents ();
     SubscribeToEvent (Urho3D::E_UIMOUSEDOUBLECLICK, URHO3D_HANDLER (IngameUIManager, HandleDoubleClickOnMap));
 }
 
@@ -343,6 +364,21 @@ void IngameUIManager::SubscribeToChatWindowEvents ()
     Urho3D::Button *sendButton = dynamic_cast <Urho3D::Button *> (
             chatWindow_->GetChild ("MessageInput", false)->GetChild ("SendButton", false));
     SubscribeToEvent (sendButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleChatWindowSendClicked));
+}
+
+void IngameUIManager::SubscribeToConnectedPlayersWindowEvents ()
+{
+    Urho3D::Button *exitButton = dynamic_cast <Urho3D::Button *> (
+            connectedPlayersWindow_->GetChild ("ControlButtons", false)->GetChild ("ExitButton", false));
+
+    Urho3D::Button *startGameButton = dynamic_cast <Urho3D::Button *> (
+            connectedPlayersWindow_->GetChild ("ControlButtons", false)->GetChild ("StartGameButton", false));
+
+    SubscribeToEvent (exitButton, Urho3D::E_CLICKEND,
+            URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersExitClicked));
+
+    SubscribeToEvent (startGameButton, Urho3D::E_CLICKEND,
+            URHO3D_HANDLER (IngameUIManager, HandleConnectedPlayersStartGameClicked));
 }
 
 void IngameUIManager::HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
@@ -414,6 +450,17 @@ void IngameUIManager::HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho
                 true
         ));
     }
+}
+
+void IngameUIManager::HandleConnectedPlayersExitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    SendEvent (E_SHUTDOWN_ALL_ACTIVITIES);
+    SendEvent (E_START_MAIN_MENU);
+}
+
+void IngameUIManager::HandleConnectedPlayersStartGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    SendEvent (E_REQUEST_GAME_START);
 }
 
 void IngameUIManager::HandleConnectedPlayersToggleRoleClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

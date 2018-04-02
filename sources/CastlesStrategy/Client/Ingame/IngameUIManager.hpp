@@ -37,6 +37,7 @@ public:
     void InformGameEnded (bool firstWon);
     void AddNewChatMessage (const Urho3D::String &message);
     void UpdatePlayersList ();
+    void SwitchToPlayingState ();
 
 private:
     struct MessageData
@@ -54,8 +55,10 @@ private:
     void SubscribeToEvents ();
     void SubscribeToTopBarEvents ();
     void SubscribeToMenuEvents ();
+
     void SubscribeToMessageWindowEvents ();
     void SubscribeToChatWindowEvents ();
+    void SubscribeToConnectedPlayersWindowEvents ();
 
     void HandleTopBarMenuClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleTopBarRecruitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
@@ -68,6 +71,9 @@ private:
 
     void HandleChatWindowSendClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+
+    void HandleConnectedPlayersExitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
+    void HandleConnectedPlayersStartGameClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
 
     void HandleConnectedPlayersToggleRoleClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
     void HandleConnectedPlayersToggleReadyClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData);
