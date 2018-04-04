@@ -69,12 +69,12 @@ private:
     void LoadResources (unsigned int &startCoins);
     void LoadScene (const Urho3D::String &mapFolder);
     void LoadMap (const Urho3D::String &mapFolder, unsigned int &startCoins, bool &useDefaultUnitTypes);
-    void SendInitialInfoToPlayers (const Urho3D::String &mapPath);
     void LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitTypes);
     void SetupPlayers (unsigned int startCoins);
     
     void SendPlayerTypeToAllPlayers (const Urho3D::String &playerName);
     void SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyValue &playerInfo);
+    void CollectMapData ();
 
     float autoDisconnectTime_;
     unsigned int serverPort_;
@@ -86,8 +86,9 @@ private:
     ManagersHub *managersHub_;
     Urho3D::Scene *scene_;
     Urho3D::String mapName_;
-    Urho3D::PODVector <ServerIncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
+    Urho3D::VectorBuffer mapData_;
 
+    Urho3D::PODVector <ServerIncomingNetworkMessageProcessor> incomingNetworkMessageProcessors_;
     unsigned int countOfPlayers_;
     Urho3D::Connection *firstPlayer_;
     Urho3D::Connection *secondPlayer_;

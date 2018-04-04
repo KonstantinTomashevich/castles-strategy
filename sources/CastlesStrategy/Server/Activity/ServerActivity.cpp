@@ -8,6 +8,10 @@
 #include <Urho3D/Resource/XMLFile.h>
 #include <Urho3D/Scene/SceneEvents.h>
 
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/IO/File.h>
+
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
@@ -18,6 +22,7 @@
 #include <CastlesStrategy/Shared/PlayerType.hpp>
 #include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
 #include <Utils/UniversalException.hpp>
+#include <Urho3D/IO/FileSystem.h>
 
 namespace CastlesStrategy
 {
@@ -32,8 +37,9 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
     managersHub_ (nullptr),
     scene_ (new Urho3D::Scene (context_)),
     mapName_ (),
-    incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT - CTSNMT_START),
+    mapData_ (),
 
+    incomingNetworkMessageProcessors_ (CTSNMT_TYPES_COUNT - CTSNMT_START),
     countOfPlayers_ (0),
     firstPlayer_ (nullptr),
     secondPlayer_ (nullptr)
@@ -167,6 +173,12 @@ const Urho3D::String &ServerActivity::GetMapName () const
 void ServerActivity::SetMapName (const Urho3D::String &mapName)
 {
     mapName_ = mapName;
+    CollectMapData ();
+
+    for (auto &connectionData : identifiedConnections_)
+    {
+        connectionData.second_.connection_->SendMessage (STCNMT_MAP_FILES, true, false, mapData_);
+    }
 }
 
 const ServerActivity::IdentifiedConnectionsMap &ServerActivity::GetIdentifiedConnections () const
@@ -238,8 +250,10 @@ void ServerActivity::HandleClientIdentity (Urho3D::StringHash eventHash, Urho3D:
     identifiedConnections_ [name] = {connection, PT_OBSERVER, false};
     Urho3D::VectorBuffer data;
     data.WriteInt (currentGameStatus_);
+
     connection->SendMessage (STCNMT_GAME_STATUS, true, false, data);
     connection->SetScene (scene_);
+    connection->SendMessage (STCNMT_MAP_FILES, true, false, mapData_);
 }
 
 void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
@@ -380,6 +394,9 @@ void ServerActivity::HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3
     LoadResources (startCoins);
     SetupPlayers (startCoins);
     ReportGameStatus ();
+
+    SendPlayerTypeToAllPlayers (*firstData);
+    SendPlayerTypeToAllPlayers (*secondData);
 }
 
 void ServerActivity::HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
@@ -496,18 +513,6 @@ void ServerActivity::LoadMap (const Urho3D::String &mapFolder, unsigned int &sta
     Map *map = dynamic_cast <Map *> (managersHub_->GetManager (MI_MAP));
     map->SetSize (mapXML.GetIntVector2 ("size"));
     map->LoadRoutesFromXML (mapXML);
-    SendInitialInfoToPlayers (mapFolder);
-}
-
-void ServerActivity::SendInitialInfoToPlayers (const Urho3D::String &mapPath)
-{
-    for (auto &identifiedConnection : identifiedConnections_)
-    {
-        Urho3D::VectorBuffer messageBuffer;
-        messageBuffer.WriteString (mapPath);
-        identifiedConnection.second_.connection_->SendMessage (STCNMT_INITIAL_INFO, true, false, messageBuffer);
-        SendPlayerTypeToAllPlayers (identifiedConnection);
-    }
 }
 
 void ServerActivity::LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, bool useDefaultUnitsTypes)
@@ -583,6 +588,30 @@ void ServerActivity::SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyVa
     for (auto &connection : identifiedConnections_)
     {
         connection.second_.connection_->SendMessage (STCNMT_PLAYER_TYPE_CHANGED, true, true, messageData);
+    }
+}
+
+void ServerActivity::CollectMapData ()
+{
+    mapData_.Clear ();
+    Urho3D::Vector <Urho3D::String> mapFiles_;
+    context_->GetSubsystem <Urho3D::FileSystem> ()->ScanDir (
+            mapFiles_, "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_, "*", Urho3D::SCAN_FILES, true);
+
+    mapData_.WriteString (mapName_);
+    mapData_.WriteUInt (mapFiles_.Size ());
+
+    for (auto &fileName : mapFiles_)
+    {
+        Urho3D::File *file = new Urho3D::File (context_,
+                "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_ + "/" + fileName, Urho3D::FILE_READ);
+
+        Urho3D::PODVector <unsigned char> buffer (file->GetSize ());
+        file->Read (&buffer [0], file->GetSize ());
+        file->Close ();
+
+        mapData_.WriteString (fileName);
+        mapData_.WriteBuffer (buffer);
     }
 }
 }
