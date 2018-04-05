@@ -271,16 +271,19 @@ void ServerActivity::HandleClientDisconnected (Urho3D::StringHash eventHash, Urh
             identifiedConnectionData.second_.connection_->SendMessage (STCNMT_PLAYER_LEFT, true, false, messageData);
         }
 
-        if (connection == firstPlayer_)
+        if (currentGameStatus_ == GS_PLAYING)
         {
-            currentGameStatus_ = GS_SECOND_WON;
-            ReportGameStatus ();
-        }
+            if (connection == firstPlayer_)
+            {
+                currentGameStatus_ = GS_SECOND_WON;
+                ReportGameStatus ();
+            }
 
-        else if (connection == secondPlayer_)
-        {
-            currentGameStatus_ = GS_FIRST_WON;
-            ReportGameStatus ();
+            else if (connection == secondPlayer_)
+            {
+                currentGameStatus_ = GS_FIRST_WON;
+                ReportGameStatus ();
+            }
         }
     }
 }
