@@ -97,6 +97,7 @@ void IngameActivity::SetGameStatus (GameStatus gameStatus)
     gameStatus_ = gameStatus;
     if (gameStatus == GS_PLAYING)
     {
+        dataManager_->LoadMapResources ();
         ingameUIManager_->SwitchToPlayingState ();
     }
 
