@@ -31,6 +31,7 @@ public:
                         UICallback callback);
 
     void ClearUI ();
+    // TODO: Use events instead of these inform and update methods.
     void CheckUIForUnitsType (unsigned int unitType);
     void UpdateCoins (unsigned int coins);
 
@@ -38,6 +39,7 @@ public:
     void AddNewChatMessage (const Urho3D::String &message);
     void UpdatePlayersList ();
     void SwitchToPlayingState ();
+    void InformMapChanged ();
 
 private:
     struct MessageData
@@ -85,8 +87,10 @@ private:
     Urho3D::Window *topBar_;
     Urho3D::Window *menu_;
     Urho3D::Window *messageWindow_;
+
     Urho3D::Window *chatWindow_;
     Urho3D::Window *connectedPlayersWindow_;
+    Urho3D::BorderImage *selectedMapImage_;
     Urho3D::List <MessageData> requestedMessages_;
 };
 }

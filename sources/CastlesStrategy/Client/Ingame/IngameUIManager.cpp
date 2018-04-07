@@ -17,6 +17,7 @@
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
+#include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
 #include <Utils/UIResizer.hpp>
 #include <Utils/UniversalException.hpp>
 
@@ -29,8 +30,10 @@ IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner
     topBar_ (nullptr),
     menu_ (nullptr),
     messageWindow_ (nullptr),
+
     chatWindow_ (nullptr),
     connectedPlayersWindow_ (nullptr),
+    selectedMapImage_ (nullptr),
     requestedMessages_ ()
 {
 
@@ -94,8 +97,10 @@ void IngameUIManager::ClearUI ()
     topBar_ = nullptr;
     menu_ = nullptr;
     messageWindow_ = nullptr;
+
     chatWindow_ = nullptr;
     connectedPlayersWindow_ = nullptr;
+    selectedMapImage_ = nullptr;
 }
 
 void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
@@ -254,7 +259,17 @@ void IngameUIManager::UpdatePlayersList ()
 void IngameUIManager::SwitchToPlayingState ()
 {
     connectedPlayersWindow_->SetVisible (false);
+    selectedMapImage_->SetVisible (false);
     topBar_->SetVisible (true);
+}
+
+void IngameUIManager::InformMapChanged ()
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    selectedMapImage_->SetTexture (resourceCache->GetResource <Urho3D::Texture2D> (
+            DEFAULT_MAPS_FOLDER + "/" + owner_->GetDataManager ()->GetMapName () + "/Image.png"
+    ));
+    selectedMapImage_->SetFullImageRect ();
 }
 
 void IngameUIManager::LoadElements ()
@@ -264,6 +279,9 @@ void IngameUIManager::LoadElements ()
 
     ui->GetRoot ()->AddTag ("UIResizer");
     Urho3D::XMLFile *style = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
+
+    selectedMapImage_ = dynamic_cast <Urho3D::BorderImage *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/SelectedMapImage.xml")->GetRoot (), style));
 
     topBar_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/TopBarWindow.xml")->GetRoot (), style));

@@ -106,6 +106,7 @@ const Urho3D::String &DataManager::GetMapName () const
 void DataManager::SetMapName (const Urho3D::String &mapName)
 {
     mapName_ = mapName;
+    owner_->GetIngameUIManager ()->InformMapChanged ();
 }
 
 unsigned int DataManager::GetSpawnsUnitType () const
