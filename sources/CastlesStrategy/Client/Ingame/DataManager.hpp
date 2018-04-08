@@ -30,6 +30,10 @@ public:
     void AddPrefabToUnit (unsigned int nodeID);
     void RecruitUnit (unsigned int unitType);
     void SpawnUnit (unsigned int unitType);
+    void LoadMapResources ();
+
+    const Urho3D::String &GetMapName () const;
+    void SetMapName (const Urho3D::String &mapName);
 
     unsigned int GetSpawnsUnitType () const;
     void SetSpawnsUnitType (unsigned int spawnsUnitType);
@@ -61,6 +65,7 @@ private:
     void PredictOrders (float timeStep);
 
     IngameActivity *owner_;
+    Urho3D::String mapName_;
     unsigned int spawnsUnitType_;
     std::vector <UnitType> unitsTypes_;
 

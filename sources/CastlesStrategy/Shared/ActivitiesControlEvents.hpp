@@ -35,4 +35,9 @@ URHO3D_EVENT (E_REQUEST_KICK_PLAYER, RequestKickPlayer)
 {
     URHO3D_PARAM (PLAYER_NAME, PlayerName);
 }
+
+URHO3D_EVENT (E_REQUEST_SELECT_MAP, RequestSelectMap)
+{
+    URHO3D_PARAM (MAP_NAME, MapName);
+}
 }

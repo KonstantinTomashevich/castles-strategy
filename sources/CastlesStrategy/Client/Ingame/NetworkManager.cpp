@@ -1,5 +1,7 @@
 #include "NetworkManager.hpp"
 #include <Urho3D/IO/Log.h>
+#include <Urho3D/IO/FileSystem.h>
+
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -12,8 +14,6 @@
 namespace CastlesStrategy
 {
 void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
-void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
-
 void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
@@ -23,6 +23,7 @@ void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBu
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessChatMessageMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessMapFilesMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
 NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
@@ -30,8 +31,6 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
 {
     SubscribeToEvent (Urho3D::E_NETWORKMESSAGE, URHO3D_HANDLER (NetworkManager, HandleNetworkMessage));
     incomingMessagesProcessors_ [STCNMT_GAME_STATUS - STCNMT_START] = ProcessGameStatusMessage;
-    incomingMessagesProcessors_ [STCNMT_INITIAL_INFO - STCNMT_START] = ProcessInitialInfoMessage;
-
     incomingMessagesProcessors_ [STCNMT_NEW_PLAYER - STCNMT_START] = ProcessNewPlayerMessage;
     incomingMessagesProcessors_ [STCNMT_PLAYER_TYPE_CHANGED - STCNMT_START] = ProcessPlayerTypeChangedMessage;
     incomingMessagesProcessors_ [STCNMT_PLAYER_READY_CHANGED - STCNMT_START] = ProcessPlayerReadyChangedMessage;
@@ -41,6 +40,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
     incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
     incomingMessagesProcessors_ [STCNMT_CHAT_MESSAGE - STCNMT_START] = ProcessChatMessageMessage;
+    incomingMessagesProcessors_ [STCNMT_MAP_FILES - STCNMT_START] = ProcessMapFilesMessage;
 }
 
 NetworkManager::~NetworkManager ()
@@ -112,26 +112,6 @@ void ProcessGameStatusMessage (IngameActivity *ingameActivity, Urho3D::VectorBuf
     ingameActivity->SetGameStatus (static_cast <GameStatus> (messageData.ReadUInt ()));
 }
 
-void ProcessInitialInfoMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
-{
-    Urho3D::ResourceCache *resourceCache = ingameActivity->GetContext ()->GetSubsystem <Urho3D::ResourceCache> ();
-    Urho3D::String mapPath = messageData.ReadString ();
-    ingameActivity->GetScene ()->CreateChild ("PlayerSide", Urho3D::LOCAL)->LoadXML (
-            resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "PlayerSide.xml")->GetRoot ());
-
-    Urho3D::XMLElement mapXml = resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "Map.xml")->GetRoot ();
-    Urho3D::XMLElement unitsXml = mapXml.GetBool ("useDefaultUnitsTypes") ?
-            resourceCache->GetResource <Urho3D::XMLFile> (DEFAULT_UNITS_TYPES_PATH)->GetRoot () :
-            resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "UnitsTypes.xml")->GetRoot ();
-
-    ingameActivity->GetDataManager ()->LoadUnitsTypesFromXML (unitsXml);
-    ingameActivity->GetIngameUIManager ()->SetupUnitsIcons ();
-    ingameActivity->GetCameraManager ()->SetupCamera (
-            mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
-
-    ingameActivity->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
-}
-
 void ProcessNewPlayerMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
     Urho3D::String name = messageData.ReadString ();
@@ -190,5 +170,28 @@ void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuff
 void ProcessChatMessageMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
     ingameActivity->GetIngameUIManager ()->AddNewChatMessage (messageData.ReadString ());
+}
+
+void ProcessMapFilesMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+{
+    Urho3D::String mapName = messageData.ReadString ();
+    unsigned int filesCount = messageData.ReadUInt ();
+    ingameActivity->GetDataManager ()->SetMapName (mapName);
+
+    while (filesCount > 0)
+    {
+        Urho3D::String fileName = messageData.ReadString ();
+        Urho3D::PODVector <unsigned char> fileContent = messageData.ReadBuffer ();
+
+        Urho3D::String fullPath = "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName + "/" + fileName;
+        Urho3D::FileSystem *fileSystem = ingameActivity->GetContext ()->GetSubsystem <Urho3D::FileSystem> ();
+        fileSystem->CreateDir (fullPath.Substring (0, fullPath.FindLast ('/')));
+        fileSystem->Delete (fullPath);
+
+        Urho3D::File *file = new Urho3D::File (ingameActivity->GetContext (), fullPath, Urho3D::FILE_WRITE);
+        file->Write (&fileContent [0], fileContent.Size ());
+        file->Close ();
+        filesCount--;
+    }
 }
 }

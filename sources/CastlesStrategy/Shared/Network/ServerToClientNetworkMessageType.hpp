@@ -7,8 +7,6 @@ enum ServerToClientNetworkMessageType
     STCNMT_START = 100,
     // GameStatus : Int.
     STCNMT_GAME_STATUS = 100,
-    // MapPath : String.
-    STCNMT_INITIAL_INFO,
     // ID : UInt (node id).
     STCNMT_UNIT_SPAWNED,
     // UnitType : UInt, NewValue : UInt.
@@ -25,6 +23,8 @@ enum ServerToClientNetworkMessageType
     STCNMT_PLAYER_READY_CHANGED,
     // PlayerName : String.
     STCNMT_PLAYER_LEFT,
+    // MapName : String, ResourcesCount : UInt, (Name : String, Bytes : PODVector <UByte>) x ResourcesCount.
+    STCNMT_MAP_FILES,
     STCNMT_TYPES_COUNT
 };
 }

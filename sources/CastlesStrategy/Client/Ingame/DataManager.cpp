@@ -4,11 +4,13 @@
 
 #include <Utils/UniversalException.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
+#include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
 
 namespace CastlesStrategy
 {
 DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
         owner_ (owner),
+        mapName_ (),
         unitsTypes_ (),
         spawnsUnitType_ (0),
 
@@ -74,6 +76,37 @@ void DataManager::SpawnUnit (unsigned int unitType)
     predictedUnitsPull_ [unitType]--;
     owner_->GetIngameUIManager ()->CheckUIForUnitsType (unitType);
     owner_->GetNetworkManager ()->SendSpawnMessage (selectedSpawnNode_->GetComponent <Unit> ()->GetID (), unitType);
+}
+
+void DataManager::LoadMapResources ()
+{
+    Urho3D::ResourceCache *resourceCache = owner_->GetContext ()->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::String mapPath = "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_ + "/";
+    owner_->GetScene ()->CreateChild ("PlayerSide", Urho3D::LOCAL)->LoadXML (
+            resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "PlayerSide.xml")->GetRoot ());
+
+    Urho3D::XMLElement mapXml = resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "Map.xml")->GetRoot ();
+    Urho3D::XMLElement unitsXml = mapXml.GetBool ("useDefaultUnitsTypes") ?
+            resourceCache->GetResource <Urho3D::XMLFile> (DEFAULT_UNITS_TYPES_PATH)->GetRoot () :
+            resourceCache->GetResource <Urho3D::XMLFile> (mapPath + "UnitsTypes.xml")->GetRoot ();
+
+    LoadUnitsTypesFromXML (unitsXml);
+    owner_->GetIngameUIManager ()->SetupUnitsIcons ();
+    owner_->GetCameraManager ()->SetupCamera (
+            mapXml.GetVector3 ("defaultCameraPosition"), mapXml.GetQuaternion ("defaultCameraRotation"));
+
+    owner_->GetFogOfWarManager ()->SetupFogOfWarMask (DEFAULT_FOG_OF_WAR_MASK_SIZE, mapXml.GetVector2 ("size"));
+}
+
+const Urho3D::String &DataManager::GetMapName () const
+{
+    return mapName_;
+}
+
+void DataManager::SetMapName (const Urho3D::String &mapName)
+{
+    mapName_ = mapName;
+    owner_->GetIngameUIManager ()->InformMapChanged ();
 }
 
 unsigned int DataManager::GetSpawnsUnitType () const

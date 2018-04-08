@@ -1,5 +1,6 @@
 #include "IngameUIManager.hpp"
 #include <Urho3D/IO/Log.h>
+#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/Text.h>
@@ -17,6 +18,7 @@
 
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
+#include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
 #include <Utils/UIResizer.hpp>
 #include <Utils/UniversalException.hpp>
 
@@ -24,13 +26,14 @@ namespace CastlesStrategy
 {
 IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner->GetContext ()),
     owner_ (owner),
-    inputEnabled_ (true),
-
     topBar_ (nullptr),
     menu_ (nullptr),
     messageWindow_ (nullptr),
+
     chatWindow_ (nullptr),
     connectedPlayersWindow_ (nullptr),
+    selectedMapImage_ (nullptr),
+    selectMapWindow_ (nullptr),
     requestedMessages_ ()
 {
 
@@ -39,21 +42,6 @@ IngameUIManager::IngameUIManager (IngameActivity *owner) : Urho3D::Object (owner
 IngameUIManager::~IngameUIManager ()
 {
     UnsubscribeFromAllEvents ();
-}
-
-const IngameActivity *IngameUIManager::GetOwner () const
-{
-    return owner_;
-}
-
-bool IngameUIManager::IsInputEnabled () const
-{
-    return inputEnabled_;
-}
-
-void IngameUIManager::SetInputEnabled (bool inputEnabled)
-{
-    inputEnabled_ = inputEnabled;
 }
 
 void IngameUIManager::LoadUI ()
@@ -94,8 +82,11 @@ void IngameUIManager::ClearUI ()
     topBar_ = nullptr;
     menu_ = nullptr;
     messageWindow_ = nullptr;
+
     chatWindow_ = nullptr;
     connectedPlayersWindow_ = nullptr;
+    selectedMapImage_ = nullptr;
+    selectMapWindow_ = nullptr;
 }
 
 void IngameUIManager::CheckUIForUnitsType (unsigned int unitType)
@@ -254,7 +245,26 @@ void IngameUIManager::UpdatePlayersList ()
 void IngameUIManager::SwitchToPlayingState ()
 {
     connectedPlayersWindow_->SetVisible (false);
+    selectedMapImage_->SetVisible (false);
+    selectMapWindow_->SetVisible (false);
     topBar_->SetVisible (true);
+}
+
+void IngameUIManager::InformMapChanged ()
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    selectedMapImage_->SetTexture (resourceCache->GetResource <Urho3D::Texture2D> (
+            DEFAULT_MAPS_FOLDER + "/" + owner_->GetDataManager ()->GetMapName () + "/Image.png"
+    ));
+    selectedMapImage_->SetFullImageRect ();
+
+    Urho3D::File *infoFile = new Urho3D::File (context_,
+            "Data/" + DEFAULT_MAPS_FOLDER + "/" + owner_->GetDataManager ()->GetMapName () + "/Info.txt",
+            Urho3D::FILE_READ);
+
+    dynamic_cast <Urho3D::Text *> (selectMapWindow_->GetChild ("MapInfoWindow", false)->GetChild ("InfoText", false))->
+            SetText (infoFile->ReadString ());
+    infoFile->Close ();
 }
 
 void IngameUIManager::LoadElements ()
@@ -264,6 +274,9 @@ void IngameUIManager::LoadElements ()
 
     ui->GetRoot ()->AddTag ("UIResizer");
     Urho3D::XMLFile *style = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
+
+    selectedMapImage_ = dynamic_cast <Urho3D::BorderImage *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/SelectedMapImage.xml")->GetRoot (), style));
 
     topBar_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
             resourceCache->GetResource <Urho3D::XMLFile> ("UI/TopBarWindow.xml")->GetRoot (), style));
@@ -287,6 +300,7 @@ void IngameUIManager::LoadElements ()
     dynamic_cast <Urho3D::ScrollView *> (connectedPlayersWindow_->GetChild ("PlayersView", false))->
             SetContentElement (connectedPlayersWindow_->GetChild ("PlayersView", false)->GetChild ("PlayersList", false));
     connectedPlayersWindow_->GetChild ("ControlButtons", false)->GetChild ("StartGameButton", false)->SetVisible (false);
+    CreateSelectMapWindow ();
 }
 
 void IngameUIManager::ShowNextMessage ()
@@ -324,6 +338,50 @@ void IngameUIManager::AddNewUnitTypeToTopBar (const UnitType &unitType)
     CheckUIForUnitsType (unitType.GetId ());
     SubscribeToEvent (recruitButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarRecruitClicked));
     SubscribeToEvent (spawnButton, Urho3D::E_CLICKEND, URHO3D_HANDLER (IngameUIManager, HandleTopBarSpawnClicked));
+}
+
+void IngameUIManager::CreateSelectMapWindow ()
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::UI *ui = context_->GetSubsystem <Urho3D::UI> ();
+    Urho3D::FileSystem *fileSystem = context_->GetSubsystem <Urho3D::FileSystem> ();
+    Urho3D::XMLFile *style = resourceCache->GetResource <Urho3D::XMLFile> ("UI/DefaultStyle.xml");
+
+    selectMapWindow_ = dynamic_cast <Urho3D::Window *> (ui->GetRoot ()->LoadChildXML (
+            resourceCache->GetResource <Urho3D::XMLFile> ("UI/SelectMapWindow.xml")->GetRoot (), style));
+    Urho3D::ScrollView *mapsView = dynamic_cast <Urho3D::ScrollView *> (selectMapWindow_->GetChild ("MapsView", false));
+    mapsView->SetContentElement (selectMapWindow_->GetChild ("MapsView", false)->GetChild ("MapsList", false));
+
+    if (!owner_->IsAdmin ())
+    {
+        mapsView->Remove ();
+        return;
+    }
+
+    dynamic_cast <Urho3D::Text *> (selectMapWindow_->GetChild ("MapInfoWindow", false)->GetChild ("InfoText", false))->
+            SetText ("Map is not selected!");
+
+    Urho3D::Vector <Urho3D::String> mapDirs;
+    fileSystem->ScanDir (mapDirs, "Data/" + DEFAULT_MAPS_FOLDER + "/", "*", Urho3D::SCAN_DIRS, false);
+
+    for (auto &dir : mapDirs)
+    {
+        if (fileSystem->FileExists ("Data/" + DEFAULT_MAPS_FOLDER + "/" + dir + "/Map.xml"))
+        {
+            Urho3D::UIElement *listElement = mapsView->GetContentElement ()->LoadChildXML (
+                    resourceCache->GetResource <Urho3D::XMLFile> ("UI/MapsListElement.xml")->GetRoot (),
+                    mapsView->GetDefaultStyle (true)
+            );
+
+            dynamic_cast <Urho3D::Text *> (listElement->GetChild ("MapNameText", false))->SetText (dir);
+            Urho3D::Button *selectButton = dynamic_cast <Urho3D::Button *> (listElement->GetChild ("SelectButton", false));
+
+            selectButton->SetVar (BUTTON_MAP_NAME_VAR, dir);
+            SubscribeToEvent (selectButton, Urho3D::E_CLICKEND,
+                    URHO3D_HANDLER (IngameUIManager, HandleSelectMapWindowSelectClicked));
+        }
+    }
+    SendEvent (EVENT_UI_RESIZER_RECALCULATE_UI_REQUEST);
 }
 
 void IngameUIManager::SubscribeToEvents ()
@@ -451,6 +509,21 @@ void IngameUIManager::HandleDoubleClickOnMap (Urho3D::StringHash eventType, Urho
                 true
         ));
     }
+}
+
+void IngameUIManager::HandleSelectMapWindowSelectClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)
+{
+    Urho3D::Button *pressedButton = dynamic_cast <Urho3D::Button *> (eventData [Urho3D::ClickEnd::P_ELEMENT].GetPtr ());
+    Urho3D::String mapName = pressedButton->GetVar (BUTTON_MAP_NAME_VAR).GetString ();
+
+    if (mapName == owner_->GetDataManager ()->GetMapName ())
+    {
+        return;
+    }
+
+    Urho3D::VariantMap selectMapEventData;
+    selectMapEventData [RequestSelectMap::MAP_NAME] = mapName;
+    SendEvent (E_REQUEST_SELECT_MAP, selectMapEventData);
 }
 
 void IngameUIManager::HandleConnectedPlayersExitClicked (Urho3D::StringHash eventType, Urho3D::VariantMap &eventData)

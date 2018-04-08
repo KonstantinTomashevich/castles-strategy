@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<element type="BorderImage">
+	<attribute name="Name" value="SelectedMapImage" />
+	<attribute name="Size" value="1842 1051" />
+	<attribute name="Pivot" value="0 0" />
+    <attribute name="Priority" value="-100" />
+    <attribute name="Variables">
+		<variant hash="7740802" type="Float" value="0" name="VX" />
+		<variant hash="7740803" type="Float" value="0" name="VY" />
+		<variant hash="307414576" type="Float" value="1" name="VWidth" />
+		<variant hash="3464421821" type="Float" value="1" name="VHeight" />
+		<variant hash="3528339576" type="String" value="SW" name="WDep" />
+		<variant hash="409466183" type="String" value="SH" name="HDep" />
+		<variant hash="13959479" type="String" value="SH" name="XDep" />
+		<variant hash="794546678" type="String" value="SH" name="YDep" />
+	</attribute>
+	<attribute name="Tags">
+		<string value="UIResizer" />
+	</attribute>
+	<attribute name="Texture" value="Texture2D;" />
+	<attribute name="Image Rect" value="0 0 0 128" />
+</element>
