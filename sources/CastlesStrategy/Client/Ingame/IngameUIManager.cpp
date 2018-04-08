@@ -132,8 +132,36 @@ void IngameUIManager::UpdateCoins (unsigned int coins)
 void IngameUIManager::InformGameEnded (bool firstWon)
 {
     menu_->SetVisible (true);
+    Urho3D::String winnerName;
+    bool found = false;
+
+    const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &
+            playersList = owner_->GetDataManager ()->GetPlayers ();
+    auto iterator = playersList.Begin ();
+
+    while (!found && iterator != playersList.End ())
+    {
+        if (iterator->second_.playerType_ == PT_FIRST && firstWon)
+        {
+            winnerName = iterator->first_;
+            found = true;
+        }
+        else if (iterator->second_.playerType_ == PT_SECOND && !firstWon)
+        {
+            winnerName = iterator->first_;
+            found = true;
+        }
+        iterator++;
+    }
+
+    if (!found)
+    {
+        throw UniversalException <IngameUIManager> ("IngameUIManager: can not find " +
+                Urho3D::String (firstWon ? "first" : "second") + " player!");
+    }
+
     dynamic_cast <Urho3D::Text *> (
-            menu_->GetChild ("Menu", false))->SetText (Urho3D::String (firstWon ? "Blue" : "Red") + " won!");
+            menu_->GetChild ("Menu", false))->SetText (winnerName + " won!");
     menu_->GetChild ("CloseMenuButton", false)->SetVisible (false);
 }
 
