@@ -3,7 +3,8 @@
 	<attribute name="Name" value="SelectedMapImage" />
 	<attribute name="Size" value="1842 1051" />
 	<attribute name="Pivot" value="0 0" />
-	<attribute name="Variables">
+    <attribute name="Priority" value="-100" />
+    <attribute name="Variables">
 		<variant hash="7740802" type="Float" value="0" name="VX" />
 		<variant hash="7740803" type="Float" value="0" name="VY" />
 		<variant hash="307414576" type="Float" value="1" name="VWidth" />
