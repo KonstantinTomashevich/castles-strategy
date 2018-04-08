@@ -60,6 +60,7 @@ private:
 
     void HandleRequestGameStart (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
     void HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
+    void HandleRequestSelectMap (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData);
 
     bool RemoveUnidentifiedConnection (Urho3D::Connection *connection);
     Urho3D::String RemoveIdentifiedConnection (Urho3D::Connection *connection);

@@ -67,6 +67,7 @@ ServerActivity::ServerActivity (Urho3D::Context *context) : Activity (context),
 
     SubscribeToEvent (E_REQUEST_GAME_START, URHO3D_HANDLER (ServerActivity, HandleRequestGameStart));
     SubscribeToEvent (E_REQUEST_KICK_PLAYER, URHO3D_HANDLER (ServerActivity, HandleRequestKickPlayer));
+    SubscribeToEvent (E_REQUEST_SELECT_MAP, URHO3D_HANDLER (ServerActivity, HandleRequestSelectMap));
 }
 
 ServerActivity::~ServerActivity ()
@@ -414,6 +415,18 @@ void ServerActivity::HandleRequestKickPlayer (Urho3D::StringHash eventHash, Urho
     }
 }
 
+void ServerActivity::HandleRequestSelectMap (Urho3D::StringHash eventHash, Urho3D::VariantMap &eventData)
+{
+    Urho3D::String mapName = eventData [RequestSelectMap::MAP_NAME].GetString ();
+    if (!context_->GetSubsystem <Urho3D::FileSystem> ()->FileExists (
+            "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName + "/Map.xml"))
+    {
+        throw UniversalException <ServerActivity> (
+                "ServerActivity: map \"" + mapName + "\" is not exists!");
+    }
+    SetMapName (mapName);
+}
+
 bool ServerActivity::RemoveUnidentifiedConnection (Urho3D::Connection *connection)
 {
     for (auto iterator = unidentifiedConnections_.Begin (); iterator != unidentifiedConnections_.End (); iterator++)
@@ -597,14 +610,14 @@ void ServerActivity::SendPlayerTypeToAllPlayers (IdentifiedConnectionsMap::KeyVa
 void ServerActivity::CollectMapData ()
 {
     mapData_.Clear ();
-    Urho3D::Vector <Urho3D::String> mapFiles_;
+    Urho3D::Vector <Urho3D::String> mapFiles;
     context_->GetSubsystem <Urho3D::FileSystem> ()->ScanDir (
-            mapFiles_, "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_, "*", Urho3D::SCAN_FILES, true);
+            mapFiles, "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_, "*", Urho3D::SCAN_FILES, true);
 
     mapData_.WriteString (mapName_);
-    mapData_.WriteUInt (mapFiles_.Size ());
+    mapData_.WriteUInt (mapFiles.Size ());
 
-    for (auto &fileName : mapFiles_)
+    for (auto &fileName : mapFiles)
     {
         Urho3D::File *file = new Urho3D::File (context_,
                 "Data/" + DEFAULT_MAPS_FOLDER + "/" + mapName_ + "/" + fileName, Urho3D::FILE_READ);
