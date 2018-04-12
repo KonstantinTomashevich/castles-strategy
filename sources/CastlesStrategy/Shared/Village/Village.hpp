@@ -27,11 +27,15 @@ public:
     float GetWealthLevel () const;
     void SetWealthLevel (float wealthLevel);
 
+    const Urho3D::String &GetPrefabPath () const;
+    void SetPrefabPath (const Urho3D::String &prefabPath);
+
 private:
     void FixOwnership ();
     
     float radius_;
     float ownership_;
     float wealthLevel_;
+    Urho3D::String prefabPath_;
 };
 }

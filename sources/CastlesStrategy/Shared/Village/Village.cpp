@@ -8,7 +8,8 @@ namespace CastlesStrategy
 Village::Village (Urho3D::Context *context) : Urho3D::Component (context),
     radius_ (0.1f),
     ownership_ (0.0f),
-    wealthLevel_ (1.0f)
+    wealthLevel_ (1.0f),
+    prefabPath_ ()
 {
 
 }
@@ -26,6 +27,8 @@ void Village::RegisterObject (Urho3D::Context *context)
     URHO3D_ACCESSOR_ATTRIBUTE ("Radius", GetRadius, SetRadius, float, 0.1f, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Ownership", GetOwnership, SetOwnership, float, 0.0f, Urho3D::AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE ("Wealth Level", GetWealthLevel, SetWealthLevel, float, 1.0f, Urho3D::AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE ("Prefab Path", GetPrefabPath, SetPrefabPath, 
+            Urho3D::String, Urho3D::String::EMPTY, Urho3D::AM_DEFAULT);
 }
 
 void Village::UpdateOwnership (float timeStep, const UnitsManager *unitsManager)
@@ -83,6 +86,16 @@ void Village::SetWealthLevel (float wealthLevel)
         throw UniversalException <Village> ("Village: wealth level can not be zero or negative!");
     }
     wealthLevel_ = wealthLevel;
+}
+
+const Urho3D::String &Village::GetPrefabPath () const
+{
+    return prefabPath_;
+}
+
+void Village::SetPrefabPath (const Urho3D::String &prefabPath)
+{
+    prefabPath_ = prefabPath;
 }
 
 void Village::FixOwnership ()
