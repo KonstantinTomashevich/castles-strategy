@@ -21,6 +21,8 @@ VillagesManager::~VillagesManager ()
 void VillagesManager::HandleUpdate (float timeStep)
 {
     UpdateVillagesOwnerships (timeStep);
+    timeUntilTaxes_ -= timeStep;
+
     if (timeUntilTaxes_ <= 0.0f)
     {
         ProcessTaxes ();
@@ -158,7 +160,7 @@ void VillagesManager::ProcessTaxes ()
     Player &secondPlayer = playersManager->GetSecondPlayer ();
 
     firstPlayer.SetCoins (firstPlayer.GetCoins () + firstPlayerCoins);
-    secondPlayer.SetCoins (secondPlayer.GetCoins () + firstPlayerCoins);
+    secondPlayer.SetCoins (secondPlayer.GetCoins () + secondPlayerCoins);
     timeUntilTaxes_ = DEFAULT_TAXES_DELAY;
 }
 }
