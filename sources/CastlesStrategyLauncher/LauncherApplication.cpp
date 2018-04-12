@@ -13,6 +13,7 @@
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Server/Activity/ServerActivity.hpp>
 #include <CastlesStrategy/Shared/ActivitiesControlEvents.hpp>
+#include <CastlesStrategy/Shared/Village/Village.hpp>
 #include <Utils/UniversalException.hpp>
 
 URHO3D_DEFINE_APPLICATION_MAIN (LauncherApplication)
@@ -58,6 +59,8 @@ void LauncherApplication::Start ()
     ActivitiesApplication::Start ();
     UIResizer::RegisterObject (context_);
     CastlesStrategy::Unit::RegisterObject (context_);
+    CastlesStrategy::Village::RegisterObject (context_);
+    
     Urho3D::Script *script = new Urho3D::Script (context_);
     context_->RegisterSubsystem (script);
 
