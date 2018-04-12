@@ -38,15 +38,7 @@ void Village::UpdateOwnership (float timeStep, const UnitsManager *unitsManager)
     {
         ownership_ += unit->GetHp () * timeStep * (unit->IsBelongsToFirst () ? 1.0f : -1.0f);
     }
-    
-    if (ownership_ > MAX_OWNERSHIP_POINTS)
-    {
-        ownership_ = MAX_OWNERSHIP_POINTS;
-    }
-    else if (ownership_ < -MAX_OWNERSHIP_POINTS)
-    {
-        ownership_ = -MAX_OWNERSHIP_POINTS;
-    }
+    FixOwnership ();
 }
 
 unsigned int Village::TakeCoins (float timeStep) const
@@ -76,6 +68,7 @@ float Village::GetOwnership () const
 void Village::SetOwnership (float ownership)
 {
     ownership_ = ownership;
+    FixOwnership ();
 }
 
 float Village::GetWealthLevel () const
@@ -90,5 +83,17 @@ void Village::SetWealthLevel (float wealthLevel)
         throw UniversalException <Village> ("Village: wealth level can not be zero or negative!");
     }
     wealthLevel_ = wealthLevel;
+}
+
+void Village::FixOwnership ()
+{
+    if (ownership_ > MAX_OWNERSHIP_POINTS)
+    {
+        ownership_ = MAX_OWNERSHIP_POINTS;
+    }
+    else if (ownership_ < -MAX_OWNERSHIP_POINTS)
+    {
+        ownership_ = -MAX_OWNERSHIP_POINTS;
+    }
 }
 }

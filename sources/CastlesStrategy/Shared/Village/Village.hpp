@@ -28,6 +28,8 @@ public:
     void SetWealthLevel (float wealthLevel);
 
 private:
+    void FixOwnership ();
+    
     float radius_;
     float ownership_;
     float wealthLevel_;
