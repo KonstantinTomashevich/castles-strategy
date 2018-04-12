@@ -15,6 +15,7 @@
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
+#include <CastlesStrategy/Server/Managers/VillagesManager.hpp>
 #include <CastlesStrategy/Server/Activity/IncomingNetworkMessageProcessors.hpp>
 
 #include <CastlesStrategy/Shared/Network/ClientToServerNetworkMessageType.hpp>
@@ -306,8 +307,9 @@ void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D:
     if (scene == scene_)
     {
         Urho3D::Node *node = static_cast <Urho3D::Node *> (eventData [Urho3D::ComponentAdded::P_NODE].GetVoidPtr ());
+        Urho3D::RefCounted *component = eventData [Urho3D::ComponentAdded::P_COMPONENT].GetPtr ();
 
-        if (dynamic_cast <Unit *> (eventData [Urho3D::ComponentAdded::P_COMPONENT].GetPtr ()) != nullptr)
+        if (dynamic_cast <Unit *> (component) != nullptr || dynamic_cast <Village *> (component) != nullptr)
         {
             Urho3D::Network *network = context_->GetSubsystem <Urho3D::Network> ();
             Urho3D::VectorBuffer messageData;
@@ -315,7 +317,7 @@ void ServerActivity::HandleComponentAdded (Urho3D::StringHash eventHash, Urho3D:
 
             for (auto &connectionData : identifiedConnections_)
             {
-                connectionData.second_.connection_->SendMessage (STCNMT_UNIT_SPAWNED, true, false, messageData);
+                connectionData.second_.connection_->SendMessage (STCNMT_OBJECT_SPAWNED, true, false, messageData);
             }
         }
     }
@@ -495,6 +497,7 @@ void ServerActivity::LoadResources (unsigned int &startCoins)
     LoadScene (mapFolder);
     LoadMap (mapFolder, startCoins, useDefaultUnitsTypes);
     LoadUnitsTypesAndSpawns (mapFolder, useDefaultUnitsTypes);
+    LoadVillages (mapFolder);
 }
 
 void ServerActivity::LoadScene (const Urho3D::String &mapFolder)
@@ -547,6 +550,14 @@ void ServerActivity::LoadUnitsTypesAndSpawns (const Urho3D::String &mapFolder, b
 
     unitsManager->LoadUnitsTypesFromXML (unitsTypesXMLFile->GetRoot ());
     unitsManager->LoadSpawnsFromXML (resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml")->GetRoot ());
+}
+
+void ServerActivity::LoadVillages (const Urho3D::String &mapFolder)
+{
+    Urho3D::ResourceCache *resourceCache = context_->GetSubsystem <Urho3D::ResourceCache> ();
+    VillagesManager *villagesManager = dynamic_cast <VillagesManager *> (managersHub_->GetManager (MI_VILLAGES_MANAGER));
+    villagesManager->LoadVillagesFromXML (
+            resourceCache->GetResource <Urho3D::XMLFile> (mapFolder + "Map.xml")->GetRoot ());
 }
 
 void ServerActivity::SetupPlayers (unsigned int startCoins)
