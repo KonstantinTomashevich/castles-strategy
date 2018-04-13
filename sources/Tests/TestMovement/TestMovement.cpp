@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     Urho3D::SharedPtr <Urho3D::Engine> engine (new Urho3D::Engine(context));
 
     context->GetSubsystem <Urho3D::Log> ()->SetLevel (Urho3D::LOG_DEBUG);
-    context->RegisterFactory <CastlesStrategy::Unit> ();
+    CastlesStrategy::Unit::RegisterObject (context);
 
     SetupEngine (engine);
     Urho3D::SharedPtr <Urho3D::Scene> scene (SetupScene (context));

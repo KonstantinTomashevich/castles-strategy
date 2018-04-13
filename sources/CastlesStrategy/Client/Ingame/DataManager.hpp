@@ -27,7 +27,7 @@ public:
     virtual ~DataManager ();
 
     void Update (float timeStep);
-    void AddPrefabToUnit (unsigned int nodeID);
+    void AddPrefabToObject (unsigned int nodeID);
     void RecruitUnit (unsigned int unitType);
     void SpawnUnit (unsigned int unitType);
     void LoadMapResources ();
@@ -69,7 +69,7 @@ private:
     unsigned int spawnsUnitType_;
     std::vector <UnitType> unitsTypes_;
 
-    Urho3D::HashSet <unsigned int> unitNodesToAddPrefabs_;
+    Urho3D::HashSet <unsigned int> objectsNodesToAddPrefabs_;
     Urho3D::PODVector <unsigned int> predictedUnitsPull_;
     unsigned int predictedCoins_;
     Urho3D::Node *selectedSpawnNode_;

@@ -5,6 +5,7 @@
 #include <Utils/UniversalException.hpp>
 #include <CastlesStrategy/Client/Ingame/IngameActivity.hpp>
 #include <CastlesStrategy/Shared/Network/ServerConstants.hpp>
+#include <CastlesStrategy/Shared/Village/Village.hpp>
 
 namespace CastlesStrategy
 {
@@ -14,7 +15,7 @@ DataManager::DataManager (IngameActivity *owner) : Urho3D::Object (owner->GetCon
         unitsTypes_ (),
         spawnsUnitType_ (0),
 
-        unitNodesToAddPrefabs_ (),
+        objectsNodesToAddPrefabs_ (),
         predictedUnitsPull_ (),
         predictedCoins_ (0),
         selectedSpawnNode_ (nullptr),
@@ -37,9 +38,9 @@ void DataManager::Update (float timeStep)
     PredictOrders (timeStep);
 }
 
-void DataManager::AddPrefabToUnit (unsigned int nodeID)
+void DataManager::AddPrefabToObject (unsigned int nodeID)
 {
-    unitNodesToAddPrefabs_.Insert (nodeID);
+    objectsNodesToAddPrefabs_.Insert (nodeID);
 }
 
 void DataManager::RecruitUnit (unsigned int unitType)
@@ -315,28 +316,41 @@ const Urho3D::HashMap <Urho3D::String, DataManager::PlayerData> &DataManager::Ge
 
 void DataManager::AttemptToAddPrefabs ()
 {
-    auto iterator = unitNodesToAddPrefabs_.Begin ();
-    while (iterator != unitNodesToAddPrefabs_.End ())
+    auto iterator = objectsNodesToAddPrefabs_.Begin ();
+    while (iterator != objectsNodesToAddPrefabs_.End ())
     {
         Urho3D::Node *node = owner_->GetScene ()->GetNode (*iterator);
         if (node != nullptr)
         {
             Unit *unit = node->GetComponent <Unit> ();
-            if (unit != nullptr)
+            Village *village = node->GetComponent <Village> ();
+
+            if (unit != nullptr || village != nullptr)
             {
                 Urho3D::Node *prefab = node->CreateChild ("Prefab", Urho3D::LOCAL);
-                const UnitType &unitType = GetUnitTypeByIndex (unit->GetUnitType ());
+                Urho3D::String prefabPath;
+
+                if (unit != nullptr)
+                {
+                    const UnitType &unitType = GetUnitTypeByIndex (unit->GetUnitType ());
+                    prefabPath = unitType.GetPrefabPath ();
+                }
+                else
+                {
+                    prefabPath = village->GetPrefabPath ();
+                }
+
                 Urho3D::XMLFile *prefabFile = context_->GetSubsystem <Urho3D::ResourceCache> ()->
-                        GetResource <Urho3D::XMLFile> (unitType.GetPrefabPath ());
+                        GetResource <Urho3D::XMLFile> (prefabPath);
 
                 if (prefabFile == nullptr || prefabFile->GetRoot ().IsNull ())
                 {
                     throw UniversalException <DataManager> ("DataManager: requested prefab \"" +
-                            unitType.GetPrefabPath () + "\" is not exists or is empty!");
+                            prefabPath + "\" is not exists or is empty!");
                 }
 
                 prefab->LoadXML (prefabFile->GetRoot ());
-                iterator = unitNodesToAddPrefabs_.Erase (iterator);
+                iterator = objectsNodesToAddPrefabs_.Erase (iterator);
                 continue;
             }
         }

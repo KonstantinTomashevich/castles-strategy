@@ -64,6 +64,8 @@ void Map::SaveRoutesToXML (Urho3D::XMLElement &output) const
 void Map::LoadRoutesFromXML (const Urho3D::XMLElement &input)
 {
     Urho3D::XMLElement element = input.GetChild ("route");
+    routes_.clear ();
+
     while (element.NotNull ())
     {
         routes_.push_back (Route::LoadFromXML (element));

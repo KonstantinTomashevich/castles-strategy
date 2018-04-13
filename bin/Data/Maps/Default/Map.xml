@@ -22,4 +22,53 @@
 
     <spawn position="30 10" belongsToFirst="true" route="1" />
     <spawn position="20 90" belongsToFirst="false" route="1" />
+
+    <village type="Village" position="5 0 20">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="10" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
+
+    <village type="Village" position="45 0 20">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="10" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
+
+    <village type="Village" position="25 0 40">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="10" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
+
+    <village type="Village" position="25 0 60">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="10" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
+
+
+    <village type="Village" position="5 0 80">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="10" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
+
+    <village type="Village" position="45 0 80">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="20" />
+        <attribute name="Ownership" value="0" />
+        <attribute name="Wealth Level" value="1" />
+        <attribute name="Prefab Path" value="DefaultUnits/VillagePrefab.xml" />
+    </village>
 </map>

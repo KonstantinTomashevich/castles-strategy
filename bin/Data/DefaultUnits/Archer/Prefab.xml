@@ -9,7 +9,7 @@
 	<attribute name="Variables" />
 	<component type="ScriptInstance" id="16777228">
 		<attribute name="Delayed Method Calls" value="0" />
-		<attribute name="Script File" value="ScriptFile;DefaultUnits/Scripts/PrefabUpdater.as" />
+		<attribute name="Script File" value="ScriptFile;DefaultUnits/Scripts/UnitPrefabUpdater.as" />
 		<attribute name="Class Name" value="PrefabUpdater" />
 	</component>
 	<node id="16777218">

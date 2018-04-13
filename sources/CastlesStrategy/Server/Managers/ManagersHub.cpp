@@ -2,6 +2,7 @@
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
 #include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
+#include <CastlesStrategy/Server/Managers/VillagesManager.hpp>
 #include <Utils/UniversalException.hpp>
 
 namespace CastlesStrategy
@@ -13,6 +14,7 @@ ManagersHub::ManagersHub (Urho3D::Scene *scene) :
     managers_ [MI_UNITS_MANAGER] = new UnitsManager (this);
     managers_ [MI_MAP] = new Map (this);
     managers_ [MI_PLAYERS_MANAGER] = new PlayersManager (this);
+    managers_ [MI_VILLAGES_MANAGER] = new VillagesManager (this);
 }
 
 ManagersHub::~ManagersHub ()

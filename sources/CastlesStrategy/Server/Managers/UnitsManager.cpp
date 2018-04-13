@@ -126,6 +126,22 @@ const Unit *UnitsManager::GetNearestEnemy (Unit *unit) const
     return nearestEnemy;
 }
 
+Urho3D::PODVector <const Unit *> UnitsManager::GetUnitsNear (Urho3D::Vector2 position, float radius) const
+{
+    Urho3D::PODVector <const Unit *> unitsNear;
+    for (Unit *unit : units_)
+    {
+        Urho3D::Vector3 unitPosition3D = unit->GetNode ()->GetPosition ();
+        Urho3D::Vector2 unitPosition = {unitPosition3D.x_, unitPosition3D.z_};
+
+        if ((unitPosition - position).Length () <= radius)
+        {
+            unitsNear.Push (unit);
+        }
+    }
+    return unitsNear;
+}
+
 void UnitsManager::HandleUpdate (float timeStep)
 {
     ProcessUnits (timeStep);

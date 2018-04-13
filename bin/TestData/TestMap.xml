@@ -21,4 +21,25 @@
 
     <spawn position="60 8" belongsToFirst="true" route="1" />
     <spawn position="40 92" belongsToFirst="false" route="1" />
+
+    <village type="Village" position="50 0 50">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="20" />
+        <attribute name="Ownership" value="1000" />
+        <attribute name="Wealth Level" value="1" />
+    </village>
+
+    <village type="Village" position="50 0 50">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="20" />
+        <attribute name="Ownership" value="1000" />
+        <attribute name="Wealth Level" value="1" />
+    </village>
+
+    <village type="Village" position="50 0 50">
+        <attribute name="Is Enabled" value="true" />
+        <attribute name="Radius" value="20" />
+        <attribute name="Ownership" value="-1000" />
+        <attribute name="Wealth Level" value="3" />
+    </village>
 </map>

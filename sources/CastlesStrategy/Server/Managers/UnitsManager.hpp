@@ -29,6 +29,7 @@ public:
     const Unit *GetUnit (unsigned int id) const;
     Unit *GetUnit (unsigned int id);
     const Unit *GetNearestEnemy (Unit *unit) const;
+    Urho3D::PODVector <const Unit *> GetUnitsNear (Urho3D::Vector2 position, float radius) const;
 
     virtual void HandleUpdate (float timeStep);
     unsigned int GetUnitsTypesCount () const;

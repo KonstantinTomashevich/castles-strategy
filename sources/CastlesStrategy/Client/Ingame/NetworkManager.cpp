@@ -19,7 +19,7 @@ void ProcessPlayerTypeChangedMessage (IngameActivity *ingameActivity, Urho3D::Ve
 void ProcessPlayerReadyChangedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 
-void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
+void ProcessObjectSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessCoinsSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
 void ProcessChatMessageMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData);
@@ -36,7 +36,7 @@ NetworkManager::NetworkManager (IngameActivity *owner) : Urho3D::Object (owner->
     incomingMessagesProcessors_ [STCNMT_PLAYER_READY_CHANGED - STCNMT_START] = ProcessPlayerReadyChangedMessage;
     incomingMessagesProcessors_ [STCNMT_PLAYER_LEFT - STCNMT_START] = ProcessPlayerLeftMessage;
 
-    incomingMessagesProcessors_ [STCNMT_UNIT_SPAWNED - STCNMT_START] = ProcessUnitSpawnedMessage;
+    incomingMessagesProcessors_ [STCNMT_OBJECT_SPAWNED - STCNMT_START] = ProcessObjectSpawnedMessage;
     incomingMessagesProcessors_ [STCNMT_UNITS_PULL_SYNC - STCNMT_START] = ProcessUnitsPullSyncMessage;
     incomingMessagesProcessors_ [STCNMT_COINS_SYNC - STCNMT_START] = ProcessCoinsSyncMessage;
     incomingMessagesProcessors_ [STCNMT_CHAT_MESSAGE - STCNMT_START] = ProcessChatMessageMessage;
@@ -150,9 +150,9 @@ void ProcessPlayerLeftMessage (IngameActivity *ingameActivity, Urho3D::VectorBuf
     ingameActivity->GetDataManager ()->RemovePlayer (name);
 }
 
-void ProcessUnitSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
+void ProcessObjectSpawnedMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)
 {
-    ingameActivity->GetDataManager ()->AddPrefabToUnit (messageData.ReadUInt ());
+    ingameActivity->GetDataManager ()->AddPrefabToObject (messageData.ReadUInt ());
 }
 
 void ProcessUnitsPullSyncMessage (IngameActivity *ingameActivity, Urho3D::VectorBuffer &messageData)

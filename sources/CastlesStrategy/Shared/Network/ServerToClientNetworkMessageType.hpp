@@ -8,7 +8,7 @@ enum ServerToClientNetworkMessageType
     // GameStatus : Int.
     STCNMT_GAME_STATUS = 100,
     // ID : UInt (node id).
-    STCNMT_UNIT_SPAWNED,
+    STCNMT_OBJECT_SPAWNED,
     // UnitType : UInt, NewValue : UInt.
     STCNMT_UNITS_PULL_SYNC,
     // NewValue : UInt.

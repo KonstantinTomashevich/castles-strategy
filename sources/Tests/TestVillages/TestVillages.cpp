@@ -17,9 +17,11 @@
 #include <Utils/UniversalException.hpp>
 #include <CastlesStrategy/Shared/Unit/Unit.hpp>
 #include <CastlesStrategy/Shared/Unit/UnitType.hpp>
-#include <CastlesStrategy/Server/Player/Player.hpp>
+#include <CastlesStrategy/Shared/Village/Village.hpp>
 
+#include <CastlesStrategy/Server/Managers/VillagesManager.hpp>
 #include <CastlesStrategy/Server/Managers/UnitsManager.hpp>
+#include <CastlesStrategy/Server/Managers/PlayersManager.hpp>
 #include <CastlesStrategy/Server/Managers/Map.hpp>
 #include <CastlesStrategy/Server/Managers/ManagersHub.hpp>
 
@@ -29,6 +31,7 @@ Urho3D::Scene *SetupScene (Urho3D::Context *context);
 
 void SetupUnitsManager (CastlesStrategy::UnitsManager *unitsManager, Urho3D::Context *context);
 void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context);
+void SetupVillagesManager (CastlesStrategy::VillagesManager *villagesManager, Urho3D::Context *context);
 
 int main (int argc, char **argv)
 {
@@ -38,6 +41,7 @@ int main (int argc, char **argv)
 
     context->GetSubsystem <Urho3D::Log> ()->SetLevel (Urho3D::LOG_DEBUG);
     CastlesStrategy::Unit::RegisterObject (context);
+    CastlesStrategy::Village::RegisterObject (context);
 
     SetupEngine (engine);
     Urho3D::SharedPtr <Urho3D::Scene> scene (SetupScene (context));
@@ -50,79 +54,51 @@ int main (int argc, char **argv)
             dynamic_cast <CastlesStrategy::UnitsManager *> (managersHub.GetManager (CastlesStrategy::MI_UNITS_MANAGER));
     SetupUnitsManager (unitsManager, context);
 
-    const unsigned UNIT_TYPE = 1;
-    const CastlesStrategy::UnitType &unitType = unitsManager->GetUnitType (UNIT_TYPE);
-    CastlesStrategy::Player player (&managersHub);
+    CastlesStrategy::PlayersManager *playersManager =
+            dynamic_cast <CastlesStrategy::PlayersManager *> (managersHub.GetManager (CastlesStrategy::MI_PLAYERS_MANAGER));
+    playersManager->SetFirstPlayer (CastlesStrategy::Player (&managersHub));
+    playersManager->SetSecondPlayer (CastlesStrategy::Player (&managersHub));
 
-    bool firstTestPassed = false;
-    try
-    {
-        player.AddOrder (UNIT_TYPE);
-    }
-    catch (...)
-    {
-        firstTestPassed = true;
-    }
+    CastlesStrategy::VillagesManager *villagesManager =
+            dynamic_cast <CastlesStrategy::VillagesManager *> (managersHub.GetManager (CastlesStrategy::MI_VILLAGES_MANAGER));
+    SetupVillagesManager (villagesManager, context);
 
-    if (!firstTestPassed)
-    {
-        URHO3D_LOGERROR ("Test 1: expected exception in AddOrder when not enough coins!");
-        return 1;
-    }
-
-    const int UNITS_ORDERED = 4;
+    const float MAX_TIME = 2.1f;
     const float TIME_STEP = 1.0f / 60.0f;
     float elapsedTime = 0.0f;
 
-    float maxTime = unitType.GetRecruitmentTime () * (UNITS_ORDERED - 1);
-    player.SetCoins (unitType.GetRecruitmentCost () * UNITS_ORDERED);
-
-    for (unsigned index = 0; index < UNITS_ORDERED; index++)
+    while (elapsedTime < MAX_TIME)
     {
-        player.AddOrder (UNIT_TYPE);
-    }
-
-    if (player.GetOrders ().Size () != UNITS_ORDERED)
-    {
-        URHO3D_LOGERROR ("Test 2: " + Urho3D::String (UNITS_ORDERED) + " units ordered, " +
-            " but there is only " + Urho3D::String (player.GetOrders ().Size ()) + " units in orders!");
-        return 2;
-    }
-
-    bool removeCalled = false;
-    while (elapsedTime < maxTime + TIME_STEP)
-    {
-        player.HandleUpdate (TIME_STEP);
-        if (elapsedTime >= maxTime / 2.0f && !removeCalled)
-        {
-            player.RemoveOrder (UNIT_TYPE);
-            removeCalled = true;
-        }
+        managersHub.HandleUpdate (TIME_STEP);
+        scene->Update (TIME_STEP);
         elapsedTime += TIME_STEP;
     }
 
-    if (player.GetUnitsPullCount (UNIT_TYPE) != UNITS_ORDERED - 1)
+    URHO3D_LOGINFO ("Result first player coins: " + Urho3D::String (playersManager->GetFirstPlayer ().GetCoins ()));
+    URHO3D_LOGINFO ("Result second player coins: " + Urho3D::String (playersManager->GetSecondPlayer ().GetCoins ()));
+
+    unsigned int firstCoinsExpected = static_cast <unsigned int> (
+            trunc (MAX_TIME / CastlesStrategy::DEFAULT_TAXES_DELAY) * 2000 * CastlesStrategy::OWNERSHIP_TO_MONEY_PER_SECOND);
+
+    unsigned int secondCoinsExpected = static_cast <unsigned int> (
+            trunc (MAX_TIME / CastlesStrategy::DEFAULT_TAXES_DELAY) * 3000 * CastlesStrategy::OWNERSHIP_TO_MONEY_PER_SECOND);
+
+    if (playersManager->GetFirstPlayer ().GetCoins () != firstCoinsExpected)
     {
-        URHO3D_LOGERROR ("Test 3: expected " + Urho3D::String (UNITS_ORDERED - 1) + " units in pool, " +
-                         "but there is " + Urho3D::String (player.GetUnitsPullCount (0)) + " units in pool!");
-        return 3;
+        URHO3D_LOGERROR ("First player coins expectancy is " + Urho3D::String (firstCoinsExpected) + "!");
+        return 1;
     }
 
-    if (player.GetCoins () != unitType.GetRecruitmentCost ())
+    else if (playersManager->GetSecondPlayer ().GetCoins () != secondCoinsExpected)
     {
-        URHO3D_LOGERROR ("Test 4: expected " + Urho3D::String (unitType.GetRecruitmentCost ()) + " coins, " +
-                         "but got " + Urho3D::String (player.GetCoins ()) + " coins!");
-        return 4;
+        URHO3D_LOGERROR ("Second player coins expectancy is " + Urho3D::String (secondCoinsExpected) + "!");
+        return 1;
     }
 
-    player.TakeUnitFromPull (UNIT_TYPE);
-    if (player.GetUnitsPullCount (UNIT_TYPE) != UNITS_ORDERED - 2)
+    else
     {
-        URHO3D_LOGERROR ("Test 5: expected " + Urho3D::String (UNITS_ORDERED - 2) + " units in pool, " +
-                         "but there is " + Urho3D::String (player.GetUnitsPullCount (0)) + " units in pool!");
-        return 3;
+        return 0;
     }
-    return 0;
 }
 
 void CustomTerminate ()
@@ -144,7 +120,7 @@ void SetupEngine (Urho3D::Engine *engine)
     Urho3D::VariantMap engineParameters;
     engineParameters [Urho3D::EP_HEADLESS] = true;
     engineParameters [Urho3D::EP_WORKER_THREADS] = false;
-    engineParameters [Urho3D::EP_LOG_NAME] = "TestPlayerOrders.log";
+    engineParameters [Urho3D::EP_LOG_NAME] = "TestVillages.log";
 
     engineParameters [Urho3D::EP_RESOURCE_PREFIX_PATHS] = "..;.";
     engineParameters [Urho3D::EP_RESOURCE_PATHS] = "CoreData;TestData;Data";
@@ -174,6 +150,7 @@ void SetupUnitsManager (CastlesStrategy::UnitsManager *unitsManager, Urho3D::Con
 {
     Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
     unitsManager->LoadUnitsTypesFromXML (cache->GetResource <Urho3D::XMLFile> ("TestUnitTypes.xml")->GetRoot ());
+    unitsManager->LoadSpawnsFromXML (cache->GetResource <Urho3D::XMLFile> ("TestMap.xml")->GetRoot ());
 }
 
 void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context)
@@ -183,4 +160,11 @@ void SetupMap (CastlesStrategy::Map *map, Urho3D::Context *context)
 
     map->SetSize (xml.GetIntVector2 ("size"));
     map->LoadRoutesFromXML (xml);
+}
+
+void SetupVillagesManager (CastlesStrategy::VillagesManager *villagesManager, Urho3D::Context *context)
+{
+    Urho3D::ResourceCache *cache = context->GetSubsystem <Urho3D::ResourceCache> ();
+    Urho3D::XMLElement xml = cache->GetResource <Urho3D::XMLFile> ("TestMap.xml")->GetRoot ();
+    villagesManager->LoadVillagesFromXML (xml);
 }
