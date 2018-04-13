@@ -42,7 +42,7 @@
 	</node>
     <component type="ScriptInstance" id="16777270">
         <attribute name="Delayed Method Calls" value="0" />
-        <attribute name="Script File" value="ScriptFile;DefaultUnits/Scripts/PrefabUpdater.as" />
+        <attribute name="Script File" value="ScriptFile;DefaultUnits/Scripts/UnitPrefabUpdater.as" />
         <attribute name="Class Name" value="PrefabUpdater" />
     </component>
 </node>
