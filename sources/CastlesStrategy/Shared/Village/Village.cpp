@@ -41,7 +41,9 @@ void Village::UpdateOwnership (float timeStep, const UnitsManager *unitsManager)
     {
         ownership_ += unit->GetHp () * timeStep * (unit->IsBelongsToFirst () ? 1.0f : -1.0f);
     }
+
     FixOwnership ();
+    MarkNetworkUpdate ();
 }
 
 unsigned int Village::TakeCoins (float timeStep) const
@@ -60,7 +62,9 @@ void Village::SetRadius (float radius)
     {
         throw UniversalException <Village> ("Village: radius can not be zero or negative!");
     }
+
     radius_ = radius;
+    MarkNetworkUpdate ();
 }
 
 float Village::GetOwnership () const
@@ -72,6 +76,7 @@ void Village::SetOwnership (float ownership)
 {
     ownership_ = ownership;
     FixOwnership ();
+    MarkNetworkUpdate ();
 }
 
 float Village::GetWealthLevel () const
@@ -85,7 +90,9 @@ void Village::SetWealthLevel (float wealthLevel)
     {
         throw UniversalException <Village> ("Village: wealth level can not be zero or negative!");
     }
+
     wealthLevel_ = wealthLevel;
+    MarkNetworkUpdate ();
 }
 
 const Urho3D::String &Village::GetPrefabPath () const
@@ -96,6 +103,7 @@ const Urho3D::String &Village::GetPrefabPath () const
 void Village::SetPrefabPath (const Urho3D::String &prefabPath)
 {
     prefabPath_ = prefabPath;
+    MarkNetworkUpdate ();
 }
 
 void Village::FixOwnership ()
