@@ -18,3 +18,8 @@ Step 5. Build and run tests.
 ```bash
 make && make test
 ```
+
+## Controls
+* WASD -- move camera.
+* Click on tower to select it.
+* Recruit and spawn units via top bar.
